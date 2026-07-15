@@ -1,0 +1,54 @@
+# Enforces the hexagonal-light layering: Core is pure, adapters live at the edges.
+# @see https://deptrac.github.io/deptrac/
+
+deptrac:
+  paths:
+    - ./src
+  layers:
+    # The pure pipeline: ports (the Filesystem interface) and value objects. Must not touch any framework.
+    - name: Core
+      collectors:
+        - type: directory
+          value: src/Core/.*
+        - type: classNameRegex
+          value: '#^AlleKnalle\\StandardsSync\\Core\\#'
+    # Driven adapters: the Symfony-backed Filesystem implementation of the Core port.
+    - name: Infrastructure
+      collectors:
+        - type: directory
+          value: src/Infrastructure/.*
+        - type: classNameRegex
+          value: '#^AlleKnalle\\StandardsSync\\Infrastructure\\#'
+    # Driving adapters: the console delivery mechanism and its drift report.
+    - name: Presentation
+      collectors:
+        - type: directory
+          value: src/Presentation/.*
+        - type: classNameRegex
+          value: '#^AlleKnalle\\StandardsSync\\Presentation\\#'
+    # Shipped test scaffolding: the framework-neutral SyncTester org packages use to test their own config.
+    - name: Testing
+      collectors:
+        - type: directory
+          value: src/Testing/.*
+        - type: classNameRegex
+          value: '#^AlleKnalle\\StandardsSync\\Testing\\#'
+    # Any class outside our own namespace, i.e. every third-party dependency (Symfony today); keeps Core provably free of vendor code.
+    - name: Vendor
+      collectors:
+        - type: classNameRegex
+          value: '#^(?!AlleKnalle\\StandardsSync\\)[^\\]+\\#'
+  ruleset:
+    Core: ~
+    Infrastructure:
+      - Core
+      - Vendor
+    Presentation:
+      - Core
+      - Infrastructure
+      - Vendor
+    Testing:
+      - Core
+      - Infrastructure
+      - Vendor
+    Vendor: ~

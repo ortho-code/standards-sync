@@ -1,0 +1,57 @@
+{
+  "name": "alleknalle/standards-sync",
+  "description": "Keeps shared config files in sync across repositories",
+  "type": "library",
+  "license": "MIT",
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "require": {
+    "php": "^8.5",
+    "ext-ctype": "*",
+    "ext-dom": "*",
+    "ext-iconv": "*",
+    "symfony/console": "^8.1",
+    "symfony/filesystem": "^8.1"
+  },
+  "require-dev": {
+    "deptrac/deptrac": "^4",
+    "phpunit/phpunit": "^13"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": {
+      "*": "dist"
+    },
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "AlleKnalle\\StandardsSync\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\AlleKnalle\\StandardsSync\\": "tests/"
+    }
+  },
+  "scripts": {
+    "app-run-tests": [
+      "vendor/bin/phpunit"
+    ],
+    "app-run-tests-unit": [
+      "vendor/bin/phpunit --testsuite unit"
+    ],
+    "app-run-tests-integration": [
+      "vendor/bin/phpunit --testsuite integration"
+    ],
+    "app-run-tests-scenario": [
+      "vendor/bin/phpunit --testsuite scenario"
+    ],
+    "deptrac": [
+      "vendor/bin/deptrac --no-cache --fail-on-uncovered"
+    ]
+  },
+  "bin" : [
+    "bin/standards-sync"
+  ]
+}

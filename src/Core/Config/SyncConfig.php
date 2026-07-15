@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+namespace AlleKnalle\StandardsSync\Core\Config;
+
+use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use AlleKnalle\StandardsSync\Core\RuleSet\RuleSetInterface;
+
+/** Immutable configuration returned by a standards-sync.php: which roots to sync and which rule sets apply. */
+final readonly class SyncConfig
+{
+    /**
+     * @param list<Path> $roots
+     * @param list<RuleSetInterface> $ruleSets
+     */
+    private function __construct(
+        private array $roots,
+        private array $ruleSets,
+    ) {
+    }
+
+    public static function create(): self
+    {
+        return new self([Path::fromString('.')], []);
+    }
+
+    /** @param list<string> $roots */
+    public function withRoots(array $roots): self
+    {
+        return new self(
+            array_map(static fn (string $root): Path => Path::fromString($root), $roots),
+            $this->ruleSets,
+        );
+    }
+
+    public function withRuleSet(RuleSetInterface $ruleSet): self
+    {
+        return new self($this->roots, [...$this->ruleSets, $ruleSet]);
+    }
+
+    /** @return list<Path> */
+    public function roots(): array
+    {
+        return $this->roots;
+    }
+
+    /** @return list<RuleSetInterface> */
+    public function ruleSets(): array
+    {
+        return $this->ruleSets;
+    }
+}

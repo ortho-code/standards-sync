@@ -1,0 +1,7 @@
+# >>> ci (managed) >>>
+/build/
+# <<< ci <<<
+
+# >>> framework (managed) >>>
+/vendor/
+# <<< framework <<<

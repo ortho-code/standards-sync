@@ -1,0 +1,14 @@
+/.idea
+/standards-sync.php
+/composer.lock
+.DS_Store
+
+/var/
+/vendor/
+/.deptrac.cache
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+.phpunit.result.cache
+###< phpunit/phpunit ###
