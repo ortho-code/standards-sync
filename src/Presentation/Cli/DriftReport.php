@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace AlleKnalle\StandardsSync\Presentation\Cli;
 
+use AlleKnalle\StandardsSync\Core\Plan\Change;
 use AlleKnalle\StandardsSync\Core\Plan\ChangeKind;
 use AlleKnalle\StandardsSync\Core\Plan\Plan;
+use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
+use AlleKnalle\StandardsSync\Core\Rule\Rule;
+use ReflectionClass;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/** Renders a Plan for humans: one line per drifting file plus a summary, or a clean-state notice. */
+/** Renders a Plan for humans: each drifting file with the rules that drifted, plus a summary, or a clean-state notice. */
 final readonly class DriftReport
 {
     public function render(Plan $plan, SymfonyStyle $style): void
@@ -21,13 +25,29 @@ final readonly class DriftReport
             return;
         }
 
-        $lines = [];
         foreach ($drift as $change) {
-            $lines[] = sprintf('%s %s', $this->verb($change->kind()), $change->path()->value());
+            $style->text($this->fileLine($change));
+            foreach ($change->driftingApplications() as $application) {
+                $style->text($this->ruleLine($application->rule(), $application->before()));
+            }
         }
 
-        $style->listing($lines);
         $style->warning(sprintf('%d file(s) drift from the managed standard.', count($drift)));
+    }
+
+    private function fileLine(Change $change): string
+    {
+        return sprintf(' %s %s', $this->verb($change->kind()), $change->path()->value());
+    }
+
+    private function ruleLine(Rule $rule, ?string $before): string
+    {
+        $line = sprintf('   - %s: %s', new ReflectionClass($rule)->getShortName(), $rule->description());
+        if ($rule instanceof ExplainsDrift) {
+            $line .= ' ' . $rule->explain($before);
+        }
+
+        return $line;
     }
 
     private function verb(ChangeKind $kind): string

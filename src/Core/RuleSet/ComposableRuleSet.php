@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace AlleKnalle\StandardsSync\Core\RuleSet;
 
-use AlleKnalle\StandardsSync\Core\Spec\FileSpec;
+use AlleKnalle\StandardsSync\Core\Rule\Rule;
 
 /**
- * Base rule set that collects specs and composes other rule sets.
- * Declaration order is override precedence: specs added later win over earlier same-label specs when merged.
+ * Base rule set that collects rules and composes other rule sets.
+ * Declaration order is fold order: rules added later fold later, so their edits win over earlier same-target rules.
  */
-abstract class ComposableRuleSet implements RuleSetInterface
+abstract class ComposableRuleSet implements RuleSet
 {
-    /** @var list<FileSpec> */
-    private array $specs = [];
+    /** @var list<Rule> */
+    private array $rules = [];
 
-    /** @return list<FileSpec> */
-    public function specs(): array
+    /** @return list<Rule> */
+    public function rules(): array
     {
-        return $this->specs;
+        return $this->rules;
     }
 
-    protected function addSpec(FileSpec $spec): void
+    protected function addRule(Rule $rule): void
     {
-        $this->specs[] = $spec;
+        $this->rules[] = $rule;
     }
 
-    /** Pulls another rule set's specs in first, so this set's own specs override them. */
-    protected function include(RuleSetInterface $ruleSet): void
+    /** Pulls another rule set's rules in first, so this set's own rules override them. */
+    protected function include(RuleSet $ruleSet): void
     {
-        foreach ($ruleSet->specs() as $spec) {
-            $this->specs[] = $spec;
+        foreach ($ruleSet->rules() as $rule) {
+            $this->rules[] = $rule;
         }
     }
 }

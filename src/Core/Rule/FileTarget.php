@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+namespace AlleKnalle\StandardsSync\Core\Rule;
+
+use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use InvalidArgumentException;
+
+/**
+ * The file a rule targets, as ordered path candidates (the tool's own precedence).
+ * The engine resolves it per root to the first candidate that exists, or the first if none do.
+ * Candidates must be relative, because one rule fans across every configured root.
+ */
+final readonly class FileTarget
+{
+    /** @param non-empty-list<Path> $candidates */
+    private function __construct(private array $candidates)
+    {
+    }
+
+    public static function fromString(string $path): self
+    {
+        return self::fromStrings($path);
+    }
+
+    public static function fromStrings(string ...$candidates): self
+    {
+        $paths = [];
+        foreach ($candidates as $candidate) {
+            $path = Path::fromString($candidate);
+            if ($path->isAbsolute()) {
+                throw new InvalidArgumentException(sprintf('A file target must be relative; got "%s".', $candidate));
+            }
+            $paths[] = $path;
+        }
+
+        if ($paths === []) {
+            throw new InvalidArgumentException('A file target needs at least one candidate path.');
+        }
+
+        return new self($paths);
+    }
+
+    /** @return non-empty-list<Path> */
+    public function candidates(): array
+    {
+        return $this->candidates;
+    }
+
+    /** The candidate list as one display string, in precedence order. */
+    public function toString(): string
+    {
+        return implode(' | ', array_map(static fn (Path $path): string => $path->value(), $this->candidates));
+    }
+}

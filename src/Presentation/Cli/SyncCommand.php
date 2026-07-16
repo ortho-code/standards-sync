@@ -41,7 +41,7 @@ final class SyncCommand extends Command
 
         $config = (new ConfigLoader())->loadFrom(Path::fromString((string) $input->getOption('config')));
 
-        $engine = Engine::create(new SymfonyFilesystem());
+        $engine = new Engine(new SymfonyFilesystem());
         $plan = $engine->plan($config);
 
         (new DriftReport())->render($plan, $style);

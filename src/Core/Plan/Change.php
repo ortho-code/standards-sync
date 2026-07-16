@@ -6,14 +6,16 @@ namespace AlleKnalle\StandardsSync\Core\Plan;
 
 use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 
-/** The diff for one file: what is on disk now versus the desired text, and whether that is drift. */
+/** The diff for one file: what is on disk now versus the desired text, and which rules produced it. */
 final readonly class Change
 {
+    /** @param list<RuleApplication> $applications */
     public function __construct(
         private Path $path,
         private ChangeKind $kind,
         private ?string $current,
         private string $desired,
+        private array $applications,
     ) {
     }
 
@@ -35,6 +37,25 @@ final readonly class Change
     public function desired(): string
     {
         return $this->desired;
+    }
+
+    /** @return list<RuleApplication> */
+    public function applications(): array
+    {
+        return $this->applications;
+    }
+
+    /**
+     * The rules that changed the running content in this file's fold.
+     *
+     * @return list<RuleApplication>
+     */
+    public function driftingApplications(): array
+    {
+        return array_values(array_filter(
+            $this->applications,
+            static fn (RuleApplication $application): bool => $application->changed(),
+        ));
     }
 
     public function isDrift(): bool

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\AlleKnalle\StandardsSync\Integration\Testing;
 
 use AlleKnalle\StandardsSync\Core\Block\Label;
+use AlleKnalle\StandardsSync\Core\Block\ManagedBlockRule;
 use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-use AlleKnalle\StandardsSync\Core\Spec\FileSpec;
 use AlleKnalle\StandardsSync\Testing\SyncTester;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -36,8 +36,8 @@ final class SyncTesterTest extends TestCase
         return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
             public function __construct()
             {
-                $this->addSpec(new FileSpec(
-                    Path::fromString('.editorconfig'),
+                $this->addRule(new ManagedBlockRule(
+                    FileTarget::fromString('.editorconfig'),
                     Label::fromString('test'),
                     "root = true\n",
                 ));

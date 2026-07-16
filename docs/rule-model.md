@@ -1,6 +1,6 @@
 # Direction: a rule-based model
 
-**Status:** direction agreed, not yet built — the current code is the block-model baseline it builds on. The pre-rename history (baseline and earlier takes) is preserved in the private predecessor repository.
+**Status:** built through R1 (2026-07-16) — the engine folds rules per [the `Rule` contract](#decided-2026-07-15-r0--the-rule-contract), with `ManagedBlockRule` as the first rule type; R2 (`ImportRule`) is next. The pre-rename history (baseline and earlier takes) is preserved in the private predecessor repository.
 
 ## The goal
 
@@ -20,7 +20,7 @@ A `Rule` is the unifying primitive. It targets one file and **applies** itself a
 
 Rule *types* map onto the tiers:
 
-- **`FullFileRule` / managed-block rule** — places a template as a managed marker block. This is the current block engine, reframed as one rule type; it handles Tier C today.
+- **`ManagedBlockRule`** — places a template as a managed marker block. This is the current block engine, reframed as one rule type; it handles Tier C today.
 - **`ImportRule`** — ensures a one-line import / require / extends is present (Tier A).
 - **`KeyRule` / structured rules** — read / check / set a specific key in a parseable file (Tier B). These are **value-aware**, not blind sets: e.g. a *floor* — "PHPStan level ≥ 6: raise it if lower, leave it if already higher" (never weakens a stricter project) — plus list-unions, ceilings, enforce-presence, enforce-absence. This is where rules beat both a dumb copy (which would *downgrade* a level-9 project) and a plain import (which ships a default the consumer can silently drop below — a floor rule *enforces* the minimum). Each such rule does **narrow, targeted** parsing of its one key with existing format libraries; there is **no universal parse-and-merge framework** (that was the weight that sank the prior attempt — see [prior-approaches.md](prior-approaches.md)).
 
@@ -47,7 +47,7 @@ Convergent lessons for our `Rule`:
 
 ## Decided 2026-07-15 (pre-R0) — contract, identity, absence
 
-Settled in discussion ahead of R0; R0 turns these into the actual interface, tested against the three probes.
+Settled in discussion ahead of R0; the R0 contract below turned these into the actual interface, tested against the three probes.
 
 ### No hand-written `check()` — drift derives from a pure `apply`
 
@@ -61,8 +61,8 @@ Settled in discussion ahead of R0; R0 turns these into the actual interface, tes
 
 ### Rule identity = the class name
 
-- Config and disable lists use the FQCN (`PhpStanLevelFloor::class`) — refactor-safe, IDE-autocompleted, and no parallel registry of string IDs to keep in sync (rejected: a string-ID registry is a second source of truth).
-- Human-facing output (drift report, generated docs) uses the short class name, plus the target path when one class has several instances: `PhpStanLevelFloor (projects/ai/phpstan.neon)`.
+- Config and disable lists use the FQCN (`PhpStanMinLevel::class`) — refactor-safe, IDE-autocompleted, and no parallel registry of string IDs to keep in sync (rejected: a string-ID registry is a second source of truth).
+- Human-facing output (drift report, generated docs) uses the short class name, plus the target path when one class has several instances: `PhpStanMinLevel (projects/ai/phpstan.neon)`.
 - Trade-offs, accepted with their fixes:
   - Renaming a rule class breaks consumers' disable lists → a rename is a major version bump; optionally keep a deprecated class alias for one release.
   - One class instantiated several times (a key rule for two keys): disabling by class disables all instances → if a real per-instance case appears, add per-instance identity keyed on class + target path. Don't build it now.
@@ -71,18 +71,129 @@ Settled in discussion ahead of R0; R0 turns these into the actual interface, tes
 
 Content-level enforce-absence (remove a key / line / block) is just another transform and needs nothing special. Whole-file removal is out of scope for now: `ChangeKind` has no delete case and the engine only ever writes.
 
-- Candidate mechanism — recorded as a possible path, **to confirm or reject at R0**, not yet a decision: the symmetric null. `apply(?string $content): ?string`, where null in = file absent (creation needs that anyway) and null out = file should not exist. The contract would express deletion from day one while the engine refuses null output until a delete branch (`ChangeKind::Delete`, a delete-capable `Filesystem` port) is actually built.
+- Candidate mechanism, the symmetric null: `apply(?string $content): ?string`, where null in = file absent (creation needs that anyway) and null out = file should not exist. **Confirmed at R0**, with the primary justification shifted from future deletion to day-one abstention — see the R0 contract below.
 
-## Open choices (with recommendations)
+## Decided 2026-07-15 (R0) — the `Rule` contract
 
-1. **Split "what" from "how", or self-contained per-format rules?** The cleaner answer: instead of one generic `FullFileRule` plus a separate apply-strategy, have **per-format rule classes** — `EditorConfigRule`, `GitignoreRule`, … — each self-contained, baking its format knowledge in (sharing a common `AbstractBlockRule` for the marker mechanics). The format-specific class *is* the "how", so no separate strategy layer or `applicable()` pairing is needed, and it grows well — a contributor adds a `FooRule` for a new format. Caveat: for format-*generic* families (an `ImportRule` that varies only by a small syntax detail across `phpstan.neon` / `rector.php`), N per-format classes are overkill — there a single rule with a tiny format-applier is lighter. **Recommendation:** decide per rule *family* — per-format classes for the full-file/block family (this resolves the split cleanly); a single rule + small applier only where a family is genuinely format-generic. Note `.editorconfig` and `.gitignore` currently do identical block-placement, so they can start on one shared base and split when real format-specifics appear (editorconfig key-merge, gitignore line-union).
-2. **Ordering.** Rules can share a file. A global integer priority is the known pain point. **Recommendation:** rules own disjoint sections + idempotent apply (no ordering needed), or a declared before/after dependency — avoid a priority integer.
-3. **Config shape.** **Recommendation:** a per-rule typed value object now; adopt a self-describing schema only if a rule's config gets rich.
+Designed on paper against the three probes; R1 builds it. The pre-R0 decisions above stand; where a detail is superseded, its entry says so.
+
+### The contract
+
+```php
+interface Rule
+{
+    /** The file this rule transforms, as ordered path candidates. */
+    public function target(): FileTarget;
+
+    /**
+     * Pure, idempotent transform from current content to desired content.
+     * Null in: the file does not exist. Null out: the file should not exist.
+     */
+    public function apply(?string $content): ?string;
+
+    /** One line stating what this rule enforces; feeds the drift report and the generated docs. */
+    public function description(): string;
+}
+
+/** Opt-in seam for rules whose drift is not self-evident from the diff. */
+interface ExplainsDrift
+{
+    /** Why the content drifts, e.g. "level 4 is below the minimum of 6". */
+    public function explain(?string $content): string;
+}
+```
+
+How the engine uses it:
+
+- **The fold.** Group rules by resolved target, then fold each file's rules in declaration order over the current content; one `Change` per file, `Engine::apply` stays the only writer, `--check` stops before writing. Rules never touch the filesystem — the engine reads each file once and passes content in, which is what keeps a rule testable as a plain string-to-string function.
+- **`ChangeKind` derives from the fold's endpoints**: null → string is Create, changed string → string is Update, unchanged is InSync. String → null is delete — refused at plan time with a clear error until a delete branch (`ChangeKind::Delete`, a delete-capable `Filesystem` port) exists.
+- **Per-rule drift attribution is free.** The fold records each rule's before/after; rule *i* drifted exactly when it changed the running content. The report can name the drifting rules per file (short class name + target, `description()`, `explain()` where implemented) — as informative per rule as hand-written checks would have been, which closes the last gap of the derived-check decision.
+- **`target()` lives on the rule, not in external pairing.** How a rule answers it is its own business: file-specific rules hardcode it (an `.editorconfig` rule cannot be pointed at `phpstan.neon` by construction); only genuinely file-generic rules (`ManagedBlockRule`) take the path as constructor input. Config that pairs paths with rules externally was rejected precisely because it allows that mismatch.
+
+### `FileTarget` — ordered path candidates
+
+Real repos vary their config filenames (`phpstan.neon` vs `phpstan.dist.neon` vs `phpstan.neon.dist`), and the first intended consumer uses a `.dist` variant. So this went into the contract now rather than being deferred: changing the base interface later breaks every rule ever written, and today zero rules exist.
+
+```php
+/**
+ * The file a rule targets, as ordered path candidates (the tool's own precedence).
+ * The engine resolves it to the first candidate that exists, or the first if none do.
+ */
+final readonly class FileTarget
+{
+    /** @param non-empty-list<Path> $candidates */
+    private function __construct(private array $candidates)
+    {
+    }
+
+    public static function fromString(string $path): self
+    {
+        return self::fromStrings($path);
+    }
+
+    public static function fromStrings(string ...$candidates): self
+    {
+        // Path::fromString each; require at least one; reject absolute paths.
+    }
+
+    /** @return non-empty-list<Path> */
+    public function candidates(): array
+    {
+        return $this->candidates;
+    }
+}
+```
+
+- **`target()` is a declaration, not a location.** The rule cannot return a resolved `Path`: rules are pure (no filesystem access to check what exists), and one rule instance fans across every configured root, where different candidates may exist — so the resolved path is a property of (rule, root, disk state). It lives on the plan's `Change::path()`, as in the baseline; `apply()` never sees a path at all.
+- **Candidates are name variants, not format alternatives (2026-07-16).** One rule's candidates name the same file and format under the tool's different filenames (`phpstan.neon` vs `phpstan.dist.neon`); format alternatives (Symfony `foo.php` / `foo.yaml` / `foo.xml`) are separate per-format rules — see the note under open choice 1. Consequence, held loosely: `ManagedBlockRule` requires all candidates to derive one comment syntax and refuses a mixed list at construction, because `apply()` cannot know which candidate resolved, making per-candidate syntax inexpressible — refusing loudly beats guessing the first candidate. Revisit against a real same-format case that needs differing syntaxes (that would be a per-candidate contract seam). Related known gap: `ManagedBlockRule` creates on absence, so "block into whichever name exists, create nothing" would additionally need an abstain-when-absent construction flag — also deferred until a real case.
+- Resolution happens at plan time (the engine owns the filesystem port): the first existing candidate wins; when none exist, the first candidate is the target — which only matters for rules that create, since abstaining rules return null anyway. Rules with different candidate lists that resolve to the same file fold together.
+- `fromString()` is the one-element case of `fromStrings()`: one resolution code path, no special case.
+- The factories accept strings and parse at the boundary (the codebase precedent: `Path::fromString`, `SyncConfig::withRoots`); the object stores and exposes `Path`. `FileTarget` adds an invariant `Path` alone does not carry: targets must be relative, because they fan across roots.
+- Each tool's rule family encodes its candidate list once (a phpstan helper returning the list above in phpstan's own precedence order) — an R3 detail, recorded so nobody re-derives per-tool precedence per rule.
+
+### Symmetric null confirmed — abstention first, deletion later
+
+The pre-R0 candidate is confirmed, with the primary justification changed: **null out is needed on day one, and deletion is the minor use.** The real one is abstention on absent files. `PhpStanMinLevel` on a repo with no phpstan config, or an `ImportRule` whose lone import line would not be a valid config file, must be able to say "no file, no opinion": `apply(null)` returns null, the file stays absent and counts as in sync. With a `string` return type that is inexpressible — returning `''` would create an empty file. Only Tier C block rules create from nothing; Tier A/B rules mostly abstain.
+
+Deletion proper (string in, null out) stays refused until a delete branch exists. And the input `?string` had to be in the contract from day one regardless: widening a parameter type later breaks every implementor, while widening a return type would have been backward-compatible — that asymmetry made this the moment to decide.
+
+### Disabling rules — FQCN, then a predicate; no hash
+
+Consumer-side disabling is not built yet; the mechanism is decided now so the contract needs no retrofit. The ladder:
+
+1. `withoutRule(PhpStanMinLevel::class)` — an FQCN list, the common case: "don't enforce this kind of rule".
+2. Class + target path, if instances on different files ever need distinguishing (also the report's identity format).
+3. A predicate, for full precision — config is PHP: `withoutRules(fn (Rule $rule): bool => ...)`. It can match on config through the rule's getters, which makes config-sensitivity visible and chosen.
+
+Rejected: matching by a hash of the rule's data (value equality), even as internal machinery behind a readable `withoutRule(class, config)` call. Rules are immutable value objects, so value equality is conceptually sound — but it rots at the wrong moment. A consumer disables a rule because they cannot meet the org minimum yet; that intent is class-level. When the org package raises the minimum from 6 to 7, a value-based match silently stops matching and the rule re-enables itself exactly when the standard got harder — nobody decided that. It also needs a canonical serialization of rule state (reflection over private properties, or an `equals()`/`fingerprint()` on the contract) for a case the predicate covers with zero machinery. Deduplication needs no equality either: folding an identical rule twice is a no-op because apply is idempotent.
+
+### The three probes, and what each proved
+
+- **`ManagedBlockRule`** (Tier C) — the current block engine as one rule: create the file as just the block, replace an existing block in place, or append the block. Proves creation from nothing. Same-label merging (`LineUnionMerger`) moves to rule *construction* inside the block family; the contract is untouched by it. *(Refined at R1: the merger machinery was deleted instead; same-label composition is last-wins via the fold — see the R1 decision below.)*
+- **`ImportRule`** (Tier A) — abstains on null, otherwise ensures the import line is present via a targeted insert. Proves abstention and the narrow edit without parse-dump.
+- **`PhpStanMinLevel`** (Tier B) — abstains on null; reads the configured level; at or above the minimum it returns the content **unchanged**, so the derived check reports in-sync for free; below it, a targeted replace of just that value. Implements `ExplainsDrift`. Proves value-awareness and format preservation. (Renamed from `PhpStanLevelFloor`: the class name says plainly what it does; "floors, not copies" stays as pitch language in prose.)
+
+## Decided 2026-07-16 (R1) — same-label composition is last-wins; the merger machinery is deleted
+
+R1 mapped the baseline onto the contract and hit the one piece that did not carry over: the `ContentMerger` seam (`SingleSpecMerger`, `LineUnionMerger`, `ContentMergerRegistry`), which merged same-label contributions into one block before rendering.
+
+- Half of it is free in the fold: a later same-label `ManagedBlockRule` replaces the earlier rule's block in place, so "child wins wholesale" is emergent behaviour — what `SingleSpecMerger` did, with zero machinery.
+- The `.gitignore` line-*union* does not survive the fold (replacement clobbers). Preserving it would have needed a pre-fold coalesce step whose only user was a case with no fixture, no scenario, and no consumer. Deleted with the seam.
+- **Union returns opt-in, never as a default flip.** When the block family splits per format (open choice 1), a `GitignoreRule` brings union back as chosen construction behaviour, with an engine-side pre-fold coalesce step as the expected mechanism for cross-set contributions. The same-label default stays last-wins: a consumer relying on last-wins to override a block must not silently start unioning when union arrives.
+- Until then, a child set that wants extra lines repeats them or uses its own label. Accepted while pre-release with no consumers: the workaround is config-only and converges on the next sync.
+- The planned `ContentMergerRegistry::default()` → `createDefault()` ride-along rename is subsumed by the deletion.
+
+## Open choices — settled at R0 (2026-07-15)
+
+1. **Split "what" from "how", or self-contained per-format rules?** The cleaner answer: instead of one generic `ManagedBlockRule` plus a separate apply-strategy, have **per-format rule classes** — `EditorConfigRule`, `GitignoreRule`, … — each self-contained, baking its format knowledge in (sharing a common `AbstractBlockRule` for the marker mechanics). The format-specific class *is* the "how", so no separate strategy layer or `applicable()` pairing is needed, and it grows well — a contributor adds a `FooRule` for a new format. Caveat: for format-*generic* families (an `ImportRule` that varies only by a small syntax detail across `phpstan.neon` / `rector.php`), N per-format classes are overkill — there a single rule with a tiny format-applier is lighter. **Decided:** per rule *family* — per-format classes for the block family (resolves the split cleanly); a single rule + small applier only where a family is genuinely format-generic. Note `.editorconfig` and `.gitignore` currently do identical block-placement, so they can start on one shared base and split when real format-specifics appear (editorconfig key-merge, gitignore line-union).
+   **Extended 2026-07-16 — multi-format config, rule families, and the block-format guard.** One concern across config formats (Symfony `foo.php` / `foo.yaml` / `foo.xml`) = one rule per format, each abstaining while its file is absent (the symmetric null), so the repo's chosen format is acted on and the others stay silent; the org package decides which format's rule creates when none exist. Declaring the same values per format would drift and a format could be forgotten, so a *family factory* declares the config once and returns the per-format rule set. A first-class rule-family concept between `RuleSet` and `Rule` is deferred until factories prove insufficient (family-level disabling or reporting would be the trigger). The what/how split stays rejected; the guard against invalid pairings is that the block family refuses formats it cannot mark: `json` (no comments at all) and `xml`/`html` (only enclosed `<!-- -->` comments — the marker grammar draws comment-*lead* lines, and for xml the generic block mechanics are structurally wrong anyway: create-from-nothing yields a rootless fragment, append-at-end lands after the root close tag, so structured rules are the right tool there). Unknown extensions keep the hash default, because opaque-text co-management is an open set (`.editorconfig`, `.gitignore`). Expected trigger for enclosed-comment support: managed README sections — markdown uses `<!-- -->` markers and append-at-end is valid there; that adds a comment *tail* to the marker grammar, and formats then leave the refusal list case by case.
+2. **Ordering.** Rules can share a file. A global integer priority is the known pain point. **Decided:** the fold runs in declaration order (rule-set composition order, matching the block engine's later-wins precedence). Idempotent rules on disjoint concerns make order irrelevant; where rules genuinely overlap, declaration order is the deterministic tiebreak. No priority integer, no dependency graph.
+3. **Config shape.** **Decided:** typed constructor parameters (`new PhpStanMinLevel(minLevel: 6)`) — the rule *is* immutable config + behaviour, which satisfies the prior-art "typed / validated" lesson without a separate seam. Adopt a `ConfigurableRule` seam or self-describing schema only if a rule's config gets rich.
 4. **Removal vs disabling vs un-applying a dropped rule** — three distinct things, worth keeping apart:
    - **Disable a rule** = stop enforcing it: do nothing, and leave whatever is already in the file untouched (matches every prior-art tool — non-registration / `severity=0`). No provenance, no undo.
    - **A "remove" rule** = a rule whose `apply()` enforces *absence* (delete a key / line / block if present, no-op if not). This is a first-class, idempotent operation — enforce-absence is just the mirror of enforce-presence — and needs no provenance.
    - **Un-applying a *dropped* rule** = undoing the past effect of a rule no longer configured at all. *This* is the hard one that needs provenance (a state file), because nothing in the config still describes what to undo.
-   Note: disabling a parent rule stops it *re-adding* its content but does **not** clean up what it already added — deleting that is a separate "remove" rule (or dropped-rule undo). **Recommendation:** support enforce-presence + enforce-absence rules and external disable now (all cheap); defer dropped-rule undo (state file) until manual cleanup is a burden. Whole-file removal is separate again — deferred but kept representable, see the pre-R0 decisions above.
+   Note: disabling a parent rule stops it *re-adding* its content but does **not** clean up what it already added — deleting that is a separate "remove" rule (or dropped-rule undo). **Decided:** enforce-presence + enforce-absence rules are plain transforms (nothing special needed); consumer-side disabling follows the ladder in the R0 contract (FQCN list, then a predicate — no hash); dropped-rule undo (state file) stays deferred until manual cleanup is a burden. Whole-file removal is the refused null output — see the R0 contract.
 
 ## Testing rules
 
@@ -92,8 +203,8 @@ Carry the fixture discipline forward from the block engine: each rule ships a **
 
 ## Sequence
 
-- **R0 — design the `Rule` interface on paper**, tested against three probes at once — `FullFileRule` (Tier C), `ImportRule` (Tier A), and a `PhpStanLevelFloor` value-aware rule (Tier B, the only tier that must *read* current values; the floor is its hardest representative, a blind key-set being a degenerate case) — so the contract isn't block-shaped or write-only. Decide the remaining open choices above and confirm/reject the symmetric-null signature.
-- **R1 — refactor to `Rule`**, with the current block work as `FullFileRule`. Reuse the pipeline and its tests.
+- **R0 — done (2026-07-15): the `Rule` contract above**, designed against three probes at once — `ManagedBlockRule` (Tier C), `ImportRule` (Tier A), and `PhpStanMinLevel` (Tier B, the only tier that must *read* current values; the floor is its hardest representative, a blind key-set being a degenerate case) — so the contract isn't block-shaped or write-only. The open choices are settled and the symmetric null is confirmed.
+- **R1 — done (2026-07-16): the baseline refactored onto `Rule`**, with the block work as `ManagedBlockRule` and the engine owning resolve-group-fold. The scenario suite and the pipeline tests carried over. `RuleSetInterface` became `RuleSet` (the other ports are suffix-less); the `ContentMergerRegistry::default()` rename was subsumed by the merger deletion (see the R1 decision above).
 - **R2 — `ImportRule` (Tier A)** — highest value; stress-tests the abstraction on a very different mechanism.
 - **R3 — structured / key rules (Tier B)**, one format at a time.
 - **R4 (later) — a state file** for clean removal, only if manual cleanup proves a burden.

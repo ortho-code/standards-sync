@@ -25,7 +25,7 @@ final class SyncTester
     public function sync(SyncConfig $config, array $existingFiles = []): array
     {
         $filesystem = new InMemoryFilesystem($existingFiles);
-        $engine = Engine::create($filesystem);
+        $engine = new Engine($filesystem);
         $engine->apply($engine->plan($config));
 
         return $filesystem->contents();
@@ -38,6 +38,6 @@ final class SyncTester
      */
     public function plan(SyncConfig $config, array $existingFiles = []): Plan
     {
-        return Engine::create(new InMemoryFilesystem($existingFiles))->plan($config);
+        return new Engine(new InMemoryFilesystem($existingFiles))->plan($config);
     }
 }

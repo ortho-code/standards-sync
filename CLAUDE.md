@@ -8,7 +8,7 @@ Open-sourced once stable — keep this file project-facing (no personal workflow
 
 `docs/` is the living design record **and** the project documentation — the repo stands alone without this file.
 
-- Direction: [rule-model.md](docs/rule-model.md) — the rule-based redesign is agreed; the current managed-block code becomes one rule type.
+- Direction: [rule-model.md](docs/rule-model.md) — the rule-based model is built (R0 contract, R1 fold); `ManagedBlockRule` is the first rule type, import and value-aware rules are next.
 - Architecture + invariants: [architecture.md](docs/architecture.md) — the pipeline, layers, seams; hold the invariants.
 - Authoring an org package: [authoring-org-packages.md](docs/authoring-org-packages.md).
 - Code + test conventions, commands: [conventions.md](docs/conventions.md).

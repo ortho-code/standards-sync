@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace AlleKnalle\StandardsSync\Core\Config;
 
 use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Core\RuleSet\RuleSetInterface;
+use AlleKnalle\StandardsSync\Core\RuleSet\RuleSet;
 
 /** Immutable configuration returned by a standards-sync.php: which roots to sync and which rule sets apply. */
 final readonly class SyncConfig
 {
     /**
      * @param list<Path> $roots
-     * @param list<RuleSetInterface> $ruleSets
+     * @param list<RuleSet> $ruleSets
      */
     private function __construct(
         private array $roots,
@@ -34,7 +34,7 @@ final readonly class SyncConfig
         );
     }
 
-    public function withRuleSet(RuleSetInterface $ruleSet): self
+    public function withRuleSet(RuleSet $ruleSet): self
     {
         return new self($this->roots, [...$this->ruleSets, $ruleSet]);
     }
@@ -45,7 +45,7 @@ final readonly class SyncConfig
         return $this->roots;
     }
 
-    /** @return list<RuleSetInterface> */
+    /** @return list<RuleSet> */
     public function ruleSets(): array
     {
         return $this->ruleSets;
