@@ -27,8 +27,8 @@ final readonly class DriftReport
 
         foreach ($drift as $change) {
             $style->text($this->fileLine($change));
-            foreach ($change->driftingApplications() as $application) {
-                $style->text($this->ruleLine($application->rule(), $application->before()));
+            foreach ($this->ruleLines($change) as $line) {
+                $style->text($line);
             }
         }
 
@@ -40,14 +40,35 @@ final readonly class DriftReport
         return sprintf(' %s %s', $this->verb($change->kind()), $change->path()->value());
     }
 
-    private function ruleLine(Rule $rule, ?string $before): string
+    /**
+     * One line per distinct drifting rule; indistinguishable instances (same class, description and explanation) collapse into one line with a count.
+     *
+     * @return list<string>
+     */
+    private function ruleLines(Change $change): array
     {
-        $line = sprintf('   - %s: %s', new ReflectionClass($rule)->getShortName(), $rule->description());
-        if ($rule instanceof ExplainsDrift) {
-            $line .= ' ' . $rule->explain($before);
+        $counts = [];
+        foreach ($change->driftingApplications() as $application) {
+            $text = $this->ruleText($application->rule(), $application->before());
+            $counts[$text] = ($counts[$text] ?? 0) + 1;
         }
 
-        return $line;
+        $lines = [];
+        foreach ($counts as $text => $count) {
+            $lines[] = sprintf('   - %s%s', $count > 1 ? sprintf('(×%d) ', $count) : '', $text);
+        }
+
+        return $lines;
+    }
+
+    private function ruleText(Rule $rule, ?string $before): string
+    {
+        $text = sprintf('%s: %s', new ReflectionClass($rule)->getShortName(), $rule->description());
+        if ($rule instanceof ExplainsDrift) {
+            $text .= ' ' . $rule->explain($before);
+        }
+
+        return $text;
     }
 
     private function verb(ChangeKind $kind): string
