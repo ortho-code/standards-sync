@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Block;
+namespace AlleKnalle\StandardsSync\Rules\Block;
 
 use InvalidArgumentException;
 

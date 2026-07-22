@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Block;
+namespace AlleKnalle\StandardsSync\Rules\Block;
 
 /** Draws and finds a single label's marker pair for one comment syntax. */
 final readonly class MarkerGrammar

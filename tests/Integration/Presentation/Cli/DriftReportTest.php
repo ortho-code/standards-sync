@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\AlleKnalle\StandardsSync\Integration\Presentation\Cli;
 
-use AlleKnalle\StandardsSync\Core\Block\Label;
-use AlleKnalle\StandardsSync\Core\Block\ManagedBlockRule;
+use AlleKnalle\StandardsSync\Rules\Block\Label;
+use AlleKnalle\StandardsSync\Rules\Block\ManagedBlockRule;
 use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
 use AlleKnalle\StandardsSync\Core\Engine\Engine;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;

@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Block;
+namespace AlleKnalle\StandardsSync\Rules\Block;
 
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Core\Rule\Rule;
+use AlleKnalle\StandardsSync\Core\Text\Lines;
 use InvalidArgumentException;
 
 /**
@@ -36,7 +37,7 @@ final readonly class ManagedBlockRule implements Rule
 
         // A missing file becomes just the block.
         if ($content === null) {
-            return $rendered . "\n";
+            return $rendered . Lines::LINE_BREAK;
         }
 
         // An existing block is replaced in place, leaving everything around it untouched.
@@ -45,7 +46,7 @@ final readonly class ManagedBlockRule implements Rule
         }
 
         // An existing file without the block keeps its content and gains the block at the end.
-        return rtrim($content, "\n") . "\n\n" . $rendered . "\n";
+        return rtrim($content, Lines::LINE_BREAK) . Lines::LINE_BREAK . Lines::LINE_BREAK . $rendered . Lines::LINE_BREAK;
     }
 
     public function description(): string
@@ -55,7 +56,7 @@ final readonly class ManagedBlockRule implements Rule
 
     private function wrap(MarkerGrammar $grammar, string $content): string
     {
-        return $grammar->open() . "\n" . rtrim($content, "\n") . "\n" . $grammar->close();
+        return $grammar->open() . Lines::LINE_BREAK . rtrim($content, Lines::LINE_BREAK) . Lines::LINE_BREAK . $grammar->close();
     }
 
     /**

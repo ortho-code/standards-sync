@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Core\Block;
+namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\Block;
 
-use AlleKnalle\StandardsSync\Core\Block\Label;
+use AlleKnalle\StandardsSync\Rules\Block\Label;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

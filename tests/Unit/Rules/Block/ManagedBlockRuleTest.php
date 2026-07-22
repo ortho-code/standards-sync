@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Core\Block;
+namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\Block;
 
-use AlleKnalle\StandardsSync\Core\Block\Label;
-use AlleKnalle\StandardsSync\Core\Block\ManagedBlockRule;
+use AlleKnalle\StandardsSync\Rules\Block\Label;
+use AlleKnalle\StandardsSync\Rules\Block\ManagedBlockRule;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;

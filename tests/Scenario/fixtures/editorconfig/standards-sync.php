@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use AlleKnalle\StandardsSync\Core\Block\Label;
-use AlleKnalle\StandardsSync\Core\Block\ManagedBlockRule;
+use AlleKnalle\StandardsSync\Rules\Block\Label;
+use AlleKnalle\StandardsSync\Rules\Block\ManagedBlockRule;
 use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
 use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;

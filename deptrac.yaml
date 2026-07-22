@@ -12,6 +12,14 @@ deptrac:
           value: src/Core/.*
         - type: classNameRegex
           value: '#^AlleKnalle\\StandardsSync\\Core\\#'
+    # The shipped rule library: concrete rules per mechanism (Block) or per tool (PhpStan), built on the Core contract.
+    # Core must never reference a concrete rule; the reverse edge is the open/closed promise, checked.
+    - name: Rules
+      collectors:
+        - type: directory
+          value: src/Rules/.*
+        - type: classNameRegex
+          value: '#^AlleKnalle\\StandardsSync\\Rules\\#'
     # Driven adapters: the Symfony-backed Filesystem implementation of the Core port.
     - name: Infrastructure
       collectors:
@@ -40,6 +48,8 @@ deptrac:
           value: '#^(?!AlleKnalle\\StandardsSync\\)[^\\]+\\#'
   ruleset:
     Core: ~
+    Rules:
+      - Core
     Infrastructure:
       - Core
       - Vendor
