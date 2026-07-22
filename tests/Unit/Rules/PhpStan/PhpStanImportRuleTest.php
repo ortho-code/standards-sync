@@ -6,6 +6,7 @@ namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\PhpStan;
 
 use AlleKnalle\StandardsSync\Rules\PhpStan\PhpStanImportRule;
 use InvalidArgumentException;
+use AlleKnalle\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -34,37 +35,126 @@ final class PhpStanImportRuleTest extends TestCase
     {
         yield 'a project without a config gets one created, holding just the import' => [
             null,
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n",
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+NEON
+            ),
         ];
 
         yield 'an existing includes section gains the entry after its last entry' => [
-            "includes:\n\t- phpstan-baseline.neon\n\nparameters:\n\tlevel: 6\n",
-            "includes:\n\t- phpstan-baseline.neon\n\t- vendor/acme/standards/phpstan.neon\n\nparameters:\n\tlevel: 6\n",
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- phpstan-baseline.neon
+
+parameters:
+	level: 6
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- phpstan-baseline.neon
+	- vendor/acme/standards/phpstan.neon
+
+parameters:
+	level: 6
+NEON
+            ),
         ];
 
         yield 'a config without includes gains the section at the top' => [
-            "parameters:\n\tlevel: 6\n",
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n\nparameters:\n\tlevel: 6\n",
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 6
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+
+parameters:
+	level: 6
+NEON
+            ),
         ];
 
         yield 'an empty includes section gains the entry' => [
-            "includes:\nparameters:\n\tlevel: 6\n",
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\nparameters:\n\tlevel: 6\n",
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+parameters:
+	level: 6
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+parameters:
+	level: 6
+NEON
+            ),
         ];
 
         yield 'an already-included import leaves the config unchanged' => [
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n\nparameters:\n\tlevel: 6\n",
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n\nparameters:\n\tlevel: 6\n",
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+
+parameters:
+	level: 6
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+
+parameters:
+	level: 6
+NEON
+            ),
         ];
 
         yield 'a quoted include of the same file counts as included' => [
-            "includes:\n\t- 'vendor/acme/standards/phpstan.neon'\n",
-            "includes:\n\t- 'vendor/acme/standards/phpstan.neon'\n",
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- 'vendor/acme/standards/phpstan.neon'
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- 'vendor/acme/standards/phpstan.neon'
+NEON
+            ),
         ];
 
         yield 'the inserted entry copies the indentation of a space-indented file' => [
-            "includes:\n    - phpstan-baseline.neon\nparameters:\n    level: 6\n",
-            "includes:\n    - phpstan-baseline.neon\n    - vendor/acme/standards/phpstan.neon\nparameters:\n    level: 6\n",
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+    - phpstan-baseline.neon
+parameters:
+    level: 6
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+    - phpstan-baseline.neon
+    - vendor/acme/standards/phpstan.neon
+parameters:
+    level: 6
+NEON
+            ),
         ];
     }
 
@@ -73,7 +163,7 @@ final class PhpStanImportRuleTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('block list');
 
-        $this->rule()->apply("includes: [phpstan-baseline.neon]\n");
+        $this->rule()->apply(FileContent::fromString('includes: [phpstan-baseline.neon]'));
     }
 
     public function testRejectsAnEmptyImportPath(): void
@@ -94,11 +184,12 @@ final class PhpStanImportRuleTest extends TestCase
 
         self::assertSame('Ensures the PHPStan config includes "vendor/acme/standards/phpstan.neon".', $rule->description());
         self::assertSame('There is no PHPStan config yet; one is created including "vendor/acme/standards/phpstan.neon".', $rule->explain(null));
-        self::assertSame('The PHPStan config does not include "vendor/acme/standards/phpstan.neon".', $rule->explain("parameters:\n"));
+        self::assertSame('The PHPStan config does not include "vendor/acme/standards/phpstan.neon".', $rule->explain(FileContent::fromString('parameters:')));
     }
 
     private function rule(): PhpStanImportRule
     {
         return new PhpStanImportRule(import: self::IMPORT);
     }
+
 }

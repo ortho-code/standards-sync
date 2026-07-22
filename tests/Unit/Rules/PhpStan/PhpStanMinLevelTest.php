@@ -8,6 +8,7 @@ use AlleKnalle\StandardsSync\Core\Rule\OnMissing;
 use AlleKnalle\StandardsSync\Rules\PhpStan\PhpStanLevel;
 use AlleKnalle\StandardsSync\Rules\PhpStan\PhpStanMinLevel;
 use InvalidArgumentException;
+use AlleKnalle\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -34,53 +35,171 @@ final class PhpStanMinLevelTest extends TestCase
         yield 'no phpstan config, no opinion' => [null, null];
 
         yield 'a lower level is raised to the floor' => [
-            "parameters:\n\tlevel: 4\n\tpaths:\n\t\t- src\n",
-            "parameters:\n\tlevel: 7\n\tpaths:\n\t\t- src\n",
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 4
+	paths:
+		- src
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7
+	paths:
+		- src
+NEON
+            ),
         ];
 
         yield 'a stricter level is never touched' => [
-            "parameters:\n\tlevel: 8\n",
-            "parameters:\n\tlevel: 8\n",
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 8
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 8
+NEON
+            ),
         ];
 
         yield 'a level equal to the floor stays put' => [
-            "parameters:\n\tlevel: 7\n",
-            "parameters:\n\tlevel: 7\n",
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7
+NEON
+            ),
         ];
 
         yield 'max satisfies any floor' => [
-            "parameters:\n\tlevel: max\n",
-            "parameters:\n\tlevel: max\n",
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: max
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: max
+NEON
+            ),
         ];
 
         yield 'a quoted lower level is raised' => [
-            "parameters:\n\tlevel: '4'\n",
-            "parameters:\n\tlevel: 7\n",
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: '4'
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7
+NEON
+            ),
         ];
 
         yield 'a missing level line is left to the imported ruleset' => [
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n\nparameters:\n\tpaths:\n\t\t- src\n",
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n\nparameters:\n\tpaths:\n\t\t- src\n",
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+
+parameters:
+	paths:
+		- src
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+
+parameters:
+	paths:
+		- src
+NEON
+            ),
         ];
 
         yield 'a config without parameters stays put' => [
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n",
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n",
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+NEON
+            ),
         ];
 
         yield 'a nested level key of an extension is never touched' => [
-            "parameters:\n\tlevel: 4\n\ttype_coverage:\n\t\tlevel: 9\n",
-            "parameters:\n\tlevel: 7\n\ttype_coverage:\n\t\tlevel: 9\n",
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 4
+	type_coverage:
+		level: 9
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7
+	type_coverage:
+		level: 9
+NEON
+            ),
         ];
 
         yield 'a nested level key alone does not count as the written level' => [
-            "parameters:\n\ttype_coverage:\n\t\tlevel: 2\n",
-            "parameters:\n\ttype_coverage:\n\t\tlevel: 2\n",
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	type_coverage:
+		level: 2
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	type_coverage:
+		level: 2
+NEON
+            ),
         ];
 
         yield 'a trailing comment on the level line survives the raise' => [
-            "parameters:\n\tlevel: 4 # keep in step with CI\n",
-            "parameters:\n\tlevel: 7 # keep in step with CI\n",
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 4 # keep in step with CI
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7 # keep in step with CI
+NEON
+            ),
         ];
     }
 
@@ -101,18 +220,60 @@ final class PhpStanMinLevelTest extends TestCase
     public static function writeModeScenarios(): iterable
     {
         yield 'the floor becomes the first child of an existing parameters section' => [
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n\nparameters:\n\tpaths:\n\t\t- src\n",
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n\nparameters:\n\tlevel: 7\n\tpaths:\n\t\t- src\n",
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+
+parameters:
+	paths:
+		- src
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+
+parameters:
+	level: 7
+	paths:
+		- src
+NEON
+            ),
         ];
 
         yield 'a config without parameters gains the section at the end' => [
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n",
-            "includes:\n\t- vendor/acme/standards/phpstan.neon\n\nparameters:\n\tlevel: 7\n",
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+
+parameters:
+	level: 7
+NEON
+            ),
         ];
 
         yield 'a written level follows the normal floor logic' => [
-            "parameters:\n\tlevel: 4\n",
-            "parameters:\n\tlevel: 7\n",
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 4
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7
+NEON
+            ),
         ];
     }
 
@@ -123,17 +284,28 @@ final class PhpStanMinLevelTest extends TestCase
 
     public function testExplainsAMissingLevelInWriteMode(): void
     {
-        self::assertSame(
-            'No PHPStan level is written; 7 is added as the minimum.',
-            $this->writeRule()->explain("includes:\n\t- vendor/acme/standards/phpstan.neon\n"),
+        $config = FileContent::fromString(
+            <<<'NEON'
+includes:
+	- vendor/acme/standards/phpstan.neon
+NEON
         );
+
+        self::assertSame('No PHPStan level is written; 7 is added as the minimum.', $this->writeRule()->explain($config));
     }
 
     public function testRefusesALevelValueItCannotJudge(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->rule()->apply("parameters:\n\tlevel: %level%\n");
+        $this->rule()->apply(
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: %level%
+NEON
+            ),
+        );
     }
 
     public function testTargetsThePhpStanConfigCandidatesInLookupOrder(): void
@@ -144,9 +316,15 @@ final class PhpStanMinLevelTest extends TestCase
     public function testDescribesAndExplainsTheFloor(): void
     {
         $rule = $this->rule();
+        $lowLevel = FileContent::fromString(
+            <<<'NEON'
+parameters:
+	level: 4
+NEON
+        );
 
         self::assertSame('Keeps the PHPStan level at or above 7.', $rule->description());
-        self::assertSame('Level 4 is below the minimum of 7.', $rule->explain("parameters:\n\tlevel: 4\n"));
+        self::assertSame('Level 4 is below the minimum of 7.', $rule->explain($lowLevel));
         self::assertSame('The PHPStan level is below the minimum of 7.', $rule->explain(null));
     }
 
@@ -159,4 +337,5 @@ final class PhpStanMinLevelTest extends TestCase
     {
         return new PhpStanMinLevel(minLevel: PhpStanLevel::fromInt(7), onMissing: OnMissing::Write);
     }
+
 }

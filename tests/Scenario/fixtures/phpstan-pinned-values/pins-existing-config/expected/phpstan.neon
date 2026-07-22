@@ -1,0 +1,4 @@
+parameters:
+	reportUnmatchedIgnoredErrors: true
+	level: 6
+	treatPhpDocTypesAsCertain: false

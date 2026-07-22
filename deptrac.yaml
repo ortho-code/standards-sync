@@ -12,6 +12,13 @@ deptrac:
           value: src/Core/.*
         - type: classNameRegex
           value: '#^AlleKnalle\\StandardsSync\\Core\\#'
+    # Format-editing machinery shared across rule families (neon today); the engine stays format-blind.
+    - name: Formats
+      collectors:
+        - type: directory
+          value: src/Formats/.*
+        - type: classNameRegex
+          value: '#^AlleKnalle\\StandardsSync\\Formats\\#'
     # The shipped rule library: concrete rules per mechanism (Block) or per tool (PhpStan), built on the Core contract.
     # Core must never reference a concrete rule; the reverse edge is the open/closed promise, checked.
     - name: Rules
@@ -48,8 +55,11 @@ deptrac:
           value: '#^(?!AlleKnalle\\StandardsSync\\)[^\\]+\\#'
   ruleset:
     Core: ~
+    Formats:
+      - Core
     Rules:
       - Core
+      - Formats
     Infrastructure:
       - Core
       - Vendor

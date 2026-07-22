@@ -8,6 +8,7 @@ use AlleKnalle\StandardsSync\Rules\Block\Label;
 use AlleKnalle\StandardsSync\Rules\Block\ManagedBlockRule;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use InvalidArgumentException;
+use AlleKnalle\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -34,25 +35,67 @@ final class ManagedBlockRuleTest extends TestCase
         yield 'absent file becomes the block' => [
             'root = true',
             null,
-            "# >>> test (managed) >>>\nroot = true\n# <<< test <<<\n",
+            FileContent::fromString(
+                <<<'FILE'
+# >>> test (managed) >>>
+root = true
+# <<< test <<<
+FILE
+            ),
         ];
 
         yield 'existing unmarked content is kept and the block appended' => [
             'ignored/',
-            "existing\n",
-            "existing\n\n# >>> test (managed) >>>\nignored/\n# <<< test <<<\n",
+            FileContent::fromString('existing'),
+            FileContent::fromString(
+                <<<'FILE'
+existing
+
+# >>> test (managed) >>>
+ignored/
+# <<< test <<<
+FILE
+            ),
         ];
 
         yield 'existing block is replaced in place' => [
             'new',
-            "top\n# >>> test (managed) >>>\nold\n# <<< test <<<\nbottom\n",
-            "top\n# >>> test (managed) >>>\nnew\n# <<< test <<<\nbottom\n",
+            FileContent::fromString(
+                <<<'FILE'
+top
+# >>> test (managed) >>>
+old
+# <<< test <<<
+bottom
+FILE
+            ),
+            FileContent::fromString(
+                <<<'FILE'
+top
+# >>> test (managed) >>>
+new
+# <<< test <<<
+bottom
+FILE
+            ),
         ];
 
         yield 'idempotent when block already matches' => [
             'root = true',
-            "# >>> test (managed) >>>\nroot = true\n# <<< test <<<\n",
-            "# >>> test (managed) >>>\nroot = true\n# <<< test <<<\n",
+            FileContent::fromString(
+                <<<'FILE'
+# >>> test (managed) >>>
+root = true
+# <<< test <<<
+FILE
+            ),
+            FileContent::fromString(
+                <<<'FILE'
+# >>> test (managed) >>>
+root = true
+# <<< test <<<
+FILE
+            ),
         ];
     }
 
@@ -126,4 +169,5 @@ final class ManagedBlockRuleTest extends TestCase
     {
         return new ManagedBlockRule(FileTarget::fromString($target), Label::fromString($label), $content);
     }
+
 }

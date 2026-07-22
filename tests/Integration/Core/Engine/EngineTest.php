@@ -15,6 +15,7 @@ use AlleKnalle\StandardsSync\Core\Rule\Rule;
 use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
 use AlleKnalle\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
 use Closure;
+use AlleKnalle\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -107,7 +108,7 @@ final class EngineTest extends TestCase
 
     public function testResolvesTheFirstExistingCandidate(): void
     {
-        $filesystem = new InMemoryFilesystem(['/a/phpstan.dist.neon' => "old\n"]);
+        $filesystem = new InMemoryFilesystem(['/a/phpstan.dist.neon' => FileContent::fromString('old')]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(new ManagedBlockRule(
             FileTarget::fromStrings('phpstan.neon', 'phpstan.dist.neon'),
             Label::fromString('test'),
@@ -138,7 +139,7 @@ final class EngineTest extends TestCase
 
     public function testRulesWithDifferentCandidatesResolvingToTheSameFileFoldTogether(): void
     {
-        $filesystem = new InMemoryFilesystem(['/a/phpstan.dist.neon' => "old\n"]);
+        $filesystem = new InMemoryFilesystem(['/a/phpstan.dist.neon' => FileContent::fromString('old')]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(
             new ManagedBlockRule(
                 FileTarget::fromStrings('phpstan.neon', 'phpstan.dist.neon'),
@@ -170,7 +171,7 @@ final class EngineTest extends TestCase
 
     public function testRefusesARuleThatWantsTheFileDeleted(): void
     {
-        $filesystem = new InMemoryFilesystem(['/a/phpstan.neon' => "level\n"]);
+        $filesystem = new InMemoryFilesystem(['/a/phpstan.neon' => FileContent::fromString('level')]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(
             $this->stubRule('phpstan.neon', static fn (?string $content): ?string => null),
         ));

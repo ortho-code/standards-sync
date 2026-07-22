@@ -10,6 +10,7 @@ use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
 use AlleKnalle\StandardsSync\Testing\SyncTester;
+use AlleKnalle\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -39,7 +40,7 @@ final class SyncTesterTest extends TestCase
                 $this->addRule(new ManagedBlockRule(
                     FileTarget::fromString('.editorconfig'),
                     Label::fromString('test'),
-                    "root = true\n",
+                    FileContent::fromString('root = true'),
                 ));
             }
         });

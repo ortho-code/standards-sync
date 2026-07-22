@@ -6,6 +6,7 @@ namespace Tests\AlleKnalle\StandardsSync\Integration\Infrastructure\Filesystem;
 
 use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 use AlleKnalle\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
+use AlleKnalle\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\AlleKnalle\StandardsSync\Integration\IntegrationTestCase;
 
@@ -23,9 +24,9 @@ final class SymfonyFilesystemTest extends IntegrationTestCase
     {
         $path = Path::fromString($this->workspace() . '/.editorconfig');
 
-        $this->filesystem->write($path, "root = true\n");
+        $this->filesystem->write($path, FileContent::fromString('root = true'));
 
-        self::assertSame("root = true\n", $this->filesystem->read($path));
+        self::assertSame(FileContent::fromString('root = true'), $this->filesystem->read($path));
     }
 
     public function testReadReturnsNullForAMissingFile(): void
@@ -37,8 +38,8 @@ final class SymfonyFilesystemTest extends IntegrationTestCase
     {
         $path = Path::fromString($this->workspace() . '/nested/deep/.gitignore');
 
-        $this->filesystem->write($path, "vendor/\n");
+        $this->filesystem->write($path, FileContent::fromString('vendor/'));
 
-        self::assertSame("vendor/\n", $this->filesystem->read($path));
+        self::assertSame(FileContent::fromString('vendor/'), $this->filesystem->read($path));
     }
 }
