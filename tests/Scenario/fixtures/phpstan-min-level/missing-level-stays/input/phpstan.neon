@@ -1,0 +1,6 @@
+includes:
+	- vendor/acme/standards/phpstan.neon
+
+parameters:
+	paths:
+		- src

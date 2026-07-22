@@ -1,6 +1,6 @@
 # Code and test conventions
 
-- PHP 8.5+, `declare(strict_types=1)` in every file. Use modern features freely (`readonly class`, enums, `new` in initializers).
+- PHP 8.5+, `declare(strict_types=1)` in every file. Use modern features freely (`readonly class`, enums, `new` in initializers) — including the newest stdlib: `array_find` / `array_any` / `array_find_key` over a stateless `foreach` scan; a scan that tracks running state stays a `foreach`.
 - Single quotes unless interpolation or escapes need double.
 - Comments in English, one sentence per line; comment the non-obvious *why*, not the *what*.
 - CLI (`Presentation/Cli`, `symfony/console`): `bin/standards-sync` keeps only the autoload probe, then builds and runs the console application.

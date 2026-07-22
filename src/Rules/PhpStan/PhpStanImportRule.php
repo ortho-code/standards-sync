@@ -46,7 +46,7 @@ final readonly class PhpStanImportRule implements Rule, ExplainsDrift
         $sectionIndex = $this->sectionIndex($lines);
 
         if ($sectionIndex === null) {
-            return $this->section($this->detectIndent($lines)) . Lines::LINE_BREAK . $content;
+            return $this->section(Indent::detect($lines) ?? self::DEFAULT_INDENT) . Lines::LINE_BREAK . $content;
         }
 
         // Scan the section's entries: bail out when the import is already there, otherwise remember where the section ends.
@@ -66,7 +66,7 @@ final readonly class PhpStanImportRule implements Rule, ExplainsDrift
             }
         }
 
-        array_splice($lines, $lastEntryIndex + 1, 0, [($entryIndent ?? $this->detectIndent($lines)) . '- ' . $this->import]);
+        array_splice($lines, $lastEntryIndex + 1, 0, [($entryIndent ?? Indent::detect($lines) ?? self::DEFAULT_INDENT) . '- ' . $this->import]);
 
         return Lines::join($lines);
     }
@@ -93,32 +93,12 @@ final readonly class PhpStanImportRule implements Rule, ExplainsDrift
     /** @param list<string> $lines */
     private function sectionIndex(array $lines): ?int
     {
-        foreach ($lines as $index => $line) {
-            if (rtrim($line) === self::SECTION) {
-                return $index;
-            }
-            if (preg_match('/^' . preg_quote(self::SECTION, '/') . '[ \t]*\S/', $line) === 1) {
-                throw new RuntimeException(sprintf('The "%s" section is not a block list; convert it to one "- entry" per line so the import can be managed.', self::SECTION));
-            }
+        $inlineForm = '/^' . preg_quote(self::SECTION, '/') . '[ \t]*\S/';
+        if (array_any($lines, static fn (string $line): bool => preg_match($inlineForm, $line) === 1)) {
+            throw new RuntimeException(sprintf('The "%s" section is not a block list; convert it to one "- entry" per line so the import can be managed.', self::SECTION));
         }
 
-        return null;
-    }
-
-    /**
-     * The file's own indentation unit, read from its first indented line.
-     *
-     * @param list<string> $lines
-     */
-    private function detectIndent(array $lines): string
-    {
-        foreach ($lines as $line) {
-            if (preg_match('/^([ \t]+)\S/', $line, $match) === 1) {
-                return $match[1];
-            }
-        }
-
-        return self::DEFAULT_INDENT;
+        return array_find_key($lines, static fn (string $line): bool => rtrim($line) === self::SECTION);
     }
 
     // Entries may quote their path; the import is matched on the unquoted value.
