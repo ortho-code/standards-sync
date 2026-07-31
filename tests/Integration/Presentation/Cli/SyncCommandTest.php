@@ -22,8 +22,8 @@ final class SyncCommandTest extends IntegrationTestCase
 
         declare(strict_types=1);
 
-        use AlleKnalle\StandardsSync\Rules\Block\Label;
-        use AlleKnalle\StandardsSync\Rules\Block\ManagedBlockRule;
+        use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
+        use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
         use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
         use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
         use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
@@ -31,7 +31,7 @@ final class SyncCommandTest extends IntegrationTestCase
         $ruleSet = new class extends ComposableRuleSet {
             public function __construct()
             {
-                $this->addRule(new ManagedBlockRule(
+                $this->addRule(new ManagedBlock(
                     FileTarget::fromString('.editorconfig'),
                     Label::fromString('test'),
                     "root = true\n",
@@ -54,7 +54,7 @@ final class SyncCommandTest extends IntegrationTestCase
         self::assertSame(1, $exitCode);
         self::assertStringContainsString('CREATE', $output);
         self::assertStringContainsString('.editorconfig', $output);
-        self::assertStringContainsString('ManagedBlockRule: Places the managed "test" block', $output);
+        self::assertStringContainsString('ManagedBlock: Places the managed "test" block', $output);
     }
 
     public function testCheckNeverWrites(): void

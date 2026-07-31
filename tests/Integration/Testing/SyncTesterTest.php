@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\AlleKnalle\StandardsSync\Integration\Testing;
 
-use AlleKnalle\StandardsSync\Rules\Block\Label;
-use AlleKnalle\StandardsSync\Rules\Block\ManagedBlockRule;
+use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
+use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
@@ -37,7 +37,7 @@ final class SyncTesterTest extends TestCase
         return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
             public function __construct()
             {
-                $this->addRule(new ManagedBlockRule(
+                $this->addRule(new ManagedBlock(
                     FileTarget::fromString('.editorconfig'),
                     Label::fromString('test'),
                     FileContent::fromString('root = true'),

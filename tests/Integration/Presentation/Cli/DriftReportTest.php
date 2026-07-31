@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\AlleKnalle\StandardsSync\Integration\Presentation\Cli;
 
-use AlleKnalle\StandardsSync\Rules\Block\Label;
-use AlleKnalle\StandardsSync\Rules\Block\ManagedBlockRule;
+use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
+use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
 use AlleKnalle\StandardsSync\Core\Engine\Engine;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
@@ -30,7 +30,7 @@ final class DriftReportTest extends TestCase
             $this->blockRule('.editorconfig', 'shared', 'child'),
         );
 
-        self::assertStringContainsString('(×2) ManagedBlockRule:', $report);
+        self::assertStringContainsString('(×2) ManagedBlock:', $report);
         self::assertSame(1, substr_count($report, 'Places the managed "shared" block'));
     }
 
@@ -64,8 +64,8 @@ final class DriftReportTest extends TestCase
         return $output->fetch();
     }
 
-    private function blockRule(string $target, string $label, string $content): ManagedBlockRule
+    private function blockRule(string $target, string $label, string $content): ManagedBlock
     {
-        return new ManagedBlockRule(FileTarget::fromString($target), Label::fromString($label), $content);
+        return new ManagedBlock(FileTarget::fromString($target), Label::fromString($label), $content);
     }
 }

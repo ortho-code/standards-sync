@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\AlleKnalle\StandardsSync\Integration\Core\Engine;
 
-use AlleKnalle\StandardsSync\Rules\Block\Label;
-use AlleKnalle\StandardsSync\Rules\Block\ManagedBlockRule;
+use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
+use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
 use AlleKnalle\StandardsSync\Core\Engine\Engine;
 use AlleKnalle\StandardsSync\Core\Plan\Change;
@@ -109,7 +109,7 @@ final class EngineTest extends TestCase
     public function testResolvesTheFirstExistingCandidate(): void
     {
         $filesystem = new InMemoryFilesystem(['/a/phpstan.dist.neon' => FileContent::fromString('old')]);
-        $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(new ManagedBlockRule(
+        $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(new ManagedBlock(
             FileTarget::fromStrings('phpstan.neon', 'phpstan.dist.neon'),
             Label::fromString('test'),
             'level',
@@ -124,7 +124,7 @@ final class EngineTest extends TestCase
 
     public function testTargetsTheFirstCandidateWhenNoneExist(): void
     {
-        $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(new ManagedBlockRule(
+        $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(new ManagedBlock(
             FileTarget::fromStrings('phpstan.neon', 'phpstan.dist.neon'),
             Label::fromString('test'),
             'level',
@@ -141,12 +141,12 @@ final class EngineTest extends TestCase
     {
         $filesystem = new InMemoryFilesystem(['/a/phpstan.dist.neon' => FileContent::fromString('old')]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(
-            new ManagedBlockRule(
+            new ManagedBlock(
                 FileTarget::fromStrings('phpstan.neon', 'phpstan.dist.neon'),
                 Label::fromString('one'),
                 'a',
             ),
-            new ManagedBlockRule(
+            new ManagedBlock(
                 FileTarget::fromString('phpstan.dist.neon'),
                 Label::fromString('two'),
                 'b',
@@ -202,9 +202,9 @@ final class EngineTest extends TestCase
             ->withRuleSet($this->ruleSetWith($this->blockRule('.editorconfig', 'test', 'root = true')));
     }
 
-    private function blockRule(string $target, string $label, string $content): ManagedBlockRule
+    private function blockRule(string $target, string $label, string $content): ManagedBlock
     {
-        return new ManagedBlockRule(FileTarget::fromString($target), Label::fromString($label), $content);
+        return new ManagedBlock(FileTarget::fromString($target), Label::fromString($label), $content);
     }
 
     /** @param Closure(?string): ?string $apply */

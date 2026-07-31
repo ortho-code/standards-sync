@@ -13,8 +13,8 @@ standards-sync.php (returns SyncConfig)
 Hexagonal-light (not full DDD; this is a transform pipeline, not a domain) — one I/O port, `Filesystem`, and the layers `deptrac` enforces:
 
 - **`Core/`** — the pure pipeline above: the `Rule` contract, the engine, ports (the `Filesystem` interface), value objects, and the text primitives (`Core/Text/`: `Lines` as the LF-convention seam, `Indent`). Imports no framework, only itself; `deptrac` forbids any `Core → Vendor` edge.
-- **`Formats/`** — format-editing machinery shared across rule families (`Formats/Neon/`: `NeonScalarWriter`). Depends on `Core` only; `deptrac` forbids `Core → Formats`, so the engine stays format-blind. Machinery used by a single family stays with that family (the block markers).
-- **`Rules/`** — the shipped rule library (Rector's engine-vs-rules split), grouped per mechanism (`Rules/Block/`: `ManagedBlockRule` plus the marker machinery) or per tool (`Rules/PhpStan/`: import, level floor, pinned values, `PhpStanConfigFile`). Depends on `Core` and `Formats`; `deptrac` forbids `Core → Rules`, so the engine provably never references a concrete rule.
+- **`Formats/`** — format-editing machinery shared across rule families (`Formats/Neon/`: `NeonScalarWriter`; `Formats/Php/`: `FluentChainWriter`). Depends on `Core` only; `deptrac` forbids `Core → Formats`, so the engine stays format-blind. Machinery used by a single family stays with that family (the block markers). A format's conventions live here too (`FluentChainWriter::INDENT`); `Core/Text/` stays character-level.
+- **`Rules/`** — the shipped rule library (Rector's engine-vs-rules split): tool directories (`Rules/PhpStan/`, `Rules/Rector/`) plus `Rules/General/` for tool-agnostic mechanisms, each holding one folder per rule with the rule class and its supporting classes (`Rules/PhpStan/MinLevel/`: the rule + `PhpStanLevel`; `Rules/General/ManagedBlock/`: `ManagedBlock` + the marker machinery), and shared per-tool knowledge at the tool root (`PhpStanConfigFile`, `RectorConfigFile`). Depends on `Core` and `Formats`; `deptrac` forbids `Core → Rules`, so the engine provably never references a concrete rule.
 - **`Infrastructure/`** — driven adapters and framework-backed I/O. `SymfonyFilesystem` and `InMemoryFilesystem` implement the `Filesystem` port (the in-memory one backs disk-free syncs — tests, previews); `TemplateDirectory` reads an org package's `templates/` assets at config-build time.
 - **`Presentation/Cli/`** — the driving adapter: the `symfony/console` `Application` / `SyncCommand`, plus the `DriftReport` presenter.
 - **`Testing/`** — shipped test scaffolding. Framework-neutral: `SyncTester` (sync in memory → result map, for presence checks), `SyncFixtureTester` (sync an on-disk fixture → the `Mismatch`es, for exact before/after checks), and `Mismatch`. Plus `ScenarioTestCase`, a phpunit base over `SyncFixtureTester` — a consumer extends it, returns `scenarios()`, and each fixture (in a `fixtures/` dir beside the test class) is synced and asserted. That phpunit reference is the one `Testing → Vendor` edge; phpunit stays `require-dev` (these classes load only under test).
@@ -23,7 +23,7 @@ Hexagonal-light (not full DDD; this is a transform pipeline, not a domain) — o
 Extension seams, open/closed:
 
 - **Rule** (`target(): FileTarget`, `apply(?string): ?string`, `description(): string`) — the unifying primitive; new rule types extend the set under `Rules/` without touching the pipeline.
-  `ManagedBlockRule` (marker blocks) and `PhpStanImportRule` (native import) ship today; value-aware rules follow (see [rule-model.md](rule-model.md)).
+  `ManagedBlock` (marker blocks), the PHPStan family (included ruleset, level floor, pins), and the Rector base set ship today (see [rule-model.md](rule-model.md)).
 - **ExplainsDrift** — opt-in seam for rules whose drift is not self-evident from the diff; the drift report calls it per drifting rule.
 
 ## Invariants (easy to violate — hold these)

@@ -14,6 +14,10 @@ How the packages are published and how consumers control how fast the standard c
 - **Engine** (`standards-sync`, this repo) — the reusable pipeline + rule types. Published to Packagist; org packages depend on it.
 - **Org package(s)** — depend on the engine, return a `SyncConfig`, ship the actual standard. Named freely (see Naming); one per organisation; can compose a hierarchy via `include()`. The current test/example org package plays this role until a real one exists.
 
+## One package, tool-runtime-free rules (decided 2026-07-23)
+
+Every tool family (phpstan, rector, …) ships in this one engine package, because rules are text transforms: they never execute the tool, import its classes, or reference its constants, so requiring the engine adds zero tool dependencies to a consumer — a project that ignores the Rector rules never needs rector installed. Composer has no conditional requires; the moment a rule family would need the tool's own code (its constants inside our types, or running the tool to validate synced config), that family moves to its own package (`standards-sync-rector`, the phpstan-extension / rector-symfony ecosystem pattern) so only its users carry the dependency. Those are the two recorded triggers for a split — until one fires: single package, and `suggest` entries may hint at the tools a family targets. The org-package layer is the real gate anyway: an org that does not use Rector declares no Rector rules.
+
 ## Local dev vs published
 
 Local co-development uses a composer **`path` repo with `symlink: true`** (org → engine), and `composer.lock` is gitignored in both. That is a dev convenience; the release path is a **public Packagist tag** for the engine (and the org package, if public). The private-packagist mirror was dropped for local dev (it 401'd without a token); the real channel is still to be decided — including whether the org package is public or lives in a private registry / VCS repo, and how a private engine is distributed.

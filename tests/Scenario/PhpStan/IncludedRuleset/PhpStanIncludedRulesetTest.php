@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\AlleKnalle\StandardsSync\Scenario\PhpStan\IncludedRuleset;
+
+use AlleKnalle\StandardsSync\Testing\ScenarioTestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
+
+#[CoversNothing]
+final class PhpStanIncludedRulesetTest extends ScenarioTestCase
+{
+    /** @return iterable<string, array{string, ?string}> */
+    public static function scenarios(): iterable
+    {
+        $config = 'standards-sync.php';
+
+        yield 'a project without a config gets one created' => ['from-scratch', $config];
+        yield 'an existing includes section gains the import' => ['insert-into-section', $config];
+        yield 'a config without includes gains the section at the top' => ['creates-section', $config];
+        yield 'an already-imported config stays put' => ['already-included', $config];
+    }
+}
