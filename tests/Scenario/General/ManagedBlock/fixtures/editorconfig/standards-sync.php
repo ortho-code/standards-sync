@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use AlleKnalle\StandardsSync\Authoring\Package;
 use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-use AlleKnalle\StandardsSync\Infrastructure\Filesystem\TemplateDirectory;
+use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
+use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 
-$templates = new TemplateDirectory(Path::fromString(__DIR__ . '/templates'));
+// The fixture is its own package: distributed content in templates/, sitting at the (virtual) consumer root.
+$package = new Package(__DIR__, '');
 
-return SyncConfig::create()->withRuleSet(new class($templates) extends ComposableRuleSet {
-    public function __construct(TemplateDirectory $templates)
+return SyncConfig::create()->withRuleSet(new class($package) extends ComposableRuleSet {
+    public function __construct(Package $package)
     {
         $this->addRule(new ManagedBlock(
             target: FileTarget::fromString('.editorconfig'),
             label: Label::fromString('test'),
-            content: $templates->read('.editorconfig'),
+            content: $package->read('.editorconfig'),
         ));
     }
 });

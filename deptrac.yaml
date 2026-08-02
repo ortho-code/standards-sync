@@ -27,6 +27,13 @@ deptrac:
           value: src/Rules/.*
         - type: classNameRegex
           value: '#^AlleKnalle\\StandardsSync\\Rules\\#'
+    # Config-build-time support for authoring org packages: the self-locating Package and the Standard base rule set.
+    - name: Authoring
+      collectors:
+        - type: directory
+          value: src/Authoring/.*
+        - type: classNameRegex
+          value: '#^AlleKnalle\\StandardsSync\\Authoring\\#'
     # Driven adapters: the Symfony-backed Filesystem implementation of the Core port.
     - name: Infrastructure
       collectors:
@@ -55,6 +62,9 @@ deptrac:
           value: '#^(?!AlleKnalle\\StandardsSync\\)[^\\]+\\#'
   ruleset:
     Core: ~
+    Authoring:
+      - Core
+      - Vendor
     Formats:
       - Core
     Rules:

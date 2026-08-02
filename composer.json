@@ -10,6 +10,7 @@
     "ext-ctype": "*",
     "ext-dom": "*",
     "ext-iconv": "*",
+    "composer-runtime-api": "^2.1",
     "symfony/console": "^8.1",
     "symfony/filesystem": "^8.1"
   },
