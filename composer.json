@@ -16,7 +16,8 @@
   "require-dev": {
     "deptrac/deptrac": "^4",
     "phpunit/phpunit": "^13",
-    "rector/rector": "^2.5"
+    "rector/rector": "^2.5",
+    "symplify/easy-coding-standard": "^13.2"
   },
   "config": {
     "optimize-autoloader": true,

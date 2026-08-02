@@ -8,7 +8,7 @@ Open-sourced once stable — keep this file project-facing (no personal workflow
 
 `docs/` is the living design record **and** the project documentation — the repo stands alone without this file.
 
-- Direction: [rule-model.md](docs/rule-model.md) — the rule-based model is built (R0 contract, R1 fold); the rule library ships the block mechanism (`ManagedBlock`) plus per-tool PHPStan and Rector families.
+- Direction: [rule-model.md](docs/rule-model.md) — the rule-based model is built (R0 contract, R1 fold); the rule library ships the block mechanism (`ManagedBlock`) plus per-tool PHPStan, Rector and ECS families.
 - Architecture + invariants: [architecture.md](docs/architecture.md) — the pipeline, layers, seams; hold the invariants.
 - Authoring an org package: [authoring-org-packages.md](docs/authoring-org-packages.md).
 - Code + test conventions, commands: [conventions.md](docs/conventions.md).

@@ -23,7 +23,7 @@ Hexagonal-light (not full DDD; this is a transform pipeline, not a domain) — o
 Extension seams, open/closed:
 
 - **Rule** (`target(): FileTarget`, `apply(?string): ?string`, `description(): string`) — the unifying primitive; new rule types extend the set under `Rules/` without touching the pipeline.
-  `ManagedBlock` (marker blocks), the PHPStan family (included ruleset, level floor, pins), and the Rector base set ship today (see [rule-model.md](rule-model.md)).
+  `ManagedBlock` (marker blocks), the PHPStan family (included ruleset, level floor, pins), and the Rector and ECS base sets ship today (see [rule-model.md](rule-model.md)).
 - **ExplainsDrift** — opt-in seam for rules whose drift is not self-evident from the diff; the drift report calls it per drifting rule.
 
 ## Invariants (easy to violate — hold these)
