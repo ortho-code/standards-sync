@@ -173,6 +173,15 @@ NEON
         new PhpStanIncludedRuleset(ruleset: ' ');
     }
 
+    // A machine-local path written into includes: would sync green here and break every other clone.
+    public function testRejectsAnAbsoluteRulesetPath(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('relative');
+
+        new PhpStanIncludedRuleset(ruleset: '/home/me/rules.neon');
+    }
+
     public function testTargetsThePhpStanConfigCandidatesInLookupOrder(): void
     {
         self::assertSame('phpstan.neon | phpstan.neon.dist | phpstan.dist.neon', $this->rule()->target()->toString());

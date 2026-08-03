@@ -53,4 +53,24 @@ final class PathTest extends TestCase
         yield 'empty' => [''];
         yield 'whitespace only' => ['   '];
     }
+
+    public function testFromRelativeStringAcceptsARelativePath(): void
+    {
+        self::assertSame('vendor/acme/standards/phpstan.neon', Path::fromRelativeString('vendor/acme/standards/phpstan.neon')->value());
+    }
+
+    public function testFromRelativeStringRejectsAnAbsolutePath(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A path must be relative; got "/etc/phpstan.neon".');
+
+        Path::fromRelativeString('/etc/phpstan.neon');
+    }
+
+    #[DataProvider('invalidPaths')]
+    public function testFromRelativeStringRejectsAnInvalidPath(string $value): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        Path::fromRelativeString($value);
+    }
 }

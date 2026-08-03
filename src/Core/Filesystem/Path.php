@@ -22,6 +22,17 @@ final readonly class Path
         return new self($value);
     }
 
+    /** For the many places a path is only meaningful relative to some root: refuses an absolute value at construction. */
+    public static function fromRelativeString(string $value): self
+    {
+        $path = self::fromString($value);
+        if ($path->isAbsolute()) {
+            throw new InvalidArgumentException(sprintf('A path must be relative; got "%s".', $value));
+        }
+
+        return $path;
+    }
+
     public function isAbsolute(): bool
     {
         return str_starts_with($this->value, '/');

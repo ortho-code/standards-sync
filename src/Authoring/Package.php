@@ -6,7 +6,6 @@ namespace AlleKnalle\StandardsSync\Authoring;
 
 use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 use Composer\InstalledVersions;
-use InvalidArgumentException;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystemComponent;
@@ -36,10 +35,7 @@ final readonly class Package
     public function __construct(string $directory, string $installedAt)
     {
         $this->directory = Path::fromString($directory);
-        $this->installedAt = $installedAt === '' ? null : Path::fromString($installedAt);
-        if ($this->installedAt?->isAbsolute() === true) {
-            throw new InvalidArgumentException('The install location must be relative to the consumer project root.');
-        }
+        $this->installedAt = $installedAt === '' ? null : Path::fromRelativeString($installedAt);
 
         $this->filesystem = new SymfonyFilesystemComponent();
     }
@@ -81,14 +77,10 @@ final readonly class Package
         return $this->installedAt === null ? $distributed->value() : $this->installedAt->join($distributed)->value();
     }
 
+    // A distributed file is named relative to the templates directory.
     private function distributed(string $file): Path
     {
-        $path = Path::fromString($file);
-        if ($path->isAbsolute()) {
-            throw new InvalidArgumentException('A distributed file is named relative to the templates directory.');
-        }
-
-        return Path::fromString(self::TEMPLATES)->join($path);
+        return Path::fromString(self::TEMPLATES)->join(Path::fromRelativeString($file));
     }
 
     private static function packageName(string $directory): string

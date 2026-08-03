@@ -63,22 +63,45 @@ final readonly class FluentChainWriter
         return Lines::join($lines);
     }
 
-    /** Appends ->method([entry,]) as the chain's last call, before the terminating semicolon. */
+    /**
+     * A ->method([entry,]) call rendered in block form, for insertion into a created config.
+     * A created config has no formatting to respect, so the call carries the canonical unit; the first line starts with `->` unindented, so the creator indents the call into its chain.
+     */
+    public static function createArrayCall(string $method, string $entry): string
+    {
+        $lines = self::arrayCallLines($method, $entry, self::INDENT);
+        $first = array_shift($lines);
+
+        return Lines::join([$first, ...array_map(static fn (string $line): string => self::INDENT . $line, $lines)]);
+    }
+
+    /** Appends ->method([entry,]) as the chain's last call, before the terminating semicolon, following the file's own indentation. */
     private static function appendArrayCall(string $content, string $method, string $entry): string
     {
         $lines = Lines::split($content);
         $lastIndex = self::terminatingLineIndex($lines, $method);
 
         $indent = self::chainIndent($lines, $lastIndex);
-        $unit = self::unit($lines);
+        $call = array_map(static fn (string $line): string => $indent . $line, self::arrayCallLines($method, $entry, self::unit($lines)));
+        $call[array_key_last($call)] .= ';';
         $lines[$lastIndex] = substr(rtrim($lines[$lastIndex]), 0, -1);
-        array_splice($lines, $lastIndex + 1, 0, [
-            $indent . '->' . $method . '([',
-            $indent . $unit . $entry . ',',
-            $indent . ']);',
-        ]);
+        array_splice($lines, $lastIndex + 1, 0, $call);
 
         return Lines::join($lines);
+    }
+
+    /**
+     * The canonical block-form shape of a ->method([entry,]) call, unindented: placement decides the indent, this decides the shape.
+     *
+     * @return non-empty-list<string>
+     */
+    private static function arrayCallLines(string $method, string $entry, string $unit): array
+    {
+        return [
+            '->' . $method . '([',
+            $unit . $entry . ',',
+            '])',
+        ];
     }
 
     /**

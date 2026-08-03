@@ -173,4 +173,16 @@ PHP
 
         FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets([;', 'withSets', "'a.php'");
     }
+
+    public function testRendersTheBlockFormArrayCall(): void
+    {
+        self::assertSame(
+            <<<'PHP'
+->withSets([
+        __DIR__ . '/vendor/acme/standards/config/rector.php',
+    ])
+PHP,
+            FluentChainWriter::createArrayCall('withSets', "__DIR__ . '/vendor/acme/standards/config/rector.php'"),
+        );
+    }
 }

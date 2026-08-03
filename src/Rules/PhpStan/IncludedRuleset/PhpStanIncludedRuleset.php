@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace AlleKnalle\StandardsSync\Rules\PhpStan\IncludedRuleset;
 
+use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Core\Rule\Rule;
 use AlleKnalle\StandardsSync\Core\Text\Indent;
 use AlleKnalle\StandardsSync\Rules\PhpStan\PhpStanConfigFile;
 use AlleKnalle\StandardsSync\Core\Text\Lines;
-use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -24,11 +24,11 @@ final readonly class PhpStanIncludedRuleset implements Rule, ExplainsDrift
     /** Neon's documented default indentation, used when the file has no indented line to copy. */
     private const string DEFAULT_INDENT = Indent::TAB;
 
-    public function __construct(private string $ruleset)
+    private Path $ruleset;
+
+    public function __construct(string $ruleset)
     {
-        if (trim($this->ruleset) === '') {
-            throw new InvalidArgumentException('The ruleset path cannot be empty.');
-        }
+        $this->ruleset = Path::fromRelativeString($ruleset);
     }
 
     public function target(): FileTarget
@@ -55,7 +55,7 @@ final readonly class PhpStanIncludedRuleset implements Rule, ExplainsDrift
         $entryIndent = null;
         for ($index = $sectionIndex + 1; $index < count($lines); $index++) {
             if (preg_match('/^([ \t]+)-[ \t]*(.*)$/', $lines[$index], $match) === 1) {
-                if ($this->entryValue($match[2]) === $this->ruleset) {
+                if ($this->entryValue($match[2]) === $this->ruleset->value()) {
                     return $content;
                 }
                 $entryIndent ??= $match[1];
@@ -67,28 +67,28 @@ final readonly class PhpStanIncludedRuleset implements Rule, ExplainsDrift
             }
         }
 
-        array_splice($lines, $lastEntryIndex + 1, 0, [($entryIndent ?? Indent::detect($lines) ?? self::DEFAULT_INDENT) . '- ' . $this->ruleset]);
+        array_splice($lines, $lastEntryIndex + 1, 0, [($entryIndent ?? Indent::detect($lines) ?? self::DEFAULT_INDENT) . '- ' . $this->ruleset->value()]);
 
         return Lines::join($lines);
     }
 
     public function description(): string
     {
-        return sprintf('Ensures the PHPStan config includes "%s".', $this->ruleset);
+        return sprintf('Ensures the PHPStan config includes "%s".', $this->ruleset->value());
     }
 
     public function explain(?string $content): string
     {
         if ($content === null) {
-            return sprintf('There is no PHPStan config yet; one is created including "%s".', $this->ruleset);
+            return sprintf('There is no PHPStan config yet; one is created including "%s".', $this->ruleset->value());
         }
 
-        return sprintf('The PHPStan config does not include "%s".', $this->ruleset);
+        return sprintf('The PHPStan config does not include "%s".', $this->ruleset->value());
     }
 
     private function section(string $indent): string
     {
-        return self::SECTION . Lines::LINE_BREAK . $indent . '- ' . $this->ruleset . Lines::LINE_BREAK;
+        return self::SECTION . Lines::LINE_BREAK . $indent . '- ' . $this->ruleset->value() . Lines::LINE_BREAK;
     }
 
     /** @param list<string> $lines */

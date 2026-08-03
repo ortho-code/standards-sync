@@ -28,11 +28,7 @@ final readonly class FileTarget
     {
         $paths = [];
         foreach ($candidates as $candidate) {
-            $path = Path::fromString($candidate);
-            if ($path->isAbsolute()) {
-                throw new InvalidArgumentException(sprintf('A file target must be relative; got "%s".', $candidate));
-            }
-            $paths[] = $path;
+            $paths[] = Path::fromRelativeString($candidate);
         }
 
         if ($paths === []) {
