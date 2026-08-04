@@ -8,17 +8,19 @@ use AlleKnalle\StandardsSync\Core\Config\ConfigLoader;
 use AlleKnalle\StandardsSync\Core\Filesystem\Filesystem;
 use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 use AlleKnalle\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
+use AlleKnalle\StandardsSync\Testing\Validation\NeonValidator;
+use AlleKnalle\StandardsSync\Testing\Validation\PsalmConfigValidator;
+use AlleKnalle\StandardsSync\Testing\Validation\SyncedFileValidator;
+use AlleKnalle\StandardsSync\Testing\Validation\XmlValidator;
 use FilesystemIterator;
-use Nette\Neon\Neon;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use RuntimeException;
 
 /**
  * Runs a sync against an on-disk fixture and reports how the result differs from the expected tree.
  * A fixture holds an input tree (a target repo's files before the sync) and an expected tree (its files after); the config is the fixture's own standards-sync.php by default, or one you supply, so the maintainer reads real files to see what a config does.
  * Framework-neutral: it returns the differences, so consumers assert with whatever they use.
- * Synced files whose format has an installed parser (nette/neon) are additionally asserted to parse, so a writer can never produce syntactically broken output unnoticed.
+ * Synced files whose format has an available parser are additionally asserted to parse (nette/neon; ext-dom for XML, plus psalm's config.xsd when vimeo/psalm is installed), so a writer can never produce syntactically broken output unnoticed.
  */
 final class SyncFixtureTester
 {
@@ -30,10 +32,16 @@ final class SyncFixtureTester
     private const string INPUT = 'input';
     private const string EXPECTED = 'expected';
 
+    /** @var list<SyncedFileValidator> */
+    private readonly array $validators;
+
+    /** @param list<SyncedFileValidator>|null $validators the checks run over synced output; null means all shipped validators */
     public function __construct(
         private readonly Filesystem $filesystem = new SymfonyFilesystem(),
         private readonly SyncTester $syncTester = new SyncTester(),
+        ?array $validators = null,
     ) {
+        $this->validators = $validators ?? [new NeonValidator(), new XmlValidator(), new PsalmConfigValidator()];
     }
 
     /**
@@ -61,25 +69,16 @@ final class SyncFixtureTester
     }
 
     /**
-     * Parses every synced file whose format has an installed parser, failing loud on syntactically broken output.
-     * Guarded per parser: the parsers are the engine's own dev dependencies, so org-package suites run without them — and gain the check by installing the parser themselves.
+     * Every synced file passes the validator list, so a writer can never produce syntactically broken output unnoticed.
+     * Validators self-guard on optional parsers, so org-package suites run without them — and gain checks by installing the parsers.
      *
      * @param array<string, string> $result
      */
     private function assertParseable(array $result): void
     {
-        if (!class_exists(Neon::class)) {
-            return;
-        }
-
         foreach ($result as $path => $content) {
-            if (!str_ends_with($path, '.neon')) {
-                continue;
-            }
-            try {
-                Neon::decode($content);
-            } catch (\Nette\Neon\Exception $exception) {
-                throw new RuntimeException(sprintf('The synced %s is not valid neon: %s', $path, $exception->getMessage()), 0, $exception);
+            foreach ($this->validators as $validator) {
+                $validator->assertValid($path, $content);
             }
         }
     }
