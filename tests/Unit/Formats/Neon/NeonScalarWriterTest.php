@@ -277,6 +277,116 @@ NEON
         );
     }
 
+    public function testAnEnforcedCommentIsWrittenWithTheValue(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+parameters:
+	level: 4 # we lowered this deliberately
+NEON
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7 # org minimum: raise freely
+NEON
+            ),
+            NeonScalarWriter::write($content, ['parameters', 'level'], 7, 'org minimum: raise freely'),
+        );
+    }
+
+    public function testAnEnforcedCommentCarriesIntoACreatedLine(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7 # org minimum: raise freely
+NEON
+            ),
+            NeonScalarWriter::write('', ['parameters', 'level'], 7, 'org minimum: raise freely'),
+        );
+    }
+
+    public function testACanonicalValueAndCommentAreLeftUnchanged(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+parameters:
+	level: 7 # org minimum: raise freely
+NEON
+        );
+
+        self::assertSame($content, NeonScalarWriter::write($content, ['parameters', 'level'], 7, 'org minimum: raise freely'));
+    }
+
+    public function testEnsuresATrailingCommentWithoutTouchingTheValueText(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+parameters:
+	level: max
+NEON
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: max # org minimum: raise freely
+NEON
+            ),
+            NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'),
+        );
+    }
+
+    public function testEnsureTrailingCommentReplacesADeviatingComment(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+parameters:
+	level: 8 # our own note
+NEON
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 8 # org minimum: raise freely
+NEON
+            ),
+            NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'),
+        );
+    }
+
+    public function testEnsureTrailingCommentLeavesACanonicalLineAlone(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+parameters:
+	level: 8 # org minimum: raise freely
+NEON
+        );
+
+        self::assertSame($content, NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'));
+    }
+
+    public function testEnsureTrailingCommentAbstainsOnAMissingKey(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+parameters:
+	paths:
+		- src
+NEON
+        );
+
+        self::assertSame($content, NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'));
+    }
+
     public function testRefusesAScalarWhereASectionOpens(): void
     {
         $content = FileContent::fromString(

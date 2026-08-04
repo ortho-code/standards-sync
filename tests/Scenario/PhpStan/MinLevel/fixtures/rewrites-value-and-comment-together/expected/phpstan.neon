@@ -1,0 +1,2 @@
+parameters:
+	level: 7 # org minimum: raise freely, lowering is reverted on sync

@@ -13,8 +13,15 @@ use RuntimeException;
  */
 final readonly class NeonScalarWriter
 {
-    /** @param non-empty-list<string> $path */
-    public static function write(string $content, array $path, bool|int|string $value): string
+    /** The canonical separator between a value and its enforced trailing comment. */
+    private const string COMMENT_LEAD = ' # ';
+
+    /**
+     * With $comment the enforced line is one unit — value and trailing comment — and a deviation in either rewrites both; without, a project's own trailing comment survives.
+     *
+     * @param non-empty-list<string> $path
+     */
+    public static function write(string $content, array $path, bool|int|string $value, ?string $comment = null): string
     {
         $lines = Lines::split($content);
         $unit = NeonIndent::fromLines($lines);
@@ -27,7 +34,7 @@ final readonly class NeonScalarWriter
             $keyIndex = self::findKey($lines, $prefix, $rangeStart, $rangeEnd);
 
             if ($keyIndex === null) {
-                return self::insertMissing($content, $lines, array_slice($path, $position), $value, $indent, $unit, $rangeStart, $position === 0);
+                return self::insertMissing($content, $lines, array_slice($path, $position), $value, $comment, $indent, $unit, $rangeStart, $position === 0);
             }
 
             $rest = trim(substr($lines[$keyIndex], strlen($prefix)));
@@ -36,11 +43,58 @@ final readonly class NeonScalarWriter
                     throw new RuntimeException(sprintf('"%s" holds a section, not a value; it cannot be pinned to a scalar.', implode('.', $path)));
                 }
 
-                return self::replaceValue($lines, $keyIndex, $prefix, $value, $content);
+                return self::replaceValue($lines, $keyIndex, $prefix, $value, $comment, $content);
             }
 
             if ($rest !== '' && !str_starts_with($rest, '#')) {
                 throw new RuntimeException(sprintf('"%s" holds a value, not a section; "%s" cannot be pinned beneath it.', implode('.', array_slice($path, 0, $position + 1)), implode('.', $path)));
+            }
+
+            [$rangeStart, $rangeEnd, $indent] = self::sectionRange($lines, $keyIndex, $indent, $unit);
+        }
+
+        return $content;
+    }
+
+    /**
+     * Enforces the trailing comment on a written scalar line, leaving the value text verbatim; a line already carrying the canonical comment stays put.
+     * When the path is not written or its leaf holds no scalar, the content returns unchanged — annotating is the value enforcement's ride-along, never its replacement.
+     *
+     * @param non-empty-list<string> $path
+     */
+    public static function ensureTrailingComment(string $content, array $path, string $comment): string
+    {
+        $lines = Lines::split($content);
+        $unit = NeonIndent::fromLines($lines);
+
+        $rangeStart = 0;
+        $rangeEnd = count($lines);
+        $indent = '';
+        foreach ($path as $position => $key) {
+            $prefix = $indent . $key . ':';
+            $keyIndex = self::findKey($lines, $prefix, $rangeStart, $rangeEnd);
+            if ($keyIndex === null) {
+                return $content;
+            }
+
+            $rest = trim(substr($lines[$keyIndex], strlen($prefix)));
+            if ($position === count($path) - 1) {
+                if ($rest === '' || str_starts_with($rest, '#')) {
+                    return $content;
+                }
+
+                [$written, $current] = NeonValue::splitTrailingComment(substr($lines[$keyIndex], strlen($prefix)));
+                if ($current === self::COMMENT_LEAD . $comment) {
+                    return $content;
+                }
+
+                $lines[$keyIndex] = $prefix . $written . self::COMMENT_LEAD . $comment;
+
+                return Lines::join($lines);
+            }
+
+            if ($rest !== '' && !str_starts_with($rest, '#')) {
+                return $content;
             }
 
             [$rangeStart, $rangeEnd, $indent] = self::sectionRange($lines, $keyIndex, $indent, $unit);
@@ -124,12 +178,13 @@ final readonly class NeonScalarWriter
      * @param list<string> $lines
      * @param non-empty-list<string> $remainingPath
      */
-    private static function insertMissing(string $content, array $lines, array $remainingPath, bool|int|string $value, string $indent, string $unit, int $insertAt, bool $topLevel): string
+    private static function insertMissing(string $content, array $lines, array $remainingPath, bool|int|string $value, ?string $comment, string $indent, string $unit, int $insertAt, bool $topLevel): string
     {
+        $suffix = $comment === null ? '' : self::COMMENT_LEAD . $comment;
         $newLines = [];
         foreach ($remainingPath as $depth => $key) {
             $isLeaf = $depth === count($remainingPath) - 1;
-            $newLines[] = $indent . str_repeat($unit, $depth) . $key . ':' . ($isLeaf ? ' ' . NeonValue::render($value) : '');
+            $newLines[] = $indent . str_repeat($unit, $depth) . $key . ':' . ($isLeaf ? ' ' . NeonValue::render($value) . $suffix : '');
         }
 
         // A missing top-level section goes to the end of the document; a missing nested key becomes its section's first child.
@@ -147,15 +202,16 @@ final readonly class NeonScalarWriter
     }
 
     /** @param list<string> $lines */
-    private static function replaceValue(array $lines, int $keyIndex, string $prefix, bool|int|string $value, string $content): string
+    private static function replaceValue(array $lines, int $keyIndex, string $prefix, bool|int|string $value, ?string $comment, string $content): string
     {
-        [$written, $comment] = NeonValue::splitTrailingComment(substr($lines[$keyIndex], strlen($prefix)));
+        [$written, $current] = NeonValue::splitTrailingComment(substr($lines[$keyIndex], strlen($prefix)));
         $rendered = NeonValue::render($value);
-        if (trim($written) === $rendered) {
+        $enforced = $comment === null ? $current : self::COMMENT_LEAD . $comment;
+        if (trim($written) === $rendered && $current === $enforced) {
             return $content;
         }
 
-        $lines[$keyIndex] = $prefix . ' ' . $rendered . $comment;
+        $lines[$keyIndex] = $prefix . ' ' . $rendered . $enforced;
 
         return Lines::join($lines);
     }

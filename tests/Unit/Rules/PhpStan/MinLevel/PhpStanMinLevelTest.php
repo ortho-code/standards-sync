@@ -215,6 +215,104 @@ NEON
         ];
     }
 
+    #[DataProvider('commentScenarios')]
+    public function testAnOrgCommentIsEnforcedOnTheLevelLine(?string $current, string $expected): void
+    {
+        self::assertSame($expected, $this->commentedRule()->apply($current));
+    }
+
+    // The expected output is apply(current), so applying again to it must return it unchanged.
+    #[DataProvider('commentScenarios')]
+    public function testTheEnforcedCommentIsIdempotent(?string $current, string $expected): void
+    {
+        self::assertSame($expected, $this->commentedRule()->apply($expected));
+    }
+
+    /** @return iterable<string, array{string|null, string}> */
+    public static function commentScenarios(): iterable
+    {
+        yield 'a raised level carries the org comment' => [
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 4
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7 # org minimum: raise freely
+NEON
+            ),
+        ];
+
+        yield 'a deviating value and comment revert together' => [
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 4 # we lowered this deliberately
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7 # org minimum: raise freely
+NEON
+            ),
+        ];
+
+        yield 'a compliant level keeps its spelling and gains the comment' => [
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: max
+NEON
+            ),
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: max # org minimum: raise freely
+NEON
+            ),
+        ];
+
+        yield 'a created config carries the comment from birth' => [
+            null,
+            FileContent::fromString(
+                <<<'NEON'
+parameters:
+	level: 7 # org minimum: raise freely
+NEON
+            ),
+        ];
+    }
+
+    public function testRefusesAMultiLineComment(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new PhpStanMinLevel(minLevel: PhpStanLevel::fromInt(7), comment: "one\ntwo");
+    }
+
+    public function testRefusesAnEmptyComment(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new PhpStanMinLevel(minLevel: PhpStanLevel::fromInt(7), comment: '');
+    }
+
+    public function testExplainsAnAlteredComment(): void
+    {
+        $compliant = FileContent::fromString(
+            <<<'NEON'
+parameters:
+	level: 8
+NEON
+        );
+
+        self::assertSame('The org comment on the level line is missing or altered.', $this->commentedRule()->explain($compliant));
+    }
+
     public function testExplainsAMissingLevel(): void
     {
         $config = FileContent::fromString(
@@ -264,5 +362,10 @@ NEON
     private function rule(): PhpStanMinLevel
     {
         return new PhpStanMinLevel(minLevel: PhpStanLevel::fromInt(7));
+    }
+
+    private function commentedRule(): PhpStanMinLevel
+    {
+        return new PhpStanMinLevel(minLevel: PhpStanLevel::fromInt(7), comment: 'org minimum: raise freely');
     }
 }
