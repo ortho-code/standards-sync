@@ -47,6 +47,8 @@ Rules that target the same file fold in declaration order — each rule receives
 2. **Hierarchy: the included standard folds first.** `include()` runs the base tier's rules before the including tier's, which is what lets the second tier layer on top: its tool-set entries register after the base's, its same-label blocks override the base's.
 3. **Creation: the first rule to meet an absent file decides the created base**; every later rule edits that content. The discipline that follows: **declare a tool's import rule before its value rules** (level floor, pins) — the created file then grows in the tool's conventional shape, and later declarations read as they behave.
 
+The same discipline covers a tool with no import tier (psalm): declare its base-config rule (`PsalmBaseConfig`) before its value rules, so an absent config grows from the org template instead of the engine skeleton. And because nothing rides `composer update` for such a tool, **the template is one-shot** — it fires only into nothingness and never edits an existing config, so only values that also have their own rule stay enforced. The template bootstraps; rules converge.
+
 ## Testing an org package
 
 Use the shipped `Testing/` helpers:
