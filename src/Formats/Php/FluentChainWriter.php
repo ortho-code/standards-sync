@@ -50,7 +50,7 @@ final readonly class FluentChainWriter
             if (trim($lines[$index]) === '') {
                 continue;
             }
-            if (rtrim(trim($lines[$index]), ',') === $entry) {
+            if (self::entryText($lines[$index]) === $entry) {
                 return $content;
             }
             preg_match('/^([ \t]*)/', $lines[$index], $match);
@@ -200,5 +200,37 @@ final readonly class FluentChainWriter
     private static function lineIndexAt(string $content, int $offset): int
     {
         return substr_count($content, Lines::LINE_BREAK, 0, $offset);
+    }
+
+    /**
+     * The entry text of an array line: a trailing line comment (`//` or `#`) cut quote-aware — a consumer-annotated entry is still that entry — then whitespace and the trailing comma stripped.
+     * Block comments on an entry line stay unhandled: the cost is a one-time visible duplicate, not an edit error.
+     */
+    private static function entryText(string $line): string
+    {
+        $quote = null;
+        for ($offset = 0; $offset < strlen($line); $offset++) {
+            $character = $line[$offset];
+            if ($quote !== null) {
+                if ($character === '\\') {
+                    $offset++;
+                    continue;
+                }
+                if ($character === $quote) {
+                    $quote = null;
+                }
+                continue;
+            }
+            if ($character === "'" || $character === '"') {
+                $quote = $character;
+                continue;
+            }
+            if ($character === '#' || ($character === '/' && ($line[$offset + 1] ?? '') === '/')) {
+                $line = substr($line, 0, $offset);
+                break;
+            }
+        }
+
+        return rtrim(trim($line), ',');
     }
 }

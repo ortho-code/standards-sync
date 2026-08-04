@@ -40,6 +40,43 @@ PHP
         );
     }
 
+    public function testACommentedEntryIsRecognizedAsPresent(): void
+    {
+        $withLineComment = FileContent::fromString(
+            <<<'PHP'
+return RectorConfig::configure()
+    ->withSets([
+        __DIR__ . '/x.php', // the org set
+    ]);
+PHP
+        );
+        $withHashComment = FileContent::fromString(
+            <<<'PHP'
+return RectorConfig::configure()
+    ->withSets([
+        __DIR__ . '/x.php', # the org set
+    ]);
+PHP
+        );
+
+        self::assertSame($withLineComment, FluentChainWriter::ensureArrayEntry($withLineComment, 'withSets', "__DIR__ . '/x.php'"));
+        self::assertSame($withHashComment, FluentChainWriter::ensureArrayEntry($withHashComment, 'withSets', "__DIR__ . '/x.php'"));
+    }
+
+    public function testSlashesInsideAQuotedEntryAreNotACommentBoundary(): void
+    {
+        $content = FileContent::fromString(
+            <<<'PHP'
+return RectorConfig::configure()
+    ->withSets([
+        'https://example.com/sets/a.php',
+    ]);
+PHP
+        );
+
+        self::assertSame($content, FluentChainWriter::ensureArrayEntry($content, 'withSets', "'https://example.com/sets/a.php'"));
+    }
+
     public function testMatchesAnEntryWithAndWithoutTrailingComma(): void
     {
         $withComma = FileContent::fromString(
