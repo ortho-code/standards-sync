@@ -1,0 +1,2 @@
+parameters:
+	editorUrl: 'https://editor.example/#open?file=%file%' # where errors open

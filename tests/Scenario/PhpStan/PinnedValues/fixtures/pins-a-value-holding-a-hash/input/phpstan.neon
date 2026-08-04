@@ -1,0 +1,2 @@
+parameters:
+	editorUrl: 'https://old.example/#x' # where errors open

@@ -14,6 +14,6 @@ final class PhpStanFamilyTest extends ScenarioTestCase
     /** @return iterable<string, array{string, ?string}> */
     public static function scenarios(): iterable
     {
-        yield 'a created config satisfies the floor via the import' => ['from-scratch', 'standards-sync.php'];
+        yield 'a created config gains the import and the floor' => ['from-scratch', 'standards-sync.php'];
     }
 }

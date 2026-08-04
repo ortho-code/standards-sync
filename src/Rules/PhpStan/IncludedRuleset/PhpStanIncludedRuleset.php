@@ -8,10 +8,8 @@ use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Core\Text\Indent;
+use AlleKnalle\StandardsSync\Formats\Neon\NeonListWriter;
 use AlleKnalle\StandardsSync\Rules\PhpStan\PhpStanConfigFile;
-use AlleKnalle\StandardsSync\Core\Text\Lines;
-use RuntimeException;
 
 /**
  * Ensures the PHPStan config includes a given file, as a targeted edit that leaves the rest of the file untouched.
@@ -19,10 +17,7 @@ use RuntimeException;
  */
 final readonly class PhpStanIncludedRuleset implements Rule, ExplainsDrift
 {
-    private const string SECTION = 'includes:';
-
-    /** Neon's documented default indentation, used when the file has no indented line to copy. */
-    private const string DEFAULT_INDENT = Indent::TAB;
+    private const string SECTION = 'includes';
 
     private Path $ruleset;
 
@@ -39,37 +34,7 @@ final readonly class PhpStanIncludedRuleset implements Rule, ExplainsDrift
     public function apply(?string $content): ?string
     {
         // A project without a PHPStan config gets one: enforcing the standard is the point, and withoutRule() is the opt-out.
-        if ($content === null) {
-            return $this->section(self::DEFAULT_INDENT);
-        }
-
-        $lines = Lines::split($content);
-        $sectionIndex = $this->sectionIndex($lines);
-
-        if ($sectionIndex === null) {
-            return $this->section(Indent::detect($lines) ?? self::DEFAULT_INDENT) . Lines::LINE_BREAK . $content;
-        }
-
-        // Scan the section's entries: bail out when the import is already there, otherwise remember where the section ends.
-        $lastEntryIndex = $sectionIndex;
-        $entryIndent = null;
-        for ($index = $sectionIndex + 1; $index < count($lines); $index++) {
-            if (preg_match('/^([ \t]+)-[ \t]*(.*)$/', $lines[$index], $match) === 1) {
-                if ($this->entryValue($match[2]) === $this->ruleset->value()) {
-                    return $content;
-                }
-                $entryIndent ??= $match[1];
-                $lastEntryIndex = $index;
-                continue;
-            }
-            if (trim($lines[$index]) !== '') {
-                break;
-            }
-        }
-
-        array_splice($lines, $lastEntryIndex + 1, 0, [($entryIndent ?? Indent::detect($lines) ?? self::DEFAULT_INDENT) . '- ' . $this->ruleset->value()]);
-
-        return Lines::join($lines);
+        return NeonListWriter::ensureEntry($content ?? '', self::SECTION, $this->ruleset->value());
     }
 
     public function description(): string
@@ -84,32 +49,5 @@ final readonly class PhpStanIncludedRuleset implements Rule, ExplainsDrift
         }
 
         return sprintf('The PHPStan config does not include "%s".', $this->ruleset->value());
-    }
-
-    private function section(string $indent): string
-    {
-        return self::SECTION . Lines::LINE_BREAK . $indent . '- ' . $this->ruleset->value() . Lines::LINE_BREAK;
-    }
-
-    /** @param list<string> $lines */
-    private function sectionIndex(array $lines): ?int
-    {
-        $inlineForm = '/^' . preg_quote(self::SECTION, '/') . '[ \t]*\S/';
-        if (array_any($lines, static fn (string $line): bool => preg_match($inlineForm, $line) === 1)) {
-            throw new RuntimeException(sprintf('The "%s" section is not a block list; convert it to one "- entry" per line so the import can be managed.', self::SECTION));
-        }
-
-        return array_find_key($lines, static fn (string $line): bool => rtrim($line) === self::SECTION);
-    }
-
-    // Entries may quote their path; the import is matched on the unquoted value.
-    private function entryValue(string $raw): string
-    {
-        $value = trim($raw);
-        if (preg_match('/^([\'"])(.*)\1$/', $value, $match) === 1) {
-            return $match[2];
-        }
-
-        return $value;
     }
 }

@@ -18,5 +18,6 @@ final class PhpStanPinTest extends ScenarioTestCase
         yield 'deviating values are rewritten and missing ones added' => ['pins-existing-config', $config];
         yield 'a project without a config gets one holding the pins' => ['creates-the-config', $config];
         yield 'an already-pinned config stays put' => ['already-pinned', $config];
+        yield 'a hash inside a pinned value is content, not a comment' => ['pins-a-value-holding-a-hash', 'standards-sync-hash.php'];
     }
 }

@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace AlleKnalle\StandardsSync\Formats\Neon;
 
-use AlleKnalle\StandardsSync\Core\Text\Indent;
 use AlleKnalle\StandardsSync\Core\Text\Lines;
 use RuntimeException;
 
 /**
- * Sets one scalar at a nested key path in neon text, creating missing keys along the way.
+ * Reads or sets one scalar at a nested key path in neon text, creating missing keys along the way when writing.
  * Targeted line edits only — everything around the touched lines stays byte-identical; no parse, no reserialization.
  */
 final readonly class NeonScalarWriter
 {
-    private const string DEFAULT_INDENT = Indent::TAB;
-
-    /** Bare strings that need no quoting in neon. */
-    private const string SAFE_STRING = '/^[A-Za-z0-9_.\/\\\\-]+$/';
-
     /** @param non-empty-list<string> $path */
     public static function write(string $content, array $path, bool|int|string $value): string
     {
         $lines = Lines::split($content);
-        $unit = Indent::detect($lines) ?? self::DEFAULT_INDENT;
+        $unit = NeonIndent::fromLines($lines);
 
         $rangeStart = 0;
         $rangeEnd = count($lines);
@@ -53,6 +47,43 @@ final readonly class NeonScalarWriter
         }
 
         return $content;
+    }
+
+    /**
+     * The scalar written at a nested key path — verbatim, without any trailing comment — or null when the path is not written or its leaf holds no scalar.
+     *
+     * @param non-empty-list<string> $path
+     */
+    public static function read(string $content, array $path): ?string
+    {
+        $lines = Lines::split($content);
+        $unit = NeonIndent::fromLines($lines);
+
+        $rangeStart = 0;
+        $rangeEnd = count($lines);
+        $indent = '';
+        foreach ($path as $position => $key) {
+            $prefix = $indent . $key . ':';
+            $keyIndex = self::findKey($lines, $prefix, $rangeStart, $rangeEnd);
+            if ($keyIndex === null) {
+                return null;
+            }
+
+            $rest = trim(substr($lines[$keyIndex], strlen($prefix)));
+            if ($position === count($path) - 1) {
+                $value = trim(NeonValue::splitTrailingComment(substr($lines[$keyIndex], strlen($prefix)))[0]);
+
+                return $value === '' ? null : $value;
+            }
+
+            if ($rest !== '' && !str_starts_with($rest, '#')) {
+                return null;
+            }
+
+            [$rangeStart, $rangeEnd, $indent] = self::sectionRange($lines, $keyIndex, $indent, $unit);
+        }
+
+        return null;
     }
 
     /** @param list<string> $lines */
@@ -98,7 +129,7 @@ final readonly class NeonScalarWriter
         $newLines = [];
         foreach ($remainingPath as $depth => $key) {
             $isLeaf = $depth === count($remainingPath) - 1;
-            $newLines[] = $indent . str_repeat($unit, $depth) . $key . ':' . ($isLeaf ? ' ' . self::render($value) : '');
+            $newLines[] = $indent . str_repeat($unit, $depth) . $key . ':' . ($isLeaf ? ' ' . NeonValue::render($value) : '');
         }
 
         // A missing top-level section goes to the end of the document; a missing nested key becomes its section's first child.
@@ -118,35 +149,14 @@ final readonly class NeonScalarWriter
     /** @param list<string> $lines */
     private static function replaceValue(array $lines, int $keyIndex, string $prefix, bool|int|string $value, string $content): string
     {
-        preg_match('/^' . preg_quote($prefix, '/') . '[ \t]*([^#]*?)([ \t]*#.*)?$/', $lines[$keyIndex], $match);
-        $rendered = self::render($value);
-        if (trim($match[1]) === $rendered) {
+        [$written, $comment] = NeonValue::splitTrailingComment(substr($lines[$keyIndex], strlen($prefix)));
+        $rendered = NeonValue::render($value);
+        if (trim($written) === $rendered) {
             return $content;
         }
 
-        $lines[$keyIndex] = $prefix . ' ' . $rendered . ($match[2] ?? '');
+        $lines[$keyIndex] = $prefix . ' ' . $rendered . $comment;
 
         return Lines::join($lines);
-    }
-
-    private static function render(bool|int|string $value): string
-    {
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-        if (is_int($value)) {
-            return (string) $value;
-        }
-        if (preg_match(self::SAFE_STRING, $value) === 1) {
-            return $value;
-        }
-        if (!str_contains($value, "'")) {
-            return "'" . $value . "'";
-        }
-        if (!str_contains($value, '"')) {
-            return '"' . $value . '"';
-        }
-
-        throw new RuntimeException(sprintf('The value %s mixes both quote styles and cannot be rendered safely.', $value));
     }
 }

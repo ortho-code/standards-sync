@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AlleKnalle\StandardsSync\Rules\PhpStan\MinLevel;
 
+use AlleKnalle\StandardsSync\Formats\Neon\NeonValue;
 use InvalidArgumentException;
 
 /**
@@ -39,10 +40,7 @@ final readonly class PhpStanLevel
     /** Parses a level as written in a config: bare or quoted, a number or the "max" alias. */
     public static function fromConfigValue(string $value): self
     {
-        $bare = trim($value);
-        if (preg_match('/^([\'"])(.*)\1$/', $bare, $match) === 1) {
-            $bare = $match[2];
-        }
+        $bare = NeonValue::unquote($value);
 
         if (strtolower($bare) === self::MAX_ALIAS) {
             return self::createMax();

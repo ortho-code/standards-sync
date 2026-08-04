@@ -39,6 +39,14 @@ return SyncConfig::create()->withRuleSet(new Acme(
 ));
 ```
 
+## Declaration order
+
+Rules that target the same file fold in declaration order — each rule receives the previous rule's output. Order never breaks correctness (every rule is idempotent and the fold is deterministic), but it *is* semantics in three places:
+
+1. **Same-label managed blocks: later wins.** A block declared after another with the same label replaces it — that is the override mechanism, e.g. a second tier replacing a base block wholesale.
+2. **Hierarchy: the included standard folds first.** `include()` runs the base tier's rules before the including tier's, which is what lets the second tier layer on top: its tool-set entries register after the base's, its same-label blocks override the base's.
+3. **Creation: the first rule to meet an absent file decides the created base**; every later rule edits that content. The discipline that follows: **declare a tool's import rule before its value rules** (level floor, pins) — the created file then grows in the tool's conventional shape, and later declarations read as they behave.
+
 ## Testing an org package
 
 Use the shipped `Testing/` helpers:
