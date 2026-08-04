@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="8"
+    resolveFromConfigFile="true"
+>
+    <!-- the project's own note survives the sync -->
+    <projectFiles>
+        <directory name="app" />
+    </projectFiles>
+</psalm>
