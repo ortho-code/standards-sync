@@ -10,7 +10,8 @@ The living design record and project documentation for this engine — findings,
 
 ## Index
 
-- [rule-model.md](rule-model.md) — the goal, the tiers of config-sharing, the `Rule` contract and the decisions behind it (R0/R1), prior art (PHP tooling), value-aware rules, and how rules are tested.
+- [rule-model.md](rule-model.md) — the goal, the tiers of config-sharing, the `Rule` contract and the decisions behind it (R0/R1), prior art (PHP tooling), value-aware rules, the cross-family decisions, and how rules are tested.
+- The tool families' decision records, split per family: [phpstan-family.md](phpstan-family.md), [rector-family.md](rector-family.md), [ecs-family.md](ecs-family.md), [deptrac-family.md](deptrac-family.md), [psalm-family.md](psalm-family.md).
 - [architecture.md](architecture.md) — the pure plan pipeline, the deptrac-enforced layers, the extension seams, and the invariants.
 - [prior-approaches.md](prior-approaches.md) — the three earlier takes on this tool and what not to repeat.
 - [prior-art.md](prior-art.md) — how other ecosystems solved this (copier/cruft, projen, mrm, renovate) and the alternatives they suggest.
