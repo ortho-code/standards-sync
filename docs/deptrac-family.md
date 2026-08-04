@@ -6,6 +6,8 @@ Part of the [rule-model design record](rule-model.md), split out per family; the
 
 Agreed as an upcoming phase — initially next, superseded the same date by the psalm family (see the entry below): psalm stresses more new abstraction surface. The design proper (behaviour table, rule naming, fixtures) opens the deptrac phase; what is settled now are the verified facts and the direction, so the design does not re-derive them.
 
+**Re-ordered 2026-08-05 — the composer.json family runs first.** The tool-enforcement flag (see the rule-model roadmap) scores on both axes at once: leverage — it makes all four shipped families' tools actually installed and run, where deptrac would add a fifth config family with the same enforcement hole under it — and the R3 coverage principle: first JSON tool (no comments, marker family out by construction), first target another program (composer itself) also rewrites, and constraint-value semantics; deptrac's YAML sits close to already-covered neon territory. Everything below otherwise stands.
+
 **Why deptrac, against the June inventory.** The first intended consumer org's config inventory (June 2026) rated deptrac "low sharing value — leave configs standalone", but that verdict was shaped by that org's heterogeneous repo architectures. For an org that standardizes its namespace architecture across repos, shared layer definitions plus the ruleset *are* an org standard — architecture rules as the org-level floor. The consuming org/repos are named when the design phase opens.
 
 **Verified config surface (deptrac 4.6.2, read from the installed source):**
