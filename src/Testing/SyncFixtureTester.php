@@ -9,13 +9,16 @@ use AlleKnalle\StandardsSync\Core\Filesystem\Filesystem;
 use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 use AlleKnalle\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
 use FilesystemIterator;
+use Nette\Neon\Neon;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use RuntimeException;
 
 /**
  * Runs a sync against an on-disk fixture and reports how the result differs from the expected tree.
  * A fixture holds an input tree (a target repo's files before the sync) and an expected tree (its files after); the config is the fixture's own standards-sync.php by default, or one you supply, so the maintainer reads real files to see what a config does.
  * Framework-neutral: it returns the differences, so consumers assert with whatever they use.
+ * Synced files whose format has an installed parser (nette/neon) are additionally asserted to parse, so a writer can never produce syntactically broken output unnoticed.
  */
 final class SyncFixtureTester
 {
@@ -52,8 +55,33 @@ final class SyncFixtureTester
             $config->withRoots([$root->value()]),
             $this->readTree($fixture->join(Path::fromString(self::INPUT)), $root),
         );
+        $this->assertParseable($result);
 
         return $this->compare($result, $this->readTree($fixture->join(Path::fromString(self::EXPECTED)), $root));
+    }
+
+    /**
+     * Parses every synced file whose format has an installed parser, failing loud on syntactically broken output.
+     * Guarded per parser: the parsers are the engine's own dev dependencies, so org-package suites run without them — and gain the check by installing the parser themselves.
+     *
+     * @param array<string, string> $result
+     */
+    private function assertParseable(array $result): void
+    {
+        if (!class_exists(Neon::class)) {
+            return;
+        }
+
+        foreach ($result as $path => $content) {
+            if (!str_ends_with($path, '.neon')) {
+                continue;
+            }
+            try {
+                Neon::decode($content);
+            } catch (\Nette\Neon\Exception $exception) {
+                throw new RuntimeException(sprintf('The synced %s is not valid neon: %s', $path, $exception->getMessage()), 0, $exception);
+            }
+        }
     }
 
     /**
