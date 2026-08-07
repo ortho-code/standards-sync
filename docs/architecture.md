@@ -3,7 +3,8 @@
 ```
 standards-sync.php (returns SyncConfig)
   → RuleSet::rules(): Rule[]              declaration order; composition = hierarchy
-  → Engine::plan: per root, resolve every rule's FileTarget (first existing candidate),
+  → Engine::plan: per root, resolve every rule's FileTarget (TargetResolver: a lone existing
+    candidate wins; a dist file beats a shadowing non-dist; same-side ambiguity refuses),
     group rules by resolved file, fold apply() in declaration order
   → Change (per FILE: kind from the fold's endpoints, plus per-rule attribution)
   → Plan{ Change[] }

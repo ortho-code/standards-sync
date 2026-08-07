@@ -12,6 +12,7 @@ final readonly class ResolvedTarget
     public function __construct(
         private Path $path,
         private ?string $current,
+        private ?Path $shadowedBy = null,
     ) {
     }
 
@@ -23,5 +24,11 @@ final readonly class ResolvedTarget
     public function current(): ?string
     {
         return $this->current;
+    }
+
+    /** An existing candidate file the tool reads in preference to this one, when there is one. */
+    public function shadowedBy(): ?Path
+    {
+        return $this->shadowedBy;
     }
 }

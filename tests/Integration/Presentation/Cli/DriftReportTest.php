@@ -26,6 +26,7 @@ final class DriftReportTest extends TestCase
     {
         // The override pattern: two same-label rules both change the running content and render identical lines.
         $report = $this->renderFor(
+            new InMemoryFilesystem(),
             $this->blockRule('.editorconfig', 'shared', 'parent'),
             $this->blockRule('.editorconfig', 'shared', 'child'),
         );
@@ -37,6 +38,7 @@ final class DriftReportTest extends TestCase
     public function testDistinctDriftingRulesKeepTheirOwnLines(): void
     {
         $report = $this->renderFor(
+            new InMemoryFilesystem(),
             $this->blockRule('.gitignore', 'one', 'a'),
             $this->blockRule('.gitignore', 'two', 'b'),
         );
@@ -46,7 +48,34 @@ final class DriftReportTest extends TestCase
         self::assertStringNotContainsString('(×', $report);
     }
 
-    private function renderFor(Rule ...$rules): string
+    public function testNotesTheLocalFileShadowingADriftingDistTarget(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            './phpstan.neon' => "local override\n",
+            './phpstan.neon.dist' => "committed home\n",
+        ]);
+
+        $report = $this->renderFor($filesystem, $this->blockRuleWithCandidates(['phpstan.neon', 'phpstan.neon.dist'], 'org', 'level'));
+
+        self::assertStringContainsString('./phpstan.neon exists and replaces ./phpstan.neon.dist for tool runs; the standard syncs to the dist file.', $report);
+        self::assertStringContainsString('UPDATE ./phpstan.neon.dist', $report);
+    }
+
+    public function testNotesTheLocalFileEvenWhenTheDistTargetIsInSync(): void
+    {
+        $rule = $this->blockRuleWithCandidates(['phpstan.neon', 'phpstan.neon.dist'], 'org', 'level');
+        $filesystem = new InMemoryFilesystem([
+            './phpstan.neon' => "local override\n",
+            './phpstan.neon.dist' => (string) $rule->apply(null),
+        ]);
+
+        $report = $this->renderFor($filesystem, $rule);
+
+        self::assertStringContainsString('./phpstan.neon exists and replaces ./phpstan.neon.dist for tool runs; the standard syncs to the dist file.', $report);
+        self::assertStringContainsString('All managed files are in sync.', $report);
+    }
+
+    private function renderFor(InMemoryFilesystem $filesystem, Rule ...$rules): string
     {
         $ruleSet = new class(...$rules) extends ComposableRuleSet {
             public function __construct(Rule ...$rules)
@@ -56,12 +85,18 @@ final class DriftReportTest extends TestCase
                 }
             }
         };
-        $plan = new Engine(new InMemoryFilesystem())->plan(SyncConfig::create()->withRuleSet($ruleSet));
+        $plan = new Engine($filesystem)->plan(SyncConfig::create()->withRuleSet($ruleSet));
 
         $output = new BufferedOutput();
         (new DriftReport())->render($plan, new SymfonyStyle(new ArrayInput([]), $output));
 
         return $output->fetch();
+    }
+
+    /** @param non-empty-list<string> $candidates */
+    private function blockRuleWithCandidates(array $candidates, string $label, string $content): ManagedBlock
+    {
+        return new ManagedBlock(FileTarget::fromStrings(...$candidates), Label::fromString($label), $content);
     }
 
     private function blockRule(string $target, string $label, string $content): ManagedBlock

@@ -8,8 +8,7 @@ use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 use InvalidArgumentException;
 
 /**
- * The file a rule targets, as ordered path candidates (the tool's own precedence).
- * The engine resolves it per root to the first candidate that exists, or the first if none do.
+ * The file a rule targets, as ordered path candidates (the tool's own precedence); which candidate stands for the target is resolved per root at plan time.
  * Candidates must be relative, because one rule fans across every configured root.
  */
 final readonly class FileTarget

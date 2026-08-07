@@ -11,7 +11,6 @@ use AlleKnalle\StandardsSync\Core\Plan\Change;
 use AlleKnalle\StandardsSync\Core\Plan\ChangeKind;
 use AlleKnalle\StandardsSync\Core\Plan\Plan;
 use AlleKnalle\StandardsSync\Core\Plan\RuleApplication;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Core\Rule\Rule;
 use RuntimeException;
 
@@ -21,8 +20,11 @@ use RuntimeException;
  */
 final readonly class Engine
 {
+    private TargetResolver $targetResolver;
+
     public function __construct(private Filesystem $filesystem)
     {
+        $this->targetResolver = new TargetResolver($filesystem);
     }
 
     public function plan(SyncConfig $config): Plan
@@ -69,7 +71,7 @@ final readonly class Engine
         /** @var array<string, non-empty-list<Rule>> $rulesByPath */
         $rulesByPath = [];
         foreach ($rules as $rule) {
-            $target = $this->resolveTarget($root, $rule->target());
+            $target = $this->targetResolver->resolve($root, $rule->target());
             $key = $target->path()->value();
             $targets[$key] ??= $target;
             $rulesByPath[$key][] = $rule;
@@ -84,20 +86,6 @@ final readonly class Engine
         }
 
         return $changes;
-    }
-
-    /** Resolves a target to the first candidate that exists under the root, or the first candidate if none do. */
-    private function resolveTarget(Path $root, FileTarget $target): ResolvedTarget
-    {
-        foreach ($target->candidates() as $candidate) {
-            $path = $root->join($candidate);
-            $current = $this->filesystem->read($path);
-            if ($current !== null) {
-                return new ResolvedTarget($path, $current);
-            }
-        }
-
-        return new ResolvedTarget($root->join($target->candidates()[0]), null);
     }
 
     /**
@@ -132,6 +120,6 @@ final readonly class Engine
             default => ChangeKind::Update,
         };
 
-        return new Change($target->path(), $kind, $current, $content, $applications);
+        return new Change($target->path(), $kind, $current, $content, $applications, $target->shadowedBy());
     }
 }

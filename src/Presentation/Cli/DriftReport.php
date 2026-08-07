@@ -12,11 +12,15 @@ use AlleKnalle\StandardsSync\Core\Rule\Rule;
 use ReflectionClass;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/** Renders a Plan for humans: each drifting file with the rules that drifted, plus a summary, or a clean-state notice. */
+/** Renders a Plan for humans: the plan's standing notes, then each drifting file with the rules that drifted, plus a summary, or a clean-state notice. */
 final readonly class DriftReport
 {
     public function render(Plan $plan, SymfonyStyle $style): void
     {
+        foreach ($this->notes($plan) as $note) {
+            $style->text($note);
+        }
+
         $drift = $plan->drift();
 
         if ($drift === []) {
@@ -33,6 +37,34 @@ final readonly class DriftReport
         }
 
         $style->warning(sprintf('%d file(s) drift from the managed standard.', count($drift)));
+    }
+
+    /**
+     * Standing facts the plan discovered, told on every run — in-sync files included — so they never pass silently.
+     *
+     * @return list<string>
+     */
+    private function notes(Plan $plan): array
+    {
+        $notes = [];
+        foreach ($plan->changes() as $change) {
+            $note = $this->shadowingNote($change);
+            if ($note !== null) {
+                $notes[] = $note;
+            }
+        }
+
+        return $notes;
+    }
+
+    private function shadowingNote(Change $change): ?string
+    {
+        $shadowedBy = $change->shadowedBy();
+        if ($shadowedBy === null) {
+            return null;
+        }
+
+        return sprintf(' NOTE %s exists and replaces %s for tool runs; the standard syncs to the dist file.', $shadowedBy->value(), $change->path()->value());
     }
 
     private function fileLine(Change $change): string

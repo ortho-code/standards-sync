@@ -106,7 +106,7 @@ final class EngineTest extends TestCase
         );
     }
 
-    public function testResolvesTheFirstExistingCandidate(): void
+    public function testResolvesTheOnlyExistingCandidateWhateverItsName(): void
     {
         $filesystem = new InMemoryFilesystem(['/a/phpstan.dist.neon' => FileContent::fromString('old')]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(new ManagedBlock(
@@ -120,6 +120,60 @@ final class EngineTest extends TestCase
         self::assertCount(1, $changes);
         self::assertSame('/a/phpstan.dist.neon', $changes[0]->path()->value());
         self::assertSame(ChangeKind::Update, $changes[0]->kind());
+        self::assertNull($changes[0]->shadowedBy());
+    }
+
+    public function testPrefersTheDistFileWhenALocalFileShadowsIt(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/phpstan.neon' => FileContent::fromString('local override'),
+            '/a/phpstan.neon.dist' => FileContent::fromString('committed home'),
+        ]);
+        $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith($this->stubRule(
+            FileTarget::fromStrings('phpstan.neon', 'phpstan.neon.dist', 'phpstan.dist.neon'),
+            static fn (?string $content): ?string => $content . FileContent::fromString('managed'),
+        )));
+
+        $changes = new Engine($filesystem)->plan($config)->changes();
+
+        self::assertCount(1, $changes);
+        self::assertSame('/a/phpstan.neon.dist', $changes[0]->path()->value());
+        self::assertSame(FileContent::fromString('committed home'), $changes[0]->current());
+        self::assertSame('/a/phpstan.neon', $changes[0]->shadowedBy()?->value());
+    }
+
+    public function testRefusesSeveralExistingDistFiles(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/phpstan.neon.dist' => FileContent::fromString('one home'),
+            '/a/phpstan.dist.neon' => FileContent::fromString('another home'),
+        ]);
+        $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith($this->stubRule(
+            FileTarget::fromStrings('phpstan.neon', 'phpstan.neon.dist', 'phpstan.dist.neon'),
+            static fn (?string $content): ?string => $content,
+        )));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Both "/a/phpstan.neon.dist" and "/a/phpstan.dist.neon" exist; the standard has one committed home — remove all but one.');
+
+        new Engine($filesystem)->plan($config);
+    }
+
+    public function testRefusesSeveralExistingNonDistFiles(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/a.conf' => FileContent::fromString('one'),
+            '/a/b.conf' => FileContent::fromString('two'),
+        ]);
+        $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith($this->stubRule(
+            FileTarget::fromStrings('a.conf', 'b.conf'),
+            static fn (?string $content): ?string => $content,
+        )));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Both "/a/a.conf" and "/a/b.conf" exist for one target; remove all but one.');
+
+        new Engine($filesystem)->plan($config);
     }
 
     public function testTargetsTheFirstCandidateWhenNoneExist(): void
@@ -208,9 +262,11 @@ final class EngineTest extends TestCase
     }
 
     /** @param Closure(?string): ?string $apply */
-    private function stubRule(string $target, Closure $apply): Rule
+    private function stubRule(string|FileTarget $target, Closure $apply): Rule
     {
-        return new class(FileTarget::fromString($target), $apply) implements Rule {
+        $target = is_string($target) ? FileTarget::fromString($target) : $target;
+
+        return new class($target, $apply) implements Rule {
             /** @param Closure(?string): ?string $apply */
             public function __construct(
                 private readonly FileTarget $target,

@@ -16,6 +16,7 @@ final readonly class Change
         private ?string $current,
         private string $desired,
         private array $applications,
+        private ?Path $shadowedBy = null,
     ) {
     }
 
@@ -43,6 +44,12 @@ final readonly class Change
     public function applications(): array
     {
         return $this->applications;
+    }
+
+    /** An existing candidate file the tool reads in preference to this one, when there is one. */
+    public function shadowedBy(): ?Path
+    {
+        return $this->shadowedBy;
     }
 
     /**
