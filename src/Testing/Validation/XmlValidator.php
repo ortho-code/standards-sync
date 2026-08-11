@@ -10,9 +10,11 @@ use RuntimeException;
 /** Every synced .xml file must be well-formed — unguarded, since ext-dom is a hard engine requirement. Pure format knowledge; tool-level schema checks are separate validators. */
 final readonly class XmlValidator implements SyncedFileValidator
 {
+    private const string EXTENSION = '.xml';
+
     public function assertValid(string $path, string $content): void
     {
-        if (!str_ends_with($path, '.xml')) {
+        if (!str_ends_with($path, self::EXTENSION)) {
             return;
         }
 

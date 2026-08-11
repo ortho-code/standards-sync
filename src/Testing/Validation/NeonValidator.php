@@ -10,9 +10,11 @@ use RuntimeException;
 /** Parses every synced .neon file; nette/neon sits in the engine's require-dev only, so the check self-guards and org suites gain it by installing the parser. */
 final readonly class NeonValidator implements SyncedFileValidator
 {
+    private const string EXTENSION = '.neon';
+
     public function assertValid(string $path, string $content): void
     {
-        if (!str_ends_with($path, '.neon') || !class_exists(Neon::class)) {
+        if (!str_ends_with($path, self::EXTENSION) || !class_exists(Neon::class)) {
             return;
         }
 
