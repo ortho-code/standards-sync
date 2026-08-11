@@ -49,6 +49,16 @@ Rules that target the same file fold in declaration order — each rule receives
 
 The same discipline covers a tool with no import tier (psalm): declare its base-config rule (`PsalmBaseConfig`) before its value rules, so an absent config grows from the org template instead of the engine skeleton. And because nothing rides `composer update` for such a tool, **the template is one-shot** — it fires only into nothingness and never edits an existing config, so only values that also have their own rule stay enforced. The template bootstraps; rules converge.
 
+## Making the standard enforceable
+
+Synced configs enforce nothing on their own: a repo that never installs the tools, or never runs them, passes every day. Closing that takes three declarations that belong together, and only the first two are engine rules:
+
+1. **`ComposerRequirement`** per tool, so the manifest actually requires it. Writing a requirement leaves `composer.lock` stale, which is deliberate — `composer install` warns, and refuses outright when the package is not in the lock at all, so the gap surfaces loudly rather than silently.
+2. **`ComposerScript`**, one named entry point that runs the tools plus `standards-sync sync --check`, so the configs and the check itself are drift-guarded.
+3. **A `ManagedBlock` in the CI config** calling that script. This needs no engine support — `ManagedBlock` works in any comment-bearing format, and CI configs are YAML.
+
+The third one calls the second one *by name*, and nothing in the engine ties them together, so pin them in the package's own test: read the script name back out of the synced manifest and assert the workflow calls it. A renamed script would otherwise leave CI running nothing.
+
 ## Testing an org package
 
 Use the shipped `Testing/` helpers:
