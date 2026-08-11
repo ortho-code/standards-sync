@@ -33,7 +33,7 @@ final class NeonValueTest extends TestCase
     public function testRefusesAValueMixingBothQuoteStyles(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('mixes both quote styles');
+        $this->expectExceptionMessageIsOrContains('mixes both quote styles');
 
         NeonValue::render('both \' and "');
     }

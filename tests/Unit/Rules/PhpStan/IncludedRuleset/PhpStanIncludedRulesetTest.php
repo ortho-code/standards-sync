@@ -161,7 +161,7 @@ NEON
     public function testRefusesAnInlineIncludesList(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('block list');
+        $this->expectExceptionMessageIsOrContains('block list');
 
         $this->rule()->apply(FileContent::fromString('includes: [phpstan-baseline.neon]'));
     }
@@ -177,7 +177,7 @@ NEON
     public function testRejectsAnAbsoluteRulesetPath(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('relative');
+        $this->expectExceptionMessageIsOrContains('relative');
 
         new PhpStanIncludedRuleset(ruleset: '/home/me/rules.neon');
     }

@@ -193,7 +193,7 @@ NEON
     public function testRefusesToPinAScalarOverASection(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('holds a section');
+        $this->expectExceptionMessageIsOrContains('holds a section');
 
         $rule = new PhpStanPinnedValues(values: PinnedValues::fromArray(['parameters' => ['cache' => 'simple']]));
 
@@ -211,7 +211,7 @@ NEON
     public function testRefusesToPinBeneathAScalar(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('holds a value');
+        $this->expectExceptionMessageIsOrContains('holds a value');
 
         $this->rule()->apply(FileContent::fromString('parameters: true'));
     }

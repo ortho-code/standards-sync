@@ -146,7 +146,7 @@ NEON
         );
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('block list');
+        $this->expectExceptionMessageIsOrContains('block list');
 
         NeonListWriter::ensureEntry($content, 'includes', 'vendor/other/phpstan.neon');
     }

@@ -30,7 +30,7 @@ NEON
     public function testFailsLoudOnBrokenNeon(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The synced ./phpstan.neon is not valid neon');
+        $this->expectExceptionMessageIsOrContains('The synced ./phpstan.neon is not valid neon');
 
         new NeonValidator()->assertValid('./phpstan.neon', "parameters:\n\tlevel: [6\n");
     }
