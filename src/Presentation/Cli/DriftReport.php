@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace AlleKnalle\StandardsSync\Presentation\Cli;
 
+use AlleKnalle\StandardsSync\Core\Plan\Abstention;
 use AlleKnalle\StandardsSync\Core\Plan\Change;
 use AlleKnalle\StandardsSync\Core\Plan\ChangeKind;
 use AlleKnalle\StandardsSync\Core\Plan\Plan;
+use AlleKnalle\StandardsSync\Core\Plan\RuleApplication;
 use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
 use AlleKnalle\StandardsSync\Core\Rule\Rule;
 use ReflectionClass;
@@ -54,6 +56,10 @@ final readonly class DriftReport
             }
         }
 
+        foreach ($plan->abstentions() as $abstention) {
+            $notes[] = $this->abstentionNote($abstention);
+        }
+
         return $notes;
     }
 
@@ -65,6 +71,47 @@ final readonly class DriftReport
         }
 
         return sprintf(' NOTE %s exists and replaces %s for tool runs; the standard syncs to the dist file.', $shadowedBy->value(), $change->path()->value());
+    }
+
+    private function abstentionNote(Abstention $abstention): string
+    {
+        return sprintf(' NOTE %s does not exist; nothing was enforced there (%s).', $abstention->path()->value(), implode(', ', $this->ruleNames($abstention->rules())));
+    }
+
+    /**
+     * The rules named once each, with a count where a rule stood down several times over.
+     *
+     * @param non-empty-list<Rule> $rules
+     * @return non-empty-list<string>
+     */
+    private function ruleNames(array $rules): array
+    {
+        $counts = $this->countOccurrences(array_map(
+            static fn (Rule $rule): string => new ReflectionClass($rule)->getShortName(),
+            $rules,
+        ));
+
+        return array_values(array_map(
+            static fn (string $name, int $count): string => $count > 1 ? sprintf('%s ×%d', $name, $count) : $name,
+            array_keys($counts),
+            $counts,
+        ));
+    }
+
+    /**
+     * How often each label occurs, in first-seen order; the two renderings above place the multiplier differently.
+     *
+     * @param list<string> $labels
+     * @return array<string, int>
+     */
+    private function countOccurrences(array $labels): array
+    {
+        $counts = [];
+        foreach ($labels as $label) {
+            $counts[$label] = ($counts[$label] ?? 0) + 1;
+        }
+
+        return $counts;
     }
 
     private function fileLine(Change $change): string
@@ -79,11 +126,10 @@ final readonly class DriftReport
      */
     private function ruleLines(Change $change): array
     {
-        $counts = [];
-        foreach ($change->driftingApplications() as $application) {
-            $text = $this->ruleText($application->rule(), $application->before());
-            $counts[$text] = ($counts[$text] ?? 0) + 1;
-        }
+        $counts = $this->countOccurrences(array_map(
+            fn (RuleApplication $application): string => $this->ruleText($application->rule(), $application->before()),
+            $change->driftingApplications(),
+        ));
 
         $lines = [];
         foreach ($counts as $text => $count) {

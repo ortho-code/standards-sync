@@ -42,6 +42,29 @@ final class SyncCommandTest extends IntegrationTestCase
         return SyncConfig::create()->withRuleSet($ruleSet);
         PHP;
 
+    private const string ABSTAINING_CONFIG = <<<'PHP'
+        <?php
+
+        declare(strict_types=1);
+
+        use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
+        use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
+        use AlleKnalle\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
+        use AlleKnalle\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+
+        $ruleSet = new class extends ComposableRuleSet {
+            public function __construct()
+            {
+                $this->addRule(new ComposerRequirement(
+                    package: 'phpstan/phpstan',
+                    constraint: VersionConstraint::fromString('^2.5'),
+                ));
+            }
+        };
+
+        return SyncConfig::create()->withRuleSet($ruleSet);
+        PHP;
+
     protected function setUp(): void
     {
         $this->writeToWorkspace('standards-sync.php', self::FIXTURE_CONFIG);
@@ -79,6 +102,29 @@ final class SyncCommandTest extends IntegrationTestCase
         [$exitCode] = $this->runSync(['--check' => true]);
 
         self::assertSame(0, $exitCode);
+    }
+
+    /** An abstention is reported but is not drift, so a repo the rule has no opinion about still passes CI. */
+    public function testCheckNotesAnAbstentionAndStillExitsZero(): void
+    {
+        $this->writeToWorkspace('standards-sync.php', self::ABSTAINING_CONFIG);
+
+        [$exitCode, $output] = $this->runSync(['--check' => true]);
+
+        self::assertSame(0, $exitCode);
+        self::assertStringContainsString('NOTE ./composer.json does not exist; nothing was enforced there (ComposerRequirement).', $output);
+    }
+
+    /** The note is a standing fact, so it is told on a writing run too, not only under --check. */
+    public function testSyncNotesAnAbstentionAsWell(): void
+    {
+        $this->writeToWorkspace('standards-sync.php', self::ABSTAINING_CONFIG);
+
+        [$exitCode, $output] = $this->runSync([]);
+
+        self::assertSame(0, $exitCode);
+        self::assertStringContainsString('NOTE ./composer.json does not exist; nothing was enforced there (ComposerRequirement).', $output);
+        self::assertFileDoesNotExist($this->workspace() . '/composer.json');
     }
 
     public function testHelpDescribesTheSyncCommand(): void

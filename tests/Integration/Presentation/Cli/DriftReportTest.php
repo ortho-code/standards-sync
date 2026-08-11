@@ -8,10 +8,13 @@ use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
 use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
 use AlleKnalle\StandardsSync\Core\Engine\Engine;
+use AlleKnalle\StandardsSync\Core\Plan\Plan;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Core\Rule\Rule;
 use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
 use AlleKnalle\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
+use AlleKnalle\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
+use AlleKnalle\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
 use AlleKnalle\StandardsSync\Presentation\Cli\DriftReport;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -75,7 +78,50 @@ final class DriftReportTest extends TestCase
         self::assertStringContainsString('All managed files are in sync.', $report);
     }
 
+    /** A declared rule that quietly does nothing is what the note exists to prevent, so it is told even on an otherwise clean run. */
+    public function testNotesAFileEveryRuleAbstainedOn(): void
+    {
+        $report = $this->renderFor(new InMemoryFilesystem(), $this->abstainingRule('phpstan/phpstan'));
+
+        self::assertStringContainsString(' NOTE ./composer.json does not exist; nothing was enforced there (ComposerRequirement).', $report);
+        self::assertStringContainsString('All managed files are in sync.', $report);
+    }
+
+    public function testTheAbstentionNoteCountsRepeatedRules(): void
+    {
+        $report = $this->renderFor(
+            new InMemoryFilesystem(),
+            $this->abstainingRule('phpstan/phpstan'),
+            $this->abstainingRule('rector/rector'),
+            $this->abstainingRule('vimeo/psalm'),
+        );
+
+        self::assertStringContainsString('nothing was enforced there (ComposerRequirement ×3).', $report);
+    }
+
+    public function testAnAbstainedFileIsNotDrift(): void
+    {
+        $plan = $this->planFor(new InMemoryFilesystem(), $this->abstainingRule('phpstan/phpstan'));
+
+        self::assertFalse($plan->hasDrift());
+        self::assertSame([], $plan->changes());
+        self::assertCount(1, $plan->abstentions());
+    }
+
+    private function abstainingRule(string $package): ComposerRequirement
+    {
+        return new ComposerRequirement(package: $package, constraint: VersionConstraint::fromString('^1.0'));
+    }
+
     private function renderFor(InMemoryFilesystem $filesystem, Rule ...$rules): string
+    {
+        $output = new BufferedOutput();
+        (new DriftReport())->render($this->planFor($filesystem, ...$rules), new SymfonyStyle(new ArrayInput([]), $output));
+
+        return $output->fetch();
+    }
+
+    private function planFor(InMemoryFilesystem $filesystem, Rule ...$rules): Plan
     {
         $ruleSet = new class(...$rules) extends ComposableRuleSet {
             public function __construct(Rule ...$rules)
@@ -85,12 +131,8 @@ final class DriftReportTest extends TestCase
                 }
             }
         };
-        $plan = new Engine($filesystem)->plan(SyncConfig::create()->withRuleSet($ruleSet));
 
-        $output = new BufferedOutput();
-        (new DriftReport())->render($plan, new SymfonyStyle(new ArrayInput([]), $output));
-
-        return $output->fetch();
+        return new Engine($filesystem)->plan(SyncConfig::create()->withRuleSet($ruleSet));
     }
 
     /** @param non-empty-list<string> $candidates */

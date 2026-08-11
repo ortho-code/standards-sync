@@ -7,6 +7,7 @@ namespace AlleKnalle\StandardsSync\Core\Engine;
 use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
 use AlleKnalle\StandardsSync\Core\Filesystem\Filesystem;
 use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use AlleKnalle\StandardsSync\Core\Plan\Abstention;
 use AlleKnalle\StandardsSync\Core\Plan\Change;
 use AlleKnalle\StandardsSync\Core\Plan\ChangeKind;
 use AlleKnalle\StandardsSync\Core\Plan\Plan;
@@ -31,12 +32,15 @@ final readonly class Engine
     {
         $rules = $this->collectRules($config);
 
-        $changes = [];
+        $outcomes = [];
         foreach ($config->roots() as $root) {
-            array_push($changes, ...$this->changesFor($root, $rules));
+            array_push($outcomes, ...$this->outcomesFor($root, $rules));
         }
 
-        return new Plan($changes);
+        return new Plan(
+            array_values(array_filter($outcomes, static fn (Change|Abstention $outcome): bool => $outcome instanceof Change)),
+            array_values(array_filter($outcomes, static fn (Change|Abstention $outcome): bool => $outcome instanceof Abstention)),
+        );
     }
 
     public function apply(Plan $plan): void
@@ -61,9 +65,9 @@ final readonly class Engine
 
     /**
      * @param list<Rule> $rules
-     * @return list<Change>
+     * @return list<Change|Abstention>
      */
-    private function changesFor(Path $root, array $rules): array
+    private function outcomesFor(Path $root, array $rules): array
     {
         // Group by resolved path, so rules with different candidate lists that resolve to the same file fold together.
         /** @var array<string, ResolvedTarget> $targets */
@@ -77,15 +81,12 @@ final readonly class Engine
             $rulesByPath[$key][] = $rule;
         }
 
-        $changes = [];
+        $outcomes = [];
         foreach ($rulesByPath as $key => $fileRules) {
-            $change = $this->foldFile($targets[$key], $fileRules);
-            if ($change instanceof Change) {
-                $changes[] = $change;
-            }
+            $outcomes[] = $this->foldFile($targets[$key], $fileRules);
         }
 
-        return $changes;
+        return $outcomes;
     }
 
     /**
@@ -93,7 +94,7 @@ final readonly class Engine
      *
      * @param non-empty-list<Rule> $rules
      */
-    private function foldFile(ResolvedTarget $target, array $rules): ?Change
+    private function foldFile(ResolvedTarget $target, array $rules): Change|Abstention
     {
         $current = $target->current();
 
@@ -105,9 +106,9 @@ final readonly class Engine
             $applications[] = new RuleApplication($rule, $before, $content);
         }
 
-        // Every rule abstained on an absent file: nothing exists and nothing should.
+        // Every rule abstained on an absent file: nothing exists and nothing should, and the rules that stood down are told rather than dropped.
         if ($current === null && $content === null) {
-            return null;
+            return new Abstention($target->path(), $rules);
         }
 
         if ($content === null) {
