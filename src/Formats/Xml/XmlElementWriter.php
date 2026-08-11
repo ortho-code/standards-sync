@@ -21,56 +21,50 @@ final readonly class XmlElementWriter
     /** The attribute's raw value as written on the element's open tag, or null when the attribute is absent. */
     public static function readAttribute(string $content, string $element, string $attribute): ?string
     {
-        [, $attributesStart, $attributesEnd] = self::openTag($content, $element);
-        $written = self::attributes($content, $element, $attributesStart, $attributesEnd);
-
-        return $written[$attribute]['value'] ?? null;
+        return self::openTag($content, $element)->attribute($attribute)?->value();
     }
 
     /** Sets the attribute on the element's open tag: an existing value is replaced keeping its quotes, a missing attribute is appended after the last one, and an equal value leaves the content untouched. */
     public static function writeAttribute(string $content, string $element, string $attribute, string $value): string
     {
-        [$tagStart, $attributesStart, $attributesEnd] = self::openTag($content, $element);
-        $written = self::attributes($content, $element, $attributesStart, $attributesEnd);
+        $tag = self::openTag($content, $element);
 
-        $existing = $written[$attribute] ?? null;
+        $existing = $tag->attribute($attribute);
         if ($existing !== null) {
-            self::assertNeedsNoEncoding($value, $existing['quote']);
-            if ($existing['value'] === $value) {
+            self::assertNeedsNoEncoding($value, $existing->quote());
+            if ($existing->value() === $value) {
                 return $content;
             }
 
-            return substr($content, 0, $existing['valueStart']) . $value . substr($content, $existing['valueEnd']);
+            return substr($content, 0, $existing->valueStart()) . $value . substr($content, $existing->valueEnd());
         }
 
         self::assertNeedsNoEncoding($value, self::INSERT_QUOTE);
         $token = $attribute . '=' . self::INSERT_QUOTE . $value . self::INSERT_QUOTE;
 
         // An attribute-less tag gets the token right after the element name.
-        if ($written === []) {
-            return substr($content, 0, $attributesStart) . ' ' . $token . substr($content, $attributesStart);
+        $last = $tag->last();
+        if ($last === null) {
+            return substr($content, 0, $tag->attributesStart()) . ' ' . $token . substr($content, $tag->attributesStart());
         }
 
-        $last = $written[array_key_last($written)];
-        $lineStart = strrpos(substr($content, 0, $last['start']), "\n");
+        $lineStart = strrpos(substr($content, 0, $last->start()), "\n");
 
         // Inline after the last attribute when it shares a line with the element name; otherwise a fresh line copying that attribute's indentation.
-        if ($lineStart === false || $lineStart < $tagStart) {
-            return substr($content, 0, $last['end']) . ' ' . $token . substr($content, $last['end']);
+        if ($lineStart === false || $lineStart < $tag->start()) {
+            return substr($content, 0, $last->end()) . ' ' . $token . substr($content, $last->end());
         }
 
         preg_match('/^[ \t]*/', substr($content, $lineStart + 1), $indent);
 
-        return substr($content, 0, $last['end']) . "\n" . $indent[0] . $token . substr($content, $last['end']);
+        return substr($content, 0, $last->end()) . "\n" . $indent[0] . $token . substr($content, $last->end());
     }
 
     /**
-     * Locates the element's one open tag, skipping comments and requiring a name boundary so a longer element name never matches.
+     * Locates the element's one open tag, skipping comments and requiring a name boundary so a longer element name never matches, then tokenizes what it writes.
      * The end scan tracks quote state, so a ">" inside an attribute value does not close the tag.
-     *
-     * @return array{int, int, int} the tag's start, and the attribute span's start and end (the ">", or the "/" of a self-closing tag)
      */
-    private static function openTag(string $content, string $element): array
+    private static function openTag(string $content, string $element): XmlOpenTag
     {
         $comments = self::commentRanges($content);
         $lead = '<' . $element;
@@ -113,7 +107,7 @@ final readonly class XmlElementWriter
             if ($character === '>') {
                 $end = $content[$index - 1] === '/' ? $index - 1 : $index;
 
-                return [$tagStart, $attributesStart, $end];
+                return new XmlOpenTag($tagStart, $attributesStart, self::attributes($content, $element, $attributesStart, $end));
             }
         }
 
@@ -123,7 +117,7 @@ final readonly class XmlElementWriter
     /**
      * Tokenizes the open tag's attribute span, in document order, failing loud on duplicates and on any content that is not a quoted attribute.
      *
-     * @return array<string, array{start: int, end: int, quote: string, value: string, valueStart: int, valueEnd: int}> keyed by attribute name, offsets absolute in $content
+     * @return array<string, XmlAttribute> keyed by attribute name, offsets absolute in $content
      */
     private static function attributes(string $content, string $element, int $start, int $end): array
     {
@@ -144,14 +138,14 @@ final readonly class XmlElementWriter
 
             $quoted = $match[2][0];
             $valueStart = $start + $match[2][1] + 1;
-            $attributes[$name] = [
-                'start' => $start + $tokenOffset,
-                'end' => $start + $tokenOffset + strlen($token),
-                'quote' => $quoted[0],
-                'value' => substr($quoted, 1, -1),
-                'valueStart' => $valueStart,
-                'valueEnd' => $valueStart + strlen($quoted) - 2,
-            ];
+            $attributes[$name] = new XmlAttribute(
+                start: $start + $tokenOffset,
+                end: $start + $tokenOffset + strlen($token),
+                quote: $quoted[0],
+                value: substr($quoted, 1, -1),
+                valueStart: $valueStart,
+                valueEnd: $valueStart + strlen($quoted) - 2,
+            );
         }
         self::assertOnlyWhitespace(substr($span, $covered), $element);
 
