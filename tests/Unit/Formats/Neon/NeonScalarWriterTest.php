@@ -17,11 +17,11 @@ final class NeonScalarWriterTest extends TestCase
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 6
-	paths:
-		- src
-NEON
+                parameters:
+                	level: 6
+                	paths:
+                		- src
+                NEON
         );
 
         self::assertSame('6', NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -31,9 +31,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 6 # keep in step with CI
-NEON
+                parameters:
+                	level: 6 # keep in step with CI
+                NEON
         );
 
         self::assertSame('6', NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -43,9 +43,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: '6'
-NEON
+                parameters:
+                	level: '6'
+                NEON
         );
 
         self::assertSame("'6'", NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -55,10 +55,10 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	paths:
-		- src
-NEON
+                parameters:
+                	paths:
+                		- src
+                NEON
         );
 
         self::assertNull(NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -68,9 +68,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
-NEON
+                includes:
+                	- vendor/acme/standards/phpstan.neon
+                NEON
         );
 
         self::assertNull(NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -80,10 +80,10 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level:
-		nested: 1
-NEON
+                parameters:
+                	level:
+                		nested: 1
+                NEON
         );
 
         self::assertNull(NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -93,10 +93,10 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	type_coverage:
-		level: 9
-NEON
+                parameters:
+                	type_coverage:
+                		level: 9
+                NEON
         );
 
         self::assertNull(NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -111,17 +111,17 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 4
-NEON
+                parameters:
+                	level: 4
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7
-NEON
+                    parameters:
+                    	level: 7
+                    NEON
             ),
             NeonScalarWriter::write($content, ['parameters', 'level'], 7),
         );
@@ -131,9 +131,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 7
-NEON
+                parameters:
+                	level: 7
+                NEON
         );
 
         self::assertSame($content, NeonScalarWriter::write($content, ['parameters', 'level'], 7));
@@ -143,17 +143,17 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 4 # keep in step with CI
-NEON
+                parameters:
+                	level: 4 # keep in step with CI
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7 # keep in step with CI
-NEON
+                    parameters:
+                    	level: 7 # keep in step with CI
+                    NEON
             ),
             NeonScalarWriter::write($content, ['parameters', 'level'], 7),
         );
@@ -163,20 +163,20 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	paths:
-		- src
-NEON
+                parameters:
+                	paths:
+                		- src
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7
-	paths:
-		- src
-NEON
+                    parameters:
+                    	level: 7
+                    	paths:
+                    		- src
+                    NEON
             ),
             NeonScalarWriter::write($content, ['parameters', 'level'], 7),
         );
@@ -186,20 +186,20 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
-NEON
+                includes:
+                	- vendor/acme/standards/phpstan.neon
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
 
-parameters:
-	level: 7
-NEON
+                    parameters:
+                    	level: 7
+                    NEON
             ),
             NeonScalarWriter::write($content, ['parameters', 'level'], 7),
         );
@@ -210,9 +210,9 @@ NEON
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7
-NEON
+                    parameters:
+                    	level: 7
+                    NEON
             ),
             NeonScalarWriter::write('', ['parameters', 'level'], 7),
         );
@@ -223,9 +223,9 @@ NEON
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	treatPhpDocTypesAsCertain: false
-NEON
+                    parameters:
+                    	treatPhpDocTypesAsCertain: false
+                    NEON
             ),
             NeonScalarWriter::write('', ['parameters', 'treatPhpDocTypesAsCertain'], false),
         );
@@ -236,9 +236,9 @@ NEON
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	message: 'hello world'
-NEON
+                    parameters:
+                    	message: 'hello world'
+                    NEON
             ),
             NeonScalarWriter::write('', ['parameters', 'message'], 'hello world'),
         );
@@ -248,9 +248,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	pattern: '~foo#bar~'
-NEON
+                parameters:
+                	pattern: '~foo#bar~'
+                NEON
         );
 
         self::assertSame("'~foo#bar~'", NeonScalarWriter::read($content, ['parameters', 'pattern']));
@@ -261,17 +261,17 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	pattern: '~foo#bar~' # the org pattern
-NEON
+                parameters:
+                	pattern: '~foo#bar~' # the org pattern
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	pattern: '~other#thing~' # the org pattern
-NEON
+                    parameters:
+                    	pattern: '~other#thing~' # the org pattern
+                    NEON
             ),
             NeonScalarWriter::write($content, ['parameters', 'pattern'], '~other#thing~'),
         );
@@ -281,17 +281,17 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 4 # we lowered this deliberately
-NEON
+                parameters:
+                	level: 4 # we lowered this deliberately
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7 # org minimum: raise freely
-NEON
+                    parameters:
+                    	level: 7 # org minimum: raise freely
+                    NEON
             ),
             NeonScalarWriter::write($content, ['parameters', 'level'], 7, 'org minimum: raise freely'),
         );
@@ -302,9 +302,9 @@ NEON
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7 # org minimum: raise freely
-NEON
+                    parameters:
+                    	level: 7 # org minimum: raise freely
+                    NEON
             ),
             NeonScalarWriter::write('', ['parameters', 'level'], 7, 'org minimum: raise freely'),
         );
@@ -314,9 +314,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 7 # org minimum: raise freely
-NEON
+                parameters:
+                	level: 7 # org minimum: raise freely
+                NEON
         );
 
         self::assertSame($content, NeonScalarWriter::write($content, ['parameters', 'level'], 7, 'org minimum: raise freely'));
@@ -326,17 +326,17 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: max
-NEON
+                parameters:
+                	level: max
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: max # org minimum: raise freely
-NEON
+                    parameters:
+                    	level: max # org minimum: raise freely
+                    NEON
             ),
             NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'),
         );
@@ -346,17 +346,17 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 8 # our own note
-NEON
+                parameters:
+                	level: 8 # our own note
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 8 # org minimum: raise freely
-NEON
+                    parameters:
+                    	level: 8 # org minimum: raise freely
+                    NEON
             ),
             NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'),
         );
@@ -366,9 +366,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 8 # org minimum: raise freely
-NEON
+                parameters:
+                	level: 8 # org minimum: raise freely
+                NEON
         );
 
         self::assertSame($content, NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'));
@@ -378,10 +378,10 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	paths:
-		- src
-NEON
+                parameters:
+                	paths:
+                		- src
+                NEON
         );
 
         self::assertSame($content, NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'));
@@ -391,10 +391,10 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level:
-		nested: 1
-NEON
+                parameters:
+                	level:
+                		nested: 1
+                NEON
         );
 
         $this->expectException(RuntimeException::class);
@@ -407,9 +407,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 6
-NEON
+                parameters:
+                	level: 6
+                NEON
         );
 
         $this->expectException(RuntimeException::class);

@@ -19,10 +19,10 @@ final class XmlElementWriterTest extends TestCase
     {
         $content = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm errorLevel="3">
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm errorLevel="3">
+                </psalm>
+                XML
         );
 
         self::assertSame('3', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -32,17 +32,17 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm
-    errorLevel="1"
-    resolveFromConfigFile="true"
-    xmlns="https://getpsalm.org/schema/config"
->
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm
+                    errorLevel="1"
+                    resolveFromConfigFile="true"
+                    xmlns="https://getpsalm.org/schema/config"
+                >
+                    <projectFiles>
+                        <directory name="src" />
+                    </projectFiles>
+                </psalm>
+                XML
         );
 
         self::assertSame('1', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -52,9 +52,9 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm errorLevel='3'>
-</psalm>
-XML
+                <psalm errorLevel='3'>
+                </psalm>
+                XML
         );
 
         self::assertSame('3', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -64,9 +64,9 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm resolveFromConfigFile="true">
-</psalm>
-XML
+                <psalm resolveFromConfigFile="true">
+                </psalm>
+                XML
         );
 
         self::assertNull(XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -76,9 +76,9 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm autoloader="a&amp;b.php">
-</psalm>
-XML
+                <psalm autoloader="a&amp;b.php">
+                </psalm>
+                XML
         );
 
         self::assertSame('a&amp;b.php', XmlElementWriter::readAttribute($content, 'psalm', 'autoloader'));
@@ -88,10 +88,10 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<!-- the old config: <psalm errorLevel="8"> -->
-<psalm errorLevel="3">
-</psalm>
-XML
+                <!-- the old config: <psalm errorLevel="8"> -->
+                <psalm errorLevel="3">
+                </psalm>
+                XML
         );
 
         self::assertSame('3', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -101,11 +101,11 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalmodie level="8">
-<psalm errorLevel="3">
-</psalm>
-</psalmodie>
-XML
+                <psalmodie level="8">
+                <psalm errorLevel="3">
+                </psalm>
+                </psalmodie>
+                XML
         );
 
         self::assertSame('3', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -115,9 +115,9 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm title="a>b" errorLevel="3">
-</psalm>
-XML
+                <psalm title="a>b" errorLevel="3">
+                </psalm>
+                XML
         );
 
         self::assertSame('3', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -128,43 +128,43 @@ XML
     {
         yield 'no open tag' => [
             <<<'XML'
-<other errorLevel="3" />
-XML,
+                <other errorLevel="3" />
+                XML,
             'No <psalm> open tag found; the file cannot be managed.',
         ];
         yield 'more than one open tag' => [
             <<<'XML'
-<psalm errorLevel="1"></psalm>
-<psalm errorLevel="2"></psalm>
-XML,
+                <psalm errorLevel="1"></psalm>
+                <psalm errorLevel="2"></psalm>
+                XML,
             'More than one <psalm> open tag found; the file cannot be managed.',
         ];
         yield 'unterminated open tag' => [
             <<<'XML'
-<psalm errorLevel="1"
-XML,
+                <psalm errorLevel="1"
+                XML,
             'The <psalm> open tag never closes; the file cannot be managed.',
         ];
         yield 'unterminated comment' => [
             <<<'XML'
-<!-- gone
-<psalm errorLevel="1">
-</psalm>
-XML,
+                <!-- gone
+                <psalm errorLevel="1">
+                </psalm>
+                XML,
             'An XML comment never closes; the file cannot be managed.',
         ];
         yield 'duplicate attribute' => [
             <<<'XML'
-<psalm errorLevel="1" errorLevel="2">
-</psalm>
-XML,
+                <psalm errorLevel="1" errorLevel="2">
+                </psalm>
+                XML,
             'The <psalm> open tag sets "errorLevel" more than once; the file cannot be managed.',
         ];
         yield 'valueless attribute' => [
             <<<'XML'
-<psalm phpVersion errorLevel="1">
-</psalm>
-XML,
+                <psalm phpVersion errorLevel="1">
+                </psalm>
+                XML,
             'Unrecognized content "phpVersion" in the <psalm> open tag; the file cannot be managed.',
         ];
     }
@@ -190,30 +190,30 @@ XML,
     {
         $content = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm
-    errorLevel="8"
-    resolveFromConfigFile="true"
->
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm
+                    errorLevel="8"
+                    resolveFromConfigFile="true"
+                >
+                    <projectFiles>
+                        <directory name="src" />
+                    </projectFiles>
+                </psalm>
+                XML
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm
-    errorLevel="4"
-    resolveFromConfigFile="true"
->
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm
+                    errorLevel="4"
+                    resolveFromConfigFile="true"
+                >
+                    <projectFiles>
+                        <directory name="src" />
+                    </projectFiles>
+                </psalm>
+                XML
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '4'));
@@ -223,16 +223,16 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm errorLevel='8'>
-</psalm>
-XML
+                <psalm errorLevel='8'>
+                </psalm>
+                XML
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
-<psalm errorLevel='4'>
-</psalm>
-XML
+                <psalm errorLevel='4'>
+                </psalm>
+                XML
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '4'));
@@ -242,9 +242,9 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm errorLevel="4">
-</psalm>
-XML
+                <psalm errorLevel="4">
+                </psalm>
+                XML
         );
 
         self::assertSame($content, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '4'));
@@ -254,14 +254,14 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm errorLevel="8" />
-XML
+                <psalm errorLevel="8" />
+                XML
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
-<psalm errorLevel="4" />
-XML
+                <psalm errorLevel="4" />
+                XML
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '4'));
@@ -271,16 +271,16 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm resolveFromConfigFile="true">
-</psalm>
-XML
+                <psalm resolveFromConfigFile="true">
+                </psalm>
+                XML
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
-<psalm resolveFromConfigFile="true" errorLevel="2">
-</psalm>
-XML
+                <psalm resolveFromConfigFile="true" errorLevel="2">
+                </psalm>
+                XML
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -290,31 +290,31 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm
-    resolveFromConfigFile="true"
-    xmlns="https://getpsalm.org/schema/config"
->
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm
+                    resolveFromConfigFile="true"
+                    xmlns="https://getpsalm.org/schema/config"
+                >
+                    <projectFiles>
+                        <directory name="src" />
+                    </projectFiles>
+                </psalm>
+                XML
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm
-    resolveFromConfigFile="true"
-    xmlns="https://getpsalm.org/schema/config"
-    errorLevel="2"
->
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm
+                    resolveFromConfigFile="true"
+                    xmlns="https://getpsalm.org/schema/config"
+                    errorLevel="2"
+                >
+                    <projectFiles>
+                        <directory name="src" />
+                    </projectFiles>
+                </psalm>
+                XML
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -324,21 +324,21 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm
-	resolveFromConfigFile="true"
->
-</psalm>
-XML
+                <psalm
+                	resolveFromConfigFile="true"
+                >
+                </psalm>
+                XML
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
-<psalm
-	resolveFromConfigFile="true"
-	errorLevel="2"
->
-</psalm>
-XML
+                <psalm
+                	resolveFromConfigFile="true"
+                	errorLevel="2"
+                >
+                </psalm>
+                XML
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -348,16 +348,16 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm>
-</psalm>
-XML
+                <psalm>
+                </psalm>
+                XML
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
-<psalm errorLevel="2">
-</psalm>
-XML
+                <psalm errorLevel="2">
+                </psalm>
+                XML
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -367,14 +367,14 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm resolveFromConfigFile="true" />
-XML
+                <psalm resolveFromConfigFile="true" />
+                XML
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
-<psalm resolveFromConfigFile="true" errorLevel="2" />
-XML
+                <psalm resolveFromConfigFile="true" errorLevel="2" />
+                XML
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -384,18 +384,18 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm resolveFromConfigFile="true"
->
-</psalm>
-XML
+                <psalm resolveFromConfigFile="true"
+                >
+                </psalm>
+                XML
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
-<psalm resolveFromConfigFile="true" errorLevel="2"
->
-</psalm>
-XML
+                <psalm resolveFromConfigFile="true" errorLevel="2"
+                >
+                </psalm>
+                XML
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -414,9 +414,9 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm>
-</psalm>
-XML
+                <psalm>
+                </psalm>
+                XML
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -429,9 +429,9 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm autoloader='old.php'>
-</psalm>
-XML
+                <psalm autoloader='old.php'>
+                </psalm>
+                XML
         );
 
         $this->expectException(InvalidArgumentException::class);

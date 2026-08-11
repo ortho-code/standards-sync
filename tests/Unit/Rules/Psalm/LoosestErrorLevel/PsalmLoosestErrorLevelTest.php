@@ -34,86 +34,86 @@ final class PsalmLoosestErrorLevelTest extends TestCase
             null,
             FileContent::fromString(
                 <<<'XML'
-<?xml version="1.0"?>
-<psalm errorLevel="4" xmlns="https://getpsalm.org/schema/config">
-    <projectFiles>
-        <directory name="src" />
-        <ignoreFiles>
-            <directory name="vendor" />
-        </ignoreFiles>
-    </projectFiles>
-</psalm>
-XML
+                    <?xml version="1.0"?>
+                    <psalm errorLevel="4" xmlns="https://getpsalm.org/schema/config">
+                        <projectFiles>
+                            <directory name="src" />
+                            <ignoreFiles>
+                                <directory name="vendor" />
+                            </ignoreFiles>
+                        </projectFiles>
+                    </psalm>
+                    XML
             ),
         ];
 
         yield 'a looser level is lowered to the limit' => [
             FileContent::fromString(
                 <<<'XML'
-<?xml version="1.0"?>
-<psalm errorLevel="8">
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                    <?xml version="1.0"?>
+                    <psalm errorLevel="8">
+                        <projectFiles>
+                            <directory name="src" />
+                        </projectFiles>
+                    </psalm>
+                    XML
             ),
             FileContent::fromString(
                 <<<'XML'
-<?xml version="1.0"?>
-<psalm errorLevel="4">
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                    <?xml version="1.0"?>
+                    <psalm errorLevel="4">
+                        <projectFiles>
+                            <directory name="src" />
+                        </projectFiles>
+                    </psalm>
+                    XML
             ),
         ];
 
         $stricter = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm errorLevel="2">
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm errorLevel="2">
+                    <projectFiles>
+                        <directory name="src" />
+                    </projectFiles>
+                </psalm>
+                XML
         );
         yield 'a stricter level is never touched' => [$stricter, $stricter];
 
         $equal = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm errorLevel="4">
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm errorLevel="4">
+                    <projectFiles>
+                        <directory name="src" />
+                    </projectFiles>
+                </psalm>
+                XML
         );
         yield 'an equal level is never touched' => [$equal, $equal];
 
         yield 'an absent errorLevel is made explicit as the default' => [
             FileContent::fromString(
                 <<<'XML'
-<?xml version="1.0"?>
-<psalm resolveFromConfigFile="true">
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                    <?xml version="1.0"?>
+                    <psalm resolveFromConfigFile="true">
+                        <projectFiles>
+                            <directory name="src" />
+                        </projectFiles>
+                    </psalm>
+                    XML
             ),
             FileContent::fromString(
                 <<<'XML'
-<?xml version="1.0"?>
-<psalm resolveFromConfigFile="true" errorLevel="2">
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                    <?xml version="1.0"?>
+                    <psalm resolveFromConfigFile="true" errorLevel="2">
+                        <projectFiles>
+                            <directory name="src" />
+                        </projectFiles>
+                    </psalm>
+                    XML
             ),
         ];
     }
@@ -122,10 +122,10 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm resolveFromConfigFile="true">
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm resolveFromConfigFile="true">
+                </psalm>
+                XML
         );
 
         $rule = new PsalmLoosestErrorLevel(loosest: PsalmErrorLevel::fromInt(1));
@@ -147,9 +147,9 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm>
-</psalm>
-XML
+                <psalm>
+                </psalm>
+                XML
         );
 
         self::assertSame('No errorLevel is written; the implicit default is made explicit as 2.', $this->rule()->explain($content));
@@ -159,9 +159,9 @@ XML
     {
         $content = FileContent::fromString(
             <<<'XML'
-<psalm errorLevel="7">
-</psalm>
-XML
+                <psalm errorLevel="7">
+                </psalm>
+                XML
         );
 
         self::assertSame('Level 7 is looser than the loosest allowed 4.', $this->rule()->explain($content));

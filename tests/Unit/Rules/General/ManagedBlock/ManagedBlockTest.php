@@ -37,10 +37,10 @@ final class ManagedBlockTest extends TestCase
             null,
             FileContent::fromString(
                 <<<'FILE'
-# >>> test (managed) >>>
-root = true
-# <<< test <<<
-FILE
+                    # >>> test (managed) >>>
+                    root = true
+                    # <<< test <<<
+                    FILE
             ),
         ];
 
@@ -49,12 +49,12 @@ FILE
             FileContent::fromString('existing'),
             FileContent::fromString(
                 <<<'FILE'
-existing
+                    existing
 
-# >>> test (managed) >>>
-ignored/
-# <<< test <<<
-FILE
+                    # >>> test (managed) >>>
+                    ignored/
+                    # <<< test <<<
+                    FILE
             ),
         ];
 
@@ -62,21 +62,21 @@ FILE
             'new',
             FileContent::fromString(
                 <<<'FILE'
-top
-# >>> test (managed) >>>
-old
-# <<< test <<<
-bottom
-FILE
+                    top
+                    # >>> test (managed) >>>
+                    old
+                    # <<< test <<<
+                    bottom
+                    FILE
             ),
             FileContent::fromString(
                 <<<'FILE'
-top
-# >>> test (managed) >>>
-new
-# <<< test <<<
-bottom
-FILE
+                    top
+                    # >>> test (managed) >>>
+                    new
+                    # <<< test <<<
+                    bottom
+                    FILE
             ),
         ];
 
@@ -84,17 +84,17 @@ FILE
             'root = true',
             FileContent::fromString(
                 <<<'FILE'
-# >>> test (managed) >>>
-root = true
-# <<< test <<<
-FILE
+                    # >>> test (managed) >>>
+                    root = true
+                    # <<< test <<<
+                    FILE
             ),
             FileContent::fromString(
                 <<<'FILE'
-# >>> test (managed) >>>
-root = true
-# <<< test <<<
-FILE
+                    # >>> test (managed) >>>
+                    root = true
+                    # <<< test <<<
+                    FILE
             ),
         ];
     }

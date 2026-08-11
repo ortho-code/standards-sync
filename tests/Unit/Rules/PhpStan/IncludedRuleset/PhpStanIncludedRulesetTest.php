@@ -37,123 +37,123 @@ final class PhpStanIncludedRulesetTest extends TestCase
             null,
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
-NEON
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
+                    NEON
             ),
         ];
 
         yield 'an existing includes section gains the entry after its last entry' => [
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- phpstan-baseline.neon
+                    includes:
+                    	- phpstan-baseline.neon
 
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- phpstan-baseline.neon
-	- vendor/acme/standards/phpstan.neon
+                    includes:
+                    	- phpstan-baseline.neon
+                    	- vendor/acme/standards/phpstan.neon
 
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
         ];
 
         yield 'a config without includes gains the section at the top' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
 
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
         ];
 
         yield 'an empty includes section gains the entry' => [
             FileContent::fromString(
                 <<<'NEON'
-includes:
-parameters:
-	level: 6
-NEON
+                    includes:
+                    parameters:
+                    	level: 6
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
-parameters:
-	level: 6
-NEON
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
+                    parameters:
+                    	level: 6
+                    NEON
             ),
         ];
 
         yield 'an already-included import leaves the config unchanged' => [
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
 
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
 
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
         ];
 
         yield 'a quoted include of the same file counts as included' => [
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- 'vendor/acme/standards/phpstan.neon'
-NEON
+                    includes:
+                    	- 'vendor/acme/standards/phpstan.neon'
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- 'vendor/acme/standards/phpstan.neon'
-NEON
+                    includes:
+                    	- 'vendor/acme/standards/phpstan.neon'
+                    NEON
             ),
         ];
 
         yield 'the inserted entry copies the indentation of a space-indented file' => [
             FileContent::fromString(
                 <<<'NEON'
-includes:
-    - phpstan-baseline.neon
-parameters:
-    level: 6
-NEON
+                    includes:
+                        - phpstan-baseline.neon
+                    parameters:
+                        level: 6
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-includes:
-    - phpstan-baseline.neon
-    - vendor/acme/standards/phpstan.neon
-parameters:
-    level: 6
-NEON
+                    includes:
+                        - phpstan-baseline.neon
+                        - vendor/acme/standards/phpstan.neon
+                    parameters:
+                        level: 6
+                    NEON
             ),
         ];
     }

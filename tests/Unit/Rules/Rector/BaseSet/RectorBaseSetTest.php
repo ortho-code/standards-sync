@@ -37,156 +37,156 @@ final class RectorBaseSetTest extends TestCase
             null,
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
+                    use Rector\Config\RectorConfig;
 
-return RectorConfig::configure()
-    ->withSets([
-        __DIR__ . '/vendor/acme/standards/config/rector.php',
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withSets([
+                            __DIR__ . '/vendor/acme/standards/config/rector.php',
+                        ]);
+                    PHP
             ),
         ];
 
         yield 'an existing withSets array gains the entry after its last entry' => [
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
-use Rector\Set\ValueObject\SetList;
+                    use Rector\Config\RectorConfig;
+                    use Rector\Set\ValueObject\SetList;
 
-return RectorConfig::configure()
-    ->withPaths([
-        __DIR__ . '/src',
-    ])
-    ->withSets([
-        SetList::DEAD_CODE,
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withPaths([
+                            __DIR__ . '/src',
+                        ])
+                        ->withSets([
+                            SetList::DEAD_CODE,
+                        ]);
+                    PHP
             ),
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
-use Rector\Set\ValueObject\SetList;
+                    use Rector\Config\RectorConfig;
+                    use Rector\Set\ValueObject\SetList;
 
-return RectorConfig::configure()
-    ->withPaths([
-        __DIR__ . '/src',
-    ])
-    ->withSets([
-        SetList::DEAD_CODE,
-        __DIR__ . '/vendor/acme/standards/config/rector.php',
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withPaths([
+                            __DIR__ . '/src',
+                        ])
+                        ->withSets([
+                            SetList::DEAD_CODE,
+                            __DIR__ . '/vendor/acme/standards/config/rector.php',
+                        ]);
+                    PHP
             ),
         ];
 
         yield 'a chain without withSets gains the call at its end' => [
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
+                    use Rector\Config\RectorConfig;
 
-return RectorConfig::configure()
-    ->withPaths([
-        __DIR__ . '/src',
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withPaths([
+                            __DIR__ . '/src',
+                        ]);
+                    PHP
             ),
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
+                    use Rector\Config\RectorConfig;
 
-return RectorConfig::configure()
-    ->withPaths([
-        __DIR__ . '/src',
-    ])
-    ->withSets([
-        __DIR__ . '/vendor/acme/standards/config/rector.php',
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withPaths([
+                            __DIR__ . '/src',
+                        ])
+                        ->withSets([
+                            __DIR__ . '/vendor/acme/standards/config/rector.php',
+                        ]);
+                    PHP
             ),
         ];
 
         yield 'an already-registered import leaves the config unchanged' => [
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
+                    use Rector\Config\RectorConfig;
 
-return RectorConfig::configure()
-    ->withSets([
-        __DIR__ . '/vendor/acme/standards/config/rector.php',
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withSets([
+                            __DIR__ . '/vendor/acme/standards/config/rector.php',
+                        ]);
+                    PHP
             ),
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
+                    use Rector\Config\RectorConfig;
 
-return RectorConfig::configure()
-    ->withSets([
-        __DIR__ . '/vendor/acme/standards/config/rector.php',
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withSets([
+                            __DIR__ . '/vendor/acme/standards/config/rector.php',
+                        ]);
+                    PHP
             ),
         ];
 
         yield 'the inserted entry copies the indentation of a two-space file' => [
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
-use Rector\Set\ValueObject\SetList;
+                    use Rector\Config\RectorConfig;
+                    use Rector\Set\ValueObject\SetList;
 
-return RectorConfig::configure()
-  ->withSets([
-    SetList::DEAD_CODE,
-  ]);
-PHP
+                    return RectorConfig::configure()
+                      ->withSets([
+                        SetList::DEAD_CODE,
+                      ]);
+                    PHP
             ),
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
-use Rector\Set\ValueObject\SetList;
+                    use Rector\Config\RectorConfig;
+                    use Rector\Set\ValueObject\SetList;
 
-return RectorConfig::configure()
-  ->withSets([
-    SetList::DEAD_CODE,
-    __DIR__ . '/vendor/acme/standards/config/rector.php',
-  ]);
-PHP
+                    return RectorConfig::configure()
+                      ->withSets([
+                        SetList::DEAD_CODE,
+                        __DIR__ . '/vendor/acme/standards/config/rector.php',
+                      ]);
+                    PHP
             ),
         ];
     }
@@ -198,16 +198,16 @@ PHP
 
         $this->rule()->apply(FileContent::fromString(
             <<<'PHP'
-<?php
+                <?php
 
-declare(strict_types=1);
+                declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
+                use Rector\Config\RectorConfig;
 
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->sets([__DIR__ . '/config/sets.php']);
-};
-PHP
+                return static function (RectorConfig $rectorConfig): void {
+                    $rectorConfig->sets([__DIR__ . '/config/sets.php']);
+                };
+                PHP
         ));
     }
 

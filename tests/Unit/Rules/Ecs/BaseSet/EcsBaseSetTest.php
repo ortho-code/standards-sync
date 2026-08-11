@@ -37,158 +37,158 @@ final class EcsBaseSetTest extends TestCase
             null,
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Symplify\EasyCodingStandard\Config\ECSConfig;
+                    use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return ECSConfig::configure()
-    ->withSets([
-        __DIR__ . '/vendor/acme/standards/config/ecs.php',
-    ]);
-PHP
+                    return ECSConfig::configure()
+                        ->withSets([
+                            __DIR__ . '/vendor/acme/standards/config/ecs.php',
+                        ]);
+                    PHP
             ),
         ];
 
         yield 'an existing withSets array gains the entry after its last entry' => [
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Symplify\EasyCodingStandard\Config\ECSConfig;
-use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
+                    use Symplify\EasyCodingStandard\Config\ECSConfig;
+                    use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
-return ECSConfig::configure()
-    ->withPaths([
-        __DIR__ . '/src',
-    ])
-    ->withSets([
-        SetList::PSR_12,
-    ]);
-PHP
+                    return ECSConfig::configure()
+                        ->withPaths([
+                            __DIR__ . '/src',
+                        ])
+                        ->withSets([
+                            SetList::PSR_12,
+                        ]);
+                    PHP
             ),
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Symplify\EasyCodingStandard\Config\ECSConfig;
-use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
+                    use Symplify\EasyCodingStandard\Config\ECSConfig;
+                    use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
-return ECSConfig::configure()
-    ->withPaths([
-        __DIR__ . '/src',
-    ])
-    ->withSets([
-        SetList::PSR_12,
-        __DIR__ . '/vendor/acme/standards/config/ecs.php',
-    ]);
-PHP
+                    return ECSConfig::configure()
+                        ->withPaths([
+                            __DIR__ . '/src',
+                        ])
+                        ->withSets([
+                            SetList::PSR_12,
+                            __DIR__ . '/vendor/acme/standards/config/ecs.php',
+                        ]);
+                    PHP
             ),
         ];
 
         yield 'a chain without withSets gains the call at its end' => [
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Symplify\EasyCodingStandard\Config\ECSConfig;
+                    use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return ECSConfig::configure()
-    ->withPaths([
-        __DIR__ . '/src',
-    ])
-    ->withPreparedSets(psr12: true);
-PHP
+                    return ECSConfig::configure()
+                        ->withPaths([
+                            __DIR__ . '/src',
+                        ])
+                        ->withPreparedSets(psr12: true);
+                    PHP
             ),
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Symplify\EasyCodingStandard\Config\ECSConfig;
+                    use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return ECSConfig::configure()
-    ->withPaths([
-        __DIR__ . '/src',
-    ])
-    ->withPreparedSets(psr12: true)
-    ->withSets([
-        __DIR__ . '/vendor/acme/standards/config/ecs.php',
-    ]);
-PHP
+                    return ECSConfig::configure()
+                        ->withPaths([
+                            __DIR__ . '/src',
+                        ])
+                        ->withPreparedSets(psr12: true)
+                        ->withSets([
+                            __DIR__ . '/vendor/acme/standards/config/ecs.php',
+                        ]);
+                    PHP
             ),
         ];
 
         yield 'an already-registered import leaves the config unchanged' => [
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Symplify\EasyCodingStandard\Config\ECSConfig;
+                    use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return ECSConfig::configure()
-    ->withSets([
-        __DIR__ . '/vendor/acme/standards/config/ecs.php',
-    ]);
-PHP
+                    return ECSConfig::configure()
+                        ->withSets([
+                            __DIR__ . '/vendor/acme/standards/config/ecs.php',
+                        ]);
+                    PHP
             ),
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Symplify\EasyCodingStandard\Config\ECSConfig;
+                    use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return ECSConfig::configure()
-    ->withSets([
-        __DIR__ . '/vendor/acme/standards/config/ecs.php',
-    ]);
-PHP
+                    return ECSConfig::configure()
+                        ->withSets([
+                            __DIR__ . '/vendor/acme/standards/config/ecs.php',
+                        ]);
+                    PHP
             ),
         ];
 
         yield 'the inserted entry copies the indentation of a two-space file' => [
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Symplify\EasyCodingStandard\Config\ECSConfig;
-use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
+                    use Symplify\EasyCodingStandard\Config\ECSConfig;
+                    use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
-return ECSConfig::configure()
-  ->withSets([
-    SetList::PSR_12,
-  ]);
-PHP
+                    return ECSConfig::configure()
+                      ->withSets([
+                        SetList::PSR_12,
+                      ]);
+                    PHP
             ),
             FileContent::fromString(
                 <<<'PHP'
-<?php
+                    <?php
 
-declare(strict_types=1);
+                    declare(strict_types=1);
 
-use Symplify\EasyCodingStandard\Config\ECSConfig;
-use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
+                    use Symplify\EasyCodingStandard\Config\ECSConfig;
+                    use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
-return ECSConfig::configure()
-  ->withSets([
-    SetList::PSR_12,
-    __DIR__ . '/vendor/acme/standards/config/ecs.php',
-  ]);
-PHP
+                    return ECSConfig::configure()
+                      ->withSets([
+                        SetList::PSR_12,
+                        __DIR__ . '/vendor/acme/standards/config/ecs.php',
+                      ]);
+                    PHP
             ),
         ];
     }
@@ -200,16 +200,16 @@ PHP
 
         $this->rule()->apply(FileContent::fromString(
             <<<'PHP'
-<?php
+                <?php
 
-declare(strict_types=1);
+                declare(strict_types=1);
 
-use Symplify\EasyCodingStandard\Config\ECSConfig;
+                use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return static function (ECSConfig $ecsConfig): void {
-    $ecsConfig->sets([__DIR__ . '/config/sets.php']);
-};
-PHP
+                return static function (ECSConfig $ecsConfig): void {
+                    $ecsConfig->sets([__DIR__ . '/config/sets.php']);
+                };
+                PHP
         ));
     }
 
@@ -221,15 +221,15 @@ PHP
 
         $this->rule()->apply(FileContent::fromString(
             <<<'PHP'
-<?php
+                <?php
 
-declare(strict_types=1);
+                declare(strict_types=1);
 
-$config = include '../../tools/easy-coding-standard/base-ruleset.php';
+                $config = include '../../tools/easy-coding-standard/base-ruleset.php';
 
-return $config
-    ->withPaths(['src', 'tests']);
-PHP
+                return $config
+                    ->withPaths(['src', 'tests']);
+                PHP
         ));
     }
 

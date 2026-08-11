@@ -35,182 +35,182 @@ final class PhpStanMinLevelTest extends TestCase
             null,
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7
-NEON
+                    parameters:
+                    	level: 7
+                    NEON
             ),
         ];
 
         yield 'a lower level is raised to the floor' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 4
-	paths:
-		- src
-NEON
+                    parameters:
+                    	level: 4
+                    	paths:
+                    		- src
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7
-	paths:
-		- src
-NEON
+                    parameters:
+                    	level: 7
+                    	paths:
+                    		- src
+                    NEON
             ),
         ];
 
         yield 'a stricter level is never touched' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 8
-NEON
+                    parameters:
+                    	level: 8
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 8
-NEON
+                    parameters:
+                    	level: 8
+                    NEON
             ),
         ];
 
         yield 'a level equal to the floor stays put' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7
-NEON
+                    parameters:
+                    	level: 7
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7
-NEON
+                    parameters:
+                    	level: 7
+                    NEON
             ),
         ];
 
         yield 'max satisfies any floor' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: max
-NEON
+                    parameters:
+                    	level: max
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: max
-NEON
+                    parameters:
+                    	level: max
+                    NEON
             ),
         ];
 
         yield 'a quoted lower level is raised' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: '4'
-NEON
+                    parameters:
+                    	level: '4'
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7
-NEON
+                    parameters:
+                    	level: 7
+                    NEON
             ),
         ];
 
         yield 'a missing level becomes the first child of an existing parameters section' => [
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
 
-parameters:
-	paths:
-		- src
-NEON
+                    parameters:
+                    	paths:
+                    		- src
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
 
-parameters:
-	level: 7
-	paths:
-		- src
-NEON
+                    parameters:
+                    	level: 7
+                    	paths:
+                    		- src
+                    NEON
             ),
         ];
 
         yield 'a config without parameters gains the section at the end' => [
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
-NEON
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
 
-parameters:
-	level: 7
-NEON
+                    parameters:
+                    	level: 7
+                    NEON
             ),
         ];
 
         yield 'a nested level key of an extension is never touched' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 4
-	type_coverage:
-		level: 9
-NEON
+                    parameters:
+                    	level: 4
+                    	type_coverage:
+                    		level: 9
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7
-	type_coverage:
-		level: 9
-NEON
+                    parameters:
+                    	level: 7
+                    	type_coverage:
+                    		level: 9
+                    NEON
             ),
         ];
 
         yield 'a nested level key alone does not count as the written level' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	type_coverage:
-		level: 2
-NEON
+                    parameters:
+                    	type_coverage:
+                    		level: 2
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7
-	type_coverage:
-		level: 2
-NEON
+                    parameters:
+                    	level: 7
+                    	type_coverage:
+                    		level: 2
+                    NEON
             ),
         ];
 
         yield 'a trailing comment on the level line survives the raise' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 4 # keep in step with CI
-NEON
+                    parameters:
+                    	level: 4 # keep in step with CI
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7 # keep in step with CI
-NEON
+                    parameters:
+                    	level: 7 # keep in step with CI
+                    NEON
             ),
         ];
     }
@@ -234,45 +234,45 @@ NEON
         yield 'a raised level carries the org comment' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 4
-NEON
+                    parameters:
+                    	level: 4
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7 # org minimum: raise freely
-NEON
+                    parameters:
+                    	level: 7 # org minimum: raise freely
+                    NEON
             ),
         ];
 
         yield 'a deviating value and comment revert together' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 4 # we lowered this deliberately
-NEON
+                    parameters:
+                    	level: 4 # we lowered this deliberately
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7 # org minimum: raise freely
-NEON
+                    parameters:
+                    	level: 7 # org minimum: raise freely
+                    NEON
             ),
         ];
 
         yield 'a compliant level keeps its spelling and gains the comment' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: max
-NEON
+                    parameters:
+                    	level: max
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: max # org minimum: raise freely
-NEON
+                    parameters:
+                    	level: max # org minimum: raise freely
+                    NEON
             ),
         ];
 
@@ -280,9 +280,9 @@ NEON
             null,
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 7 # org minimum: raise freely
-NEON
+                    parameters:
+                    	level: 7 # org minimum: raise freely
+                    NEON
             ),
         ];
     }
@@ -305,9 +305,9 @@ NEON
     {
         $compliant = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 8
-NEON
+                parameters:
+                	level: 8
+                NEON
         );
 
         self::assertSame('The org comment on the level line is missing or altered.', $this->commentedRule()->explain($compliant));
@@ -317,9 +317,9 @@ NEON
     {
         $config = FileContent::fromString(
             <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
-NEON
+                includes:
+                	- vendor/acme/standards/phpstan.neon
+                NEON
         );
 
         self::assertSame('No PHPStan level is written; 7 is added as the minimum.', $this->rule()->explain($config));
@@ -332,9 +332,9 @@ NEON
         $this->rule()->apply(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: %level%
-NEON
+                    parameters:
+                    	level: %level%
+                    NEON
             ),
         );
     }
@@ -349,9 +349,9 @@ NEON
         $rule = $this->rule();
         $lowLevel = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 4
-NEON
+                parameters:
+                	level: 4
+                NEON
         );
 
         self::assertSame('Keeps the PHPStan level at or above 7.', $rule->description());

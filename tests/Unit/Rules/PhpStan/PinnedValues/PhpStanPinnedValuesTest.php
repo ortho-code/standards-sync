@@ -35,112 +35,112 @@ final class PhpStanPinnedValuesTest extends TestCase
             null,
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	treatPhpDocTypesAsCertain: false
-NEON
+                    parameters:
+                    	treatPhpDocTypesAsCertain: false
+                    NEON
             ),
         ];
 
         yield 'a deviating value is rewritten in place' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 6
-	treatPhpDocTypesAsCertain: true
-NEON
+                    parameters:
+                    	level: 6
+                    	treatPhpDocTypesAsCertain: true
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 6
-	treatPhpDocTypesAsCertain: false
-NEON
+                    parameters:
+                    	level: 6
+                    	treatPhpDocTypesAsCertain: false
+                    NEON
             ),
         ];
 
         yield 'an already-pinned value leaves the config unchanged' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	treatPhpDocTypesAsCertain: false
-NEON
+                    parameters:
+                    	treatPhpDocTypesAsCertain: false
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	treatPhpDocTypesAsCertain: false
-NEON
+                    parameters:
+                    	treatPhpDocTypesAsCertain: false
+                    NEON
             ),
         ];
 
         yield 'a missing key becomes the first child of its section' => [
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- a.neon
+                    includes:
+                    	- a.neon
 
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- a.neon
+                    includes:
+                    	- a.neon
 
-parameters:
-	treatPhpDocTypesAsCertain: false
-	level: 6
-NEON
+                    parameters:
+                    	treatPhpDocTypesAsCertain: false
+                    	level: 6
+                    NEON
             ),
         ];
 
         yield 'a missing top-level section is appended at the end' => [
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- a.neon
-NEON
+                    includes:
+                    	- a.neon
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- a.neon
+                    includes:
+                    	- a.neon
 
-parameters:
-	treatPhpDocTypesAsCertain: false
-NEON
+                    parameters:
+                    	treatPhpDocTypesAsCertain: false
+                    NEON
             ),
         ];
 
         yield 'a trailing comment on the pinned line survives' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	treatPhpDocTypesAsCertain: true # why not
-NEON
+                    parameters:
+                    	treatPhpDocTypesAsCertain: true # why not
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	treatPhpDocTypesAsCertain: false # why not
-NEON
+                    parameters:
+                    	treatPhpDocTypesAsCertain: false # why not
+                    NEON
             ),
         ];
 
         yield 'a space-indented file keeps its indentation' => [
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-    level: 6
-NEON
+                    parameters:
+                        level: 6
+                    NEON
             ),
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-    treatPhpDocTypesAsCertain: false
-    level: 6
-NEON
+                    parameters:
+                        treatPhpDocTypesAsCertain: false
+                        level: 6
+                    NEON
             ),
         ];
     }
@@ -154,20 +154,20 @@ NEON
         $result = $rule->apply(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	cache:
-		nodesByStringCountMax: 128
-	level: 6
-NEON
+                    parameters:
+                    	cache:
+                    		nodesByStringCountMax: 128
+                    	level: 6
+                    NEON
             ),
             $result,
         );
@@ -182,9 +182,9 @@ NEON
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	tmpDir: 'var/php stan'
-NEON
+                    parameters:
+                    	tmpDir: 'var/php stan'
+                    NEON
             ),
             $rule->apply(null),
         );
@@ -200,10 +200,10 @@ NEON
         $rule->apply(
             FileContent::fromString(
                 <<<'NEON'
-parameters:
-	cache:
-		nodesByStringCountMax: 128
-NEON
+                    parameters:
+                    	cache:
+                    		nodesByStringCountMax: 128
+                    NEON
             ),
         );
     }

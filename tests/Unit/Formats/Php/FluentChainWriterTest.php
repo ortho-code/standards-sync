@@ -18,21 +18,21 @@ final class FluentChainWriterTest extends TestCase
         self::assertSame(
             FileContent::fromString(
                 <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-        'a.php',
-        'b.php',
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withSets([
+                            'a.php',
+                            'b.php',
+                        ]);
+                    PHP
             ),
             FluentChainWriter::ensureArrayEntry(
                 FileContent::fromString(
                     <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-        'a.php',
-    ]);
-PHP
+                        return RectorConfig::configure()
+                            ->withSets([
+                                'a.php',
+                            ]);
+                        PHP
                 ),
                 'withSets',
                 "'b.php'",
@@ -44,19 +44,19 @@ PHP
     {
         $withLineComment = FileContent::fromString(
             <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-        __DIR__ . '/x.php', // the org set
-    ]);
-PHP
+                return RectorConfig::configure()
+                    ->withSets([
+                        __DIR__ . '/x.php', // the org set
+                    ]);
+                PHP
         );
         $withHashComment = FileContent::fromString(
             <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-        __DIR__ . '/x.php', # the org set
-    ]);
-PHP
+                return RectorConfig::configure()
+                    ->withSets([
+                        __DIR__ . '/x.php', # the org set
+                    ]);
+                PHP
         );
 
         self::assertSame($withLineComment, FluentChainWriter::ensureArrayEntry($withLineComment, 'withSets', "__DIR__ . '/x.php'"));
@@ -67,11 +67,11 @@ PHP
     {
         $content = FileContent::fromString(
             <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-        'https://example.com/sets/a.php',
-    ]);
-PHP
+                return RectorConfig::configure()
+                    ->withSets([
+                        'https://example.com/sets/a.php',
+                    ]);
+                PHP
         );
 
         self::assertSame($content, FluentChainWriter::ensureArrayEntry($content, 'withSets', "'https://example.com/sets/a.php'"));
@@ -81,19 +81,19 @@ PHP
     {
         $withComma = FileContent::fromString(
             <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-        'a.php',
-    ]);
-PHP
+                return RectorConfig::configure()
+                    ->withSets([
+                        'a.php',
+                    ]);
+                PHP
         );
         $withoutComma = FileContent::fromString(
             <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-        'a.php'
-    ]);
-PHP
+                return RectorConfig::configure()
+                    ->withSets([
+                        'a.php'
+                    ]);
+                PHP
         );
 
         self::assertSame($withComma, FluentChainWriter::ensureArrayEntry($withComma, 'withSets', "'a.php'"));
@@ -105,19 +105,19 @@ PHP
         self::assertSame(
             FileContent::fromString(
                 <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-        'a.php',
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withSets([
+                            'a.php',
+                        ]);
+                    PHP
             ),
             FluentChainWriter::ensureArrayEntry(
                 FileContent::fromString(
                     <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-    ]);
-PHP
+                        return RectorConfig::configure()
+                            ->withSets([
+                            ]);
+                        PHP
                 ),
                 'withSets',
                 "'a.php'",
@@ -129,11 +129,11 @@ PHP
     {
         $content = FileContent::fromString(
             <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-        'a)]b.php',
-    ]);
-PHP
+                return RectorConfig::configure()
+                    ->withSets([
+                        'a)]b.php',
+                    ]);
+                PHP
         );
 
         self::assertSame($content, FluentChainWriter::ensureArrayEntry($content, 'withSets', "'a)]b.php'"));
@@ -144,19 +144,19 @@ PHP
         self::assertSame(
             FileContent::fromString(
                 <<<'PHP'
-return RectorConfig::configure()
-    ->withDeadCodeLevel(10)
-    ->withSets([
-        'a.php',
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withDeadCodeLevel(10)
+                        ->withSets([
+                            'a.php',
+                        ]);
+                    PHP
             ),
             FluentChainWriter::ensureArrayEntry(
                 FileContent::fromString(
                     <<<'PHP'
-return RectorConfig::configure()
-    ->withDeadCodeLevel(10);
-PHP
+                        return RectorConfig::configure()
+                            ->withDeadCodeLevel(10);
+                        PHP
                 ),
                 'withSets',
                 "'a.php'",
@@ -169,11 +169,11 @@ PHP
         self::assertSame(
             FileContent::fromString(
                 <<<'PHP'
-return RectorConfig::configure()
-    ->withSets([
-        'a.php',
-    ]);
-PHP
+                    return RectorConfig::configure()
+                        ->withSets([
+                            'a.php',
+                        ]);
+                    PHP
             ),
             FluentChainWriter::ensureArrayEntry(FileContent::fromString('return RectorConfig::configure();'), 'withSets', "'a.php'"),
         );
@@ -215,10 +215,10 @@ PHP
     {
         self::assertSame(
             <<<'PHP'
-->withSets([
-        __DIR__ . '/vendor/acme/standards/config/rector.php',
-    ])
-PHP,
+                ->withSets([
+                        __DIR__ . '/vendor/acme/standards/config/rector.php',
+                    ])
+                PHP,
             FluentChainWriter::createArrayCall('withSets', "__DIR__ . '/vendor/acme/standards/config/rector.php'"),
         );
     }

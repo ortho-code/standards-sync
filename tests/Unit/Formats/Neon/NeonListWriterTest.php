@@ -18,9 +18,9 @@ final class NeonListWriterTest extends TestCase
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
-NEON
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
+                    NEON
             ),
             NeonListWriter::ensureEntry('', 'includes', 'vendor/acme/standards/phpstan.neon'),
         );
@@ -30,20 +30,20 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 6
-NEON
+                parameters:
+                	level: 6
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
 
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
             NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'),
         );
@@ -53,9 +53,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
-NEON
+                includes:
+                	- vendor/acme/standards/phpstan.neon
+                NEON
         );
 
         self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
@@ -65,9 +65,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon # the org baseline
-NEON
+                includes:
+                	- vendor/acme/standards/phpstan.neon # the org baseline
+                NEON
         );
 
         self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
@@ -77,9 +77,9 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-includes:
-	- 'vendor/acme/standards/phpstan.neon'
-NEON
+                includes:
+                	- 'vendor/acme/standards/phpstan.neon'
+                NEON
         );
 
         self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
@@ -89,24 +89,24 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-includes:
-    - phar://phpstan.phar/conf/bleedingEdge.neon
+                includes:
+                    - phar://phpstan.phar/conf/bleedingEdge.neon
 
-parameters:
-	level: 6
-NEON
+                parameters:
+                	level: 6
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-includes:
-    - phar://phpstan.phar/conf/bleedingEdge.neon
-    - vendor/acme/standards/phpstan.neon
+                    includes:
+                        - phar://phpstan.phar/conf/bleedingEdge.neon
+                        - vendor/acme/standards/phpstan.neon
 
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
             NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'),
         );
@@ -116,22 +116,22 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-includes:
+                includes:
 
-parameters:
-	level: 6
-NEON
+                parameters:
+                	level: 6
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-includes:
-	- vendor/acme/standards/phpstan.neon
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
 
-parameters:
-	level: 6
-NEON
+                    parameters:
+                    	level: 6
+                    NEON
             ),
             NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'),
         );
@@ -141,8 +141,8 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-includes: [vendor/acme/standards/phpstan.neon]
-NEON
+                includes: [vendor/acme/standards/phpstan.neon]
+                NEON
         );
 
         $this->expectException(RuntimeException::class);
@@ -155,24 +155,24 @@ NEON
     {
         $content = FileContent::fromString(
             <<<'NEON'
-services:
-	- App\Some\Service
+                services:
+                	- App\Some\Service
 
-includes:
-	- vendor/acme/standards/phpstan.neon
-NEON
+                includes:
+                	- vendor/acme/standards/phpstan.neon
+                NEON
         );
 
         self::assertSame(
             FileContent::fromString(
                 <<<'NEON'
-services:
-	- App\Some\Service
+                    services:
+                    	- App\Some\Service
 
-includes:
-	- vendor/acme/standards/phpstan.neon
-	- vendor/acme/standards/strict.neon
-NEON
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
+                    	- vendor/acme/standards/strict.neon
+                    NEON
             ),
             NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/strict.neon'),
         );

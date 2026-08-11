@@ -19,13 +19,13 @@ final class XmlValidatorTest extends TestCase
 
         $content = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm errorLevel="4">
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm errorLevel="4">
+                    <projectFiles>
+                        <directory name="src" />
+                    </projectFiles>
+                </psalm>
+                XML
         );
 
         new XmlValidator()->assertValid('./psalm.xml', $content);

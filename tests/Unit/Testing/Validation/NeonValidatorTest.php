@@ -19,9 +19,9 @@ final class NeonValidatorTest extends TestCase
 
         $content = FileContent::fromString(
             <<<'NEON'
-parameters:
-	level: 6
-NEON
+                parameters:
+                	level: 6
+                NEON
         );
 
         new NeonValidator()->assertValid('./phpstan.neon', $content);

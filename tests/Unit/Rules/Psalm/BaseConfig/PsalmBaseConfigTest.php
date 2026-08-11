@@ -22,13 +22,13 @@ final class PsalmBaseConfigTest extends TestCase
     {
         $existing = FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm errorLevel="8">
-    <projectFiles>
-        <directory name="app" />
-    </projectFiles>
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm errorLevel="8">
+                    <projectFiles>
+                        <directory name="app" />
+                    </projectFiles>
+                </psalm>
+                XML
         );
 
         self::assertSame($existing, $this->rule()->apply($existing));
@@ -50,16 +50,16 @@ XML
     {
         return FileContent::fromString(
             <<<'XML'
-<?xml version="1.0"?>
-<psalm
-    errorLevel="2"
-    xmlns="https://getpsalm.org/schema/config"
->
-    <projectFiles>
-        <directory name="src" />
-    </projectFiles>
-</psalm>
-XML
+                <?xml version="1.0"?>
+                <psalm
+                    errorLevel="2"
+                    xmlns="https://getpsalm.org/schema/config"
+                >
+                    <projectFiles>
+                        <directory name="src" />
+                    </projectFiles>
+                </psalm>
+                XML
         );
     }
 }

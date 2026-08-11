@@ -12,20 +12,20 @@ return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
     public function __construct()
     {
         $this->addRule(new PsalmBaseConfig(config: <<<'XML'
-<?xml version="1.0"?>
-<psalm
-    errorLevel="2"
-    resolveFromConfigFile="true"
-    xmlns="https://getpsalm.org/schema/config"
->
-    <projectFiles>
-        <directory name="src" />
-        <ignoreFiles>
-            <directory name="vendor" />
-        </ignoreFiles>
-    </projectFiles>
-</psalm>
+            <?xml version="1.0"?>
+            <psalm
+                errorLevel="2"
+                resolveFromConfigFile="true"
+                xmlns="https://getpsalm.org/schema/config"
+            >
+                <projectFiles>
+                    <directory name="src" />
+                    <ignoreFiles>
+                        <directory name="vendor" />
+                    </ignoreFiles>
+                </projectFiles>
+            </psalm>
 
-XML));
+            XML));
     }
 });
