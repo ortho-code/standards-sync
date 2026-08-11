@@ -1,0 +1,7 @@
+{
+    "name": "acme/project",
+    "require-dev": {
+        "rector/rector": "^2.5",
+        "phpstan/phpstan": "^2.5"
+    }
+}

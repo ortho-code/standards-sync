@@ -1,0 +1,10 @@
+{
+    "scripts": {
+        "app-check-standards": [
+            "vendor/bin/standards-sync sync --check"
+        ],
+        "app-run-tests": [
+            "vendor/bin/phpunit"
+        ]
+    }
+}

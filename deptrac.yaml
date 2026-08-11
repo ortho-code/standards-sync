@@ -23,10 +23,20 @@ deptrac:
     # Core must never reference a concrete rule; the reverse edge is the open/closed promise, checked.
     - name: Rules
       collectors:
+        - type: bool
+          must:
+            - type: directory
+              value: src/Rules/.*
+          must_not:
+            - type: directory
+              value: src/Rules/Composer/.*
+    # The composer family, the one rule family allowed vendor code: composer's own semver library is the authority on
+    # version constraints, and composer is not an optional tool — every consumer installed this engine with it.
+    # Scoped to this directory so every other family stays provably vendor-free.
+    - name: ComposerRules
+      collectors:
         - type: directory
-          value: src/Rules/.*
-        - type: classNameRegex
-          value: '#^AlleKnalle\\StandardsSync\\Rules\\#'
+          value: src/Rules/Composer/.*
     # Config-build-time support for authoring org packages: the self-locating Package and the Standard base rule set.
     - name: Authoring
       collectors:
@@ -70,6 +80,10 @@ deptrac:
     Rules:
       - Core
       - Formats
+    ComposerRules:
+      - Core
+      - Formats
+      - Vendor
     Infrastructure:
       - Core
       - Vendor
