@@ -13,6 +13,7 @@ use AlleKnalle\StandardsSync\Testing\Validation\NeonValidator;
 use AlleKnalle\StandardsSync\Testing\Validation\PsalmConfigValidator;
 use AlleKnalle\StandardsSync\Testing\Validation\SyncedFileValidator;
 use AlleKnalle\StandardsSync\Testing\Validation\XmlValidator;
+use AlleKnalle\StandardsSync\Testing\Validation\YamlValidator;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -21,7 +22,7 @@ use RecursiveIteratorIterator;
  * Runs a sync against an on-disk fixture and reports how the result differs from the expected tree.
  * A fixture holds an input tree (a target repo's files before the sync) and an expected tree (its files after); the config is the fixture's own standards-sync.php by default, or one you supply, so the maintainer reads real files to see what a config does.
  * Framework-neutral: it returns the differences, so consumers assert with whatever they use.
- * Synced files whose format has an available parser are additionally asserted to parse (nette/neon; ext-dom for XML, plus psalm's config.xsd when vimeo/psalm is installed; ext-json for JSON), so a writer can never produce syntactically broken output unnoticed.
+ * Synced files whose format has an available parser are additionally asserted to parse (nette/neon; ext-dom for XML, plus psalm's config.xsd when vimeo/psalm is installed; ext-json for JSON; symfony/yaml for YAML), so a writer can never produce syntactically broken output unnoticed.
  */
 final class SyncFixtureTester
 {
@@ -42,7 +43,7 @@ final class SyncFixtureTester
         private readonly SyncTester $syncTester = new SyncTester(),
         ?array $validators = null,
     ) {
-        $this->validators = $validators ?? [new NeonValidator(), new XmlValidator(), new PsalmConfigValidator(), new JsonValidator()];
+        $this->validators = $validators ?? [new NeonValidator(), new XmlValidator(), new PsalmConfigValidator(), new JsonValidator(), new YamlValidator()];
     }
 
     /**

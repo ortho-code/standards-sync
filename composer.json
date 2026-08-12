@@ -20,6 +20,7 @@
     "nette/neon": "^3.4",
     "phpunit/phpunit": "^12",
     "rector/rector": "^2.5",
+    "symfony/yaml": "^8.1",
     "symplify/easy-coding-standard": "^13.2"
   },
   "config": {
