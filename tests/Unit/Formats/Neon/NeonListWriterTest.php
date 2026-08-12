@@ -85,6 +85,31 @@ final class NeonListWriterTest extends TestCase
         self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
     }
 
+    public function testAnEntryBelowACommentLineIsStillRecognized(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                	# the org baseline
+                	- vendor/acme/standards/phpstan.neon
+                NEON
+        );
+
+        self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
+    }
+
+    public function testASectionHeaderWithATrailingCommentIsStillTheSection(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes: # org standards
+                	- vendor/acme/standards/phpstan.neon
+                NEON
+        );
+
+        self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
+    }
+
     public function testInsertsAfterTheLastEntryCopyingItsIndentation(): void
     {
         $content = FileContent::fromString(

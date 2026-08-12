@@ -14,6 +14,10 @@ use RuntimeException;
  */
 final readonly class NeonListWriter
 {
+    private const string ENTRY_LINE = '/^([ \t]+)-[ \t]*(.*)$/';
+
+    private const string COMMENT_LINE = '/^[ \t]*#/';
+
     /**
      * Ensures the entry in the section: a present entry is kept, an absent one is inserted after the section's last entry.
      * A missing section is created at the top of the document holding just the entry; empty content becomes only that section.
@@ -36,13 +40,17 @@ final readonly class NeonListWriter
         $lastEntryIndex = $sectionIndex;
         $entryIndent = null;
         for ($index = $sectionIndex + 1; $index < count($lines); $index++) {
-            if (preg_match('/^([ \t]+)-[ \t]*(.*)$/', $lines[$index], $match) === 1) {
+            if (preg_match(self::ENTRY_LINE, $lines[$index], $match) === 1) {
                 // A consumer-annotated entry is still that entry: the trailing comment is not part of the value.
                 if (NeonValue::unquote(NeonValue::splitTrailingComment($match[2])[0]) === NeonValue::unquote($entry)) {
                     return $content;
                 }
                 $entryIndent ??= $match[1];
                 $lastEntryIndex = $index;
+                continue;
+            }
+            // A comment line neither ends the section nor holds an entry — the entries around it still count.
+            if (preg_match(self::COMMENT_LINE, $lines[$index]) === 1) {
                 continue;
             }
             if (trim($lines[$index]) !== '') {
@@ -63,11 +71,20 @@ final readonly class NeonListWriter
     /** @param list<string> $lines */
     private static function sectionIndex(array $lines, string $section): ?int
     {
-        $inlineForm = '/^' . preg_quote($section . ':', '/') . '[ \t]*\S/';
-        if (array_any($lines, static fn (string $line): bool => preg_match($inlineForm, $line) === 1)) {
+        if (array_any($lines, static fn (string $line): bool => (self::headerValue($line, $section) ?? '') !== '')) {
             throw new RuntimeException(sprintf('The "%s:" section is not a block list; convert it to one "- entry" per line so the entry can be managed.', $section));
         }
 
-        return array_find_key($lines, static fn (string $line): bool => rtrim($line) === $section . ':');
+        return array_find_key($lines, static fn (string $line): bool => self::headerValue($line, $section) === '');
+    }
+
+    /** The value text on the section's header line, trailing comment stripped — or null when the line is not that header. */
+    private static function headerValue(string $line, string $section): ?string
+    {
+        if (!str_starts_with($line, $section . ':')) {
+            return null;
+        }
+
+        return trim(NeonValue::splitTrailingComment(substr($line, strlen($section) + 1))[0]);
     }
 }
