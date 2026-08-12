@@ -7,15 +7,27 @@ namespace AlleKnalle\StandardsSync\Testing\Validation;
 use Nette\Neon\Neon;
 use RuntimeException;
 
-/** Parses every synced .neon file; nette/neon sits in the engine's require-dev only, so the check self-guards and org suites gain it by installing the parser. */
+/** Parses every synced .neon file; a .neon file synced without nette/neon installed fails loud, so the format is never silently unvalidated. */
 final readonly class NeonValidator implements SyncedFileValidator
 {
     private const string EXTENSION = '.neon';
 
+    private bool $parserInstalled;
+
+    /** @param bool|null $parserInstalled overrides the nette/neon availability detection; null detects */
+    public function __construct(?bool $parserInstalled = null)
+    {
+        $this->parserInstalled = $parserInstalled ?? class_exists(Neon::class);
+    }
+
     public function assertValid(string $path, string $content): void
     {
-        if (!str_ends_with($path, self::EXTENSION) || !class_exists(Neon::class)) {
+        if (!str_ends_with($path, self::EXTENSION)) {
             return;
+        }
+
+        if (!$this->parserInstalled) {
+            throw new RuntimeException(sprintf('The synced %s cannot be validated: install nette/neon (require-dev) to parse synced neon, or leave the NeonValidator out of the validator list.', $path));
         }
 
         try {

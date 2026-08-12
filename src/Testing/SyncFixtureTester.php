@@ -22,7 +22,7 @@ use RecursiveIteratorIterator;
  * Runs a sync against an on-disk fixture and reports how the result differs from the expected tree.
  * A fixture holds an input tree (a target repo's files before the sync) and an expected tree (its files after); the config is the fixture's own standards-sync.php by default, or one you supply, so the maintainer reads real files to see what a config does.
  * Framework-neutral: it returns the differences, so consumers assert with whatever they use.
- * Synced files whose format has an available parser are additionally asserted to parse (nette/neon; ext-dom for XML, plus psalm's config.xsd when vimeo/psalm is installed; ext-json for JSON; symfony/yaml for YAML), so a writer can never produce syntactically broken output unnoticed.
+ * Synced files are additionally asserted to parse (nette/neon; ext-dom for XML, plus psalm's config.xsd via vimeo/psalm; ext-json for JSON; symfony/yaml for YAML), so a writer can never produce syntactically broken output unnoticed; a synced file whose parser is not installed fails loud rather than skipping silently.
  */
 final class SyncFixtureTester
 {

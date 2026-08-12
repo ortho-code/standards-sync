@@ -9,7 +9,7 @@ use DOMDocument;
 use RuntimeException;
 
 /**
- * Validates a synced psalm config against psalm's shipped config.xsd, when the running suite has psalm installed — the engine's own suite cannot host psalm, so org suites opt in by installing it.
+ * Validates a synced psalm config against psalm's shipped config.xsd; a psalm config synced without vimeo/psalm installed fails loud, so the check is never silently skipped.
  * Tool knowledge, deliberately beside the format validators: the candidate names are psalm's own discovery list, restated because the Testing layer may not depend on the rule library.
  * Replicates psalm's missing-xmlns tolerance (injected in memory before validating), so the check accepts exactly what psalm accepts.
  */
@@ -18,15 +18,22 @@ final readonly class PsalmConfigValidator implements SyncedFileValidator
     private const array CANDIDATES = ['psalm.xml', 'psalm.xml.dist', 'psalm.dist.xml'];
     private const string XMLNS = 'https://getpsalm.org/schema/config';
 
+    private ?string $schema;
+
+    /** @param bool|null $psalmInstalled overrides the vimeo/psalm availability detection; null locates its shipped schema through composer's install record */
+    public function __construct(?bool $psalmInstalled = null)
+    {
+        $this->schema = $psalmInstalled === false ? null : self::installedSchema();
+    }
+
     public function assertValid(string $path, string $content): void
     {
         if (!in_array(basename($path), self::CANDIDATES, true)) {
             return;
         }
 
-        $schema = self::schema();
-        if ($schema === null) {
-            return;
+        if ($this->schema === null) {
+            throw new RuntimeException(sprintf('The synced %s cannot be validated against the psalm config schema: install vimeo/psalm (require-dev), or leave the PsalmConfigValidator out of the validator list.', $path));
         }
 
         $previous = libxml_use_internal_errors(true);
@@ -41,7 +48,7 @@ final readonly class PsalmConfigValidator implements SyncedFileValidator
                 $document->loadXML((string) preg_replace('/<psalm(?=[\s\/>])/', sprintf('<psalm xmlns="%s"', self::XMLNS), $content, 1));
             }
 
-            if (!$document->schemaValidate($schema)) {
+            if (!$document->schemaValidate($this->schema)) {
                 throw new RuntimeException(sprintf('The synced %s violates the psalm config schema: %s', $path, self::firstLibxmlError()));
             }
         } finally {
@@ -51,7 +58,7 @@ final readonly class PsalmConfigValidator implements SyncedFileValidator
     }
 
     /** Psalm's shipped schema, located through composer's install record — null when psalm is not installed in the running suite. */
-    private static function schema(): ?string
+    private static function installedSchema(): ?string
     {
         if (!InstalledVersions::isInstalled('vimeo/psalm')) {
             return null;

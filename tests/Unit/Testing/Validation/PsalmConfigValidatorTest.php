@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\AlleKnalle\StandardsSync\Unit\Testing\Validation;
 
+use AlleKnalle\StandardsSync\Testing\FileContent;
 use AlleKnalle\StandardsSync\Testing\Validation\PsalmConfigValidator;
-use Composer\InstalledVersions;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 #[CoversClass(PsalmConfigValidator::class)]
 final class PsalmConfigValidatorTest extends TestCase
@@ -19,15 +20,44 @@ final class PsalmConfigValidatorTest extends TestCase
         new PsalmConfigValidator()->assertValid('./other.xml', "<foo><bar></foo>\n");
     }
 
-    // The schema tier activates only where psalm is installed; this suite cannot host it (phpunit 13 conflict), so the validator must stay silent here.
-    public function testStaysSilentWhenPsalmIsNotInstalled(): void
+    public function testAcceptsAConfigTheSchemaAllows(): void
     {
-        if (InstalledVersions::isInstalled('vimeo/psalm')) {
-            self::markTestSkipped('psalm is installed in this suite; the no-op guard cannot be observed.');
-        }
-
         $this->expectNotToPerformAssertions();
 
-        new PsalmConfigValidator()->assertValid('./psalm.xml', "<psalm><bogus /></psalm>\n");
+        $content = FileContent::fromString(
+            <<<'XML'
+                <?xml version="1.0"?>
+                <psalm errorLevel="4">
+                    <projectFiles>
+                        <directory name="src" />
+                    </projectFiles>
+                </psalm>
+                XML
+        );
+
+        new PsalmConfigValidator()->assertValid('./psalm.xml', $content);
+    }
+
+    public function testFailsLoudOnASchemaViolation(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('violates the psalm config schema');
+
+        new PsalmConfigValidator()->assertValid('./psalm.xml', "<psalm errorLevel=\"4\"><bogus /></psalm>\n");
+    }
+
+    public function testFailsLoudWhenPsalmIsMissing(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('install vimeo/psalm');
+
+        new PsalmConfigValidator(psalmInstalled: false)->assertValid('./psalm.xml', "<psalm errorLevel=\"4\" />\n");
+    }
+
+    public function testIgnoresAFileItDoesNotCoverEvenWithoutPsalm(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        new PsalmConfigValidator(psalmInstalled: false)->assertValid('./other.xml', 'anything');
     }
 }

@@ -21,7 +21,8 @@
     "phpunit/phpunit": "^12",
     "rector/rector": "^2.5",
     "symfony/yaml": "^8.1",
-    "symplify/easy-coding-standard": "^13.2"
+    "symplify/easy-coding-standard": "^13.2",
+    "vimeo/psalm": "^6.14"
   },
   "config": {
     "optimize-autoloader": true,

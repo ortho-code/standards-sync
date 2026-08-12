@@ -41,4 +41,19 @@ final class NeonValidatorTest extends TestCase
 
         new NeonValidator()->assertValid('./notes.txt', "parameters:\n\tlevel: [6\n");
     }
+
+    public function testFailsLoudWhenTheParserIsMissing(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('install nette/neon');
+
+        new NeonValidator(parserInstalled: false)->assertValid('./phpstan.neon', "parameters:\n\tlevel: 6\n");
+    }
+
+    public function testIgnoresAFileItDoesNotCoverEvenWithoutTheParser(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        new NeonValidator(parserInstalled: false)->assertValid('./notes.txt', 'anything');
+    }
 }
