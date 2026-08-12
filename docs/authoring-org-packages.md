@@ -64,7 +64,7 @@ The third one calls the second one *by name*, and nothing in the engine ties the
 Use the shipped `Testing/` helpers:
 
 - Extend `ScenarioTestCase` for fixture-based before/after scenarios (fixtures in a `fixtures/` dir beside the test). This is the fit when a package ships **custom rules**: each rule's fixtures are its behaviour catalog, exactly as the engine tests its own rule library. A package that only composes shipped rules usually needs no fixtures — the engine's own catalog already pins how each rule behaves.
-- Fixture runs parse-validate every synced file whose format has an installed parser (`Testing/Validation/`); a missing parser skips the check silently, so a package that wants that net installs the parsers for the formats it ships (nette/neon for neon, symfony/yaml for yaml).
+- Fixture runs parse-validate every synced file (`Testing/Validation/`); a synced file whose parser is not installed fails loud, so install the parsers for the formats your package ships (nette/neon for neon, symfony/yaml for yaml, vimeo/psalm for the psalm schema check) — or leave that validator out via `SyncFixtureTester`'s `validators:` parameter.
 - Use `SyncTester` directly for a quick presence check (sync in memory, assert the block and content land) when the synced file is a whole file a fixture would just duplicate — asserting exact bytes there would only re-state the template, and the exact rendering is the engine's responsibility, not the org package's.
 - Tests that assert reference paths inject a fixed package, because in the package's own repo the org is composer's *root* package and references would render bare (`templates/…`) instead of consumer-realistic:
 
