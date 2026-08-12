@@ -46,11 +46,11 @@ final readonly class JsonObjectWriter
     }
 
     /**
-     * Sets a string at a nested key path: an existing member's value is replaced, a missing one is inserted, and an equal value leaves the content untouched.
+     * Sets a scalar at a nested key path: an existing member's value is replaced, a missing one is inserted, and an equal value leaves the content untouched.
      *
      * @param non-empty-list<string> $path
      */
-    public static function write(string $content, array $path, string $value): string
+    public static function write(string $content, array $path, string|bool|int $value): string
     {
         return self::set($content, $path, $value);
     }
@@ -102,9 +102,9 @@ final readonly class JsonObjectWriter
 
     /**
      * @param non-empty-list<string> $path
-     * @param string|non-empty-list<string> $value
+     * @param string|bool|int|non-empty-list<string> $value
      */
-    private static function set(string $content, array $path, string|array $value): string
+    private static function set(string $content, array $path, string|bool|int|array $value): string
     {
         [$object, $member, $depth] = self::walk($content, $path);
         $unit = self::detectIndent($content);
@@ -209,11 +209,11 @@ final readonly class JsonObjectWriter
     /**
      * A null indent renders on one line, for a member being written into an object the project keeps on one line.
      *
-     * @param string|non-empty-list<string> $value
+     * @param string|bool|int|non-empty-list<string> $value
      */
-    private static function renderValue(string|array $value, ?string $indent, string $unit): string
+    private static function renderValue(string|bool|int|array $value, ?string $indent, string $unit): string
     {
-        if (is_string($value)) {
+        if (!is_array($value)) {
             return self::encode($value);
         }
 
@@ -230,9 +230,9 @@ final readonly class JsonObjectWriter
      * One member, with the objects the remaining path still needs wrapped around it.
      *
      * @param non-empty-list<string> $path
-     * @param string|non-empty-list<string> $value
+     * @param string|bool|int|non-empty-list<string> $value
      */
-    private static function renderMember(array $path, string|array $value, ?string $indent, string $unit): string
+    private static function renderMember(array $path, string|bool|int|array $value, ?string $indent, string $unit): string
     {
         $key = self::encode($path[0]);
         if (count($path) === 1) {
@@ -355,7 +355,7 @@ final readonly class JsonObjectWriter
         }
     }
 
-    private static function encode(string $value): string
+    private static function encode(string|bool|int $value): string
     {
         return json_encode($value, self::RENDER_FLAGS);
     }

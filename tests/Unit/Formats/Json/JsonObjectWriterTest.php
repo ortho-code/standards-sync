@@ -240,6 +240,49 @@ final class JsonObjectWriterTest extends TestCase
         self::assertSame($expected, JsonObjectWriter::writeList($content, ['scripts', 'app-check-standards'], ['vendor/bin/standards-sync sync --check']));
     }
 
+    /** @return iterable<string, array{string|bool|int, string}> */
+    public static function scalars(): iterable
+    {
+        yield 'a boolean' => [true, 'true'];
+        yield 'a false boolean' => [false, 'false'];
+        yield 'an integer' => [900, '900'];
+        yield 'a string' => ['vendor', '"vendor"'];
+    }
+
+    /** A boolean must land as JSON's own literal, not as the text "true". */
+    #[DataProvider('scalars')]
+    public function testWritesAScalarInItsJsonForm(string|bool|int $value, string $written): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "config": {
+                        "optimize-autoloader": true
+                    }
+                }
+                JSON
+        );
+
+        $result = JsonObjectWriter::write($content, ['config', 'sort-packages'], $value);
+
+        self::assertStringContainsString('"sort-packages": ' . $written, $result);
+    }
+
+    public function testWritingAnEqualBooleanLeavesTheContentUntouched(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "config": {
+                        "sort-packages": true
+                    }
+                }
+                JSON
+        );
+
+        self::assertSame($content, JsonObjectWriter::write($content, ['config', 'sort-packages'], true));
+    }
+
     public function testWritesEveryEntryOfAMultiEntryListOnItsOwnLine(): void
     {
         $content = FileContent::fromString(
