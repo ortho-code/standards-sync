@@ -193,7 +193,7 @@ final class PhpStanPinnedValuesTest extends TestCase
     public function testRefusesToPinAScalarOverASection(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('holds a section');
+        $this->expectExceptionMessage('holds a section');
 
         $rule = new PhpStanPinnedValues(values: PinnedValues::fromArray(['parameters' => ['cache' => 'simple']]));
 
@@ -211,7 +211,7 @@ final class PhpStanPinnedValuesTest extends TestCase
     public function testRefusesToPinBeneathAScalar(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('holds a value');
+        $this->expectExceptionMessage('holds a value');
 
         $this->rule()->apply(FileContent::fromString('parameters: true'));
     }

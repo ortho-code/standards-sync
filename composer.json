@@ -18,7 +18,7 @@
   "require-dev": {
     "deptrac/deptrac": "^4",
     "nette/neon": "^3.4",
-    "phpunit/phpunit": "^13",
+    "phpunit/phpunit": "^12",
     "rector/rector": "^2.5",
     "symplify/easy-coding-standard": "^13.2"
   },

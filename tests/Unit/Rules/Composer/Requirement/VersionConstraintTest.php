@@ -115,7 +115,7 @@ final class VersionConstraintTest extends TestCase
     public function testRefusesAConstraintComposerCannotParse(string $constraint): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('is not a version constraint composer can parse');
+        $this->expectExceptionMessage('is not a version constraint composer can parse');
 
         VersionConstraint::fromString($constraint);
     }
@@ -123,7 +123,7 @@ final class VersionConstraintTest extends TestCase
     public function testRefusesToMeasureAgainstAMinimumThatStatesNoVersion(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('states no lowest version');
+        $this->expectExceptionMessage('states no lowest version');
 
         VersionConstraint::fromString('^2.5')->meets(VersionConstraint::fromString('dev-main'));
     }

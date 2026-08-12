@@ -154,7 +154,7 @@ final class EngineTest extends TestCase
         )));
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('Both "/a/phpstan.neon.dist" and "/a/phpstan.dist.neon" exist; the standard has one committed home — remove all but one.');
+        $this->expectExceptionMessage('Both "/a/phpstan.neon.dist" and "/a/phpstan.dist.neon" exist; the standard has one committed home — remove all but one.');
 
         new Engine($filesystem)->plan($config);
     }
@@ -171,7 +171,7 @@ final class EngineTest extends TestCase
         )));
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('Both "/a/a.conf" and "/a/b.conf" exist for one target; remove all but one.');
+        $this->expectExceptionMessage('Both "/a/a.conf" and "/a/b.conf" exist for one target; remove all but one.');
 
         new Engine($filesystem)->plan($config);
     }
@@ -231,7 +231,7 @@ final class EngineTest extends TestCase
         ));
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('deletion is not supported');
+        $this->expectExceptionMessage('deletion is not supported');
 
         new Engine($filesystem)->plan($config);
     }

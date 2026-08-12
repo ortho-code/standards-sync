@@ -20,7 +20,7 @@ final class ComposerRequirementTest extends TestCase
     public function testRefusesAConstraintThatStatesNoMinimum(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('names a branch, so it states no minimum version to enforce');
+        $this->expectExceptionMessage('names a branch, so it states no minimum version to enforce');
 
         new ComposerRequirement(package: 'phpstan/phpstan', constraint: VersionConstraint::fromString('dev-main'));
     }
@@ -68,7 +68,7 @@ final class ComposerRequirementTest extends TestCase
     public function testRefusesAConstraintTheManifestWritesThatComposerCannotParse(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('requires phpstan/phpstan at "not a constraint" in require-dev, which is not a version constraint composer can parse');
+        $this->expectExceptionMessage('requires phpstan/phpstan at "not a constraint" in require-dev, which is not a version constraint composer can parse');
 
         self::rule()->apply(self::manifest('{"require-dev": {"phpstan/phpstan": "not a constraint"}}'));
     }

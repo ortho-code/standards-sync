@@ -51,7 +51,7 @@ final class TargetResolverTest extends TestCase
     {
         // If the directory name counted, this would resolve with a preference instead of refusing two same-side files.
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('Both "/a/dist/a.conf" and "/a/etc/a.conf" exist for one target; remove all but one.');
+        $this->expectExceptionMessage('Both "/a/dist/a.conf" and "/a/etc/a.conf" exist for one target; remove all but one.');
 
         $this->resolver([
             '/a/dist/a.conf' => "one\n",
@@ -62,7 +62,7 @@ final class TargetResolverTest extends TestCase
     public function testDistInsideASegmentIsNotADistVariant(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('Both "/a/distribution.neon" and "/a/phpstan.neon" exist for one target; remove all but one.');
+        $this->expectExceptionMessage('Both "/a/distribution.neon" and "/a/phpstan.neon" exist for one target; remove all but one.');
 
         $this->resolver([
             '/a/distribution.neon' => "one\n",

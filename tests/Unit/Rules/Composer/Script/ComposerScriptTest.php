@@ -15,7 +15,7 @@ final class ComposerScriptTest extends TestCase
     public function testRefusesAScriptWithoutAName(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('needs a name');
+        $this->expectExceptionMessage('needs a name');
 
         new ComposerScript(name: ' ', commands: ['vendor/bin/standards-sync sync --check']);
     }
@@ -23,7 +23,7 @@ final class ComposerScriptTest extends TestCase
     public function testRefusesAScriptWithoutCommands(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('needs at least one command');
+        $this->expectExceptionMessage('needs at least one command');
 
         new ComposerScript(name: 'app-check-standards', commands: []);
     }

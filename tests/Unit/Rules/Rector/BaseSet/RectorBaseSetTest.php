@@ -194,7 +194,7 @@ final class RectorBaseSetTest extends TestCase
     public function testRefusesACallableStyleConfig(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('fluent form');
+        $this->expectExceptionMessage('fluent form');
 
         $this->rule()->apply(FileContent::fromString(
             <<<'PHP'
@@ -214,7 +214,7 @@ final class RectorBaseSetTest extends TestCase
     public function testRefusesASingleLineSetsArray(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('one entry per line');
+        $this->expectExceptionMessage('one entry per line');
 
         $this->rule()->apply(FileContent::fromString("return RectorConfig::configure()->withSets([SetList::DEAD_CODE]);"));
     }
@@ -230,7 +230,7 @@ final class RectorBaseSetTest extends TestCase
     public function testRejectsAnExpressionAsTheSetPath(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('relative path');
+        $this->expectExceptionMessage('relative path');
 
         new RectorBaseSet(set: "__DIR__ . '/vendor/acme/standards/config/rector.php'");
     }
@@ -238,7 +238,7 @@ final class RectorBaseSetTest extends TestCase
     public function testRejectsAnAbsoluteSetPath(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('relative');
+        $this->expectExceptionMessage('relative');
 
         new RectorBaseSet(set: '/vendor/acme/standards/config/rector.php');
     }

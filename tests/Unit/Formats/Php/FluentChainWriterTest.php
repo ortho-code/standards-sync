@@ -182,7 +182,7 @@ final class FluentChainWriterTest extends TestCase
     public function testRefusesToAppendWithoutATerminatedStatement(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('terminated statement');
+        $this->expectExceptionMessage('terminated statement');
 
         FluentChainWriter::ensureArrayEntry(FileContent::fromString('return RectorConfig::configure()'), 'withSets', "'a.php'");
     }
@@ -190,7 +190,7 @@ final class FluentChainWriterTest extends TestCase
     public function testRefusesASingleLineArray(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('one entry per line');
+        $this->expectExceptionMessage('one entry per line');
 
         FluentChainWriter::ensureArrayEntry("return RectorConfig::configure()->withSets(['a.php']);", 'withSets', "'b.php'");
     }
@@ -198,7 +198,7 @@ final class FluentChainWriterTest extends TestCase
     public function testRefusesANonArrayArgument(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('not an array');
+        $this->expectExceptionMessage('not an array');
 
         FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets($sets);', 'withSets', "'a.php'");
     }
@@ -206,7 +206,7 @@ final class FluentChainWriterTest extends TestCase
     public function testRefusesACallThatNeverCloses(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('never closes');
+        $this->expectExceptionMessage('never closes');
 
         FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets([;', 'withSets', "'a.php'");
     }

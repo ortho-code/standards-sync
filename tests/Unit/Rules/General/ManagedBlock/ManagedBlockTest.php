@@ -117,7 +117,7 @@ final class ManagedBlockTest extends TestCase
     public function testRejectsATargetWithoutLineComments(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('no line comments');
+        $this->expectExceptionMessage('no line comments');
 
         $this->rule('composer.json', 'test', 'x');
     }
@@ -125,7 +125,7 @@ final class ManagedBlockTest extends TestCase
     public function testRejectsCandidatesThatDisagreeOnCommentSyntax(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('disagree on comment syntax');
+        $this->expectExceptionMessage('disagree on comment syntax');
 
         new ManagedBlock(FileTarget::fromStrings('php.ini', 'php.conf'), Label::fromString('test'), 'x');
     }

@@ -398,7 +398,7 @@ final class NeonScalarWriterTest extends TestCase
         );
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('holds a section');
+        $this->expectExceptionMessage('holds a section');
 
         NeonScalarWriter::write($content, ['parameters', 'level'], 7);
     }
@@ -413,7 +413,7 @@ final class NeonScalarWriterTest extends TestCase
         );
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('holds a value');
+        $this->expectExceptionMessage('holds a value');
 
         NeonScalarWriter::write($content, ['parameters', 'level', 'nested'], 7);
     }
@@ -421,7 +421,7 @@ final class NeonScalarWriterTest extends TestCase
     public function testRefusesAValueMixingBothQuoteStyles(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('mixes both quote styles');
+        $this->expectExceptionMessage('mixes both quote styles');
 
         NeonScalarWriter::write('', ['parameters', 'message'], 'both \' and "');
     }

@@ -48,7 +48,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testRefusesToReadANonStringAsAString(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('"config.sort-packages" does not hold a string');
+        $this->expectExceptionMessage('"config.sort-packages" does not hold a string');
 
         JsonObjectWriter::read(self::manifest(), ['config', 'sort-packages']);
     }
@@ -444,7 +444,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testRefusesMalformedJson(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('is not valid JSON');
+        $this->expectExceptionMessage('is not valid JSON');
 
         JsonObjectWriter::read('{"name": }', ['name']);
     }
@@ -452,7 +452,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testRefusesARootThatIsNotAnObject(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('does not hold a JSON object');
+        $this->expectExceptionMessage('does not hold a JSON object');
 
         JsonObjectWriter::read('["a"]', ['name']);
     }
@@ -460,7 +460,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testRefusesToWriteBeneathANonObject(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('"name" does not hold an object');
+        $this->expectExceptionMessage('"name" does not hold an object');
 
         JsonObjectWriter::write(self::manifest(), ['name', 'nested'], 'x');
     }
@@ -479,7 +479,7 @@ final class JsonObjectWriterTest extends TestCase
         );
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('sets "phpstan/phpstan" more than once');
+        $this->expectExceptionMessage('sets "phpstan/phpstan" more than once');
 
         JsonObjectWriter::read($content, ['require-dev', 'phpstan/phpstan']);
     }

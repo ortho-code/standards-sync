@@ -146,7 +146,7 @@ final class NeonListWriterTest extends TestCase
         );
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('block list');
+        $this->expectExceptionMessage('block list');
 
         NeonListWriter::ensureEntry($content, 'includes', 'vendor/other/phpstan.neon');
     }

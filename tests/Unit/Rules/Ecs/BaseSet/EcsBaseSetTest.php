@@ -196,7 +196,7 @@ final class EcsBaseSetTest extends TestCase
     public function testRefusesACallableStyleConfig(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('fluent form');
+        $this->expectExceptionMessage('fluent form');
 
         $this->rule()->apply(FileContent::fromString(
             <<<'PHP'
@@ -217,7 +217,7 @@ final class EcsBaseSetTest extends TestCase
     public function testRefusesAnIncludeChainConfig(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('fluent form');
+        $this->expectExceptionMessage('fluent form');
 
         $this->rule()->apply(FileContent::fromString(
             <<<'PHP'
@@ -236,7 +236,7 @@ final class EcsBaseSetTest extends TestCase
     public function testRefusesASingleLineSetsArray(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('one entry per line');
+        $this->expectExceptionMessage('one entry per line');
 
         $this->rule()->apply(FileContent::fromString("return ECSConfig::configure()->withSets([SetList::PSR_12]);"));
     }
@@ -252,7 +252,7 @@ final class EcsBaseSetTest extends TestCase
     public function testRejectsAnExpressionAsTheSetPath(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('relative path');
+        $this->expectExceptionMessage('relative path');
 
         new EcsBaseSet(set: "__DIR__ . '/vendor/acme/standards/config/ecs.php'");
     }
@@ -260,7 +260,7 @@ final class EcsBaseSetTest extends TestCase
     public function testRejectsAnAbsoluteSetPath(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('relative');
+        $this->expectExceptionMessage('relative');
 
         new EcsBaseSet(set: '/vendor/acme/standards/config/ecs.php');
     }
