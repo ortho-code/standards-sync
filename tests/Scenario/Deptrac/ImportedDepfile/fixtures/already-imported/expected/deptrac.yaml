@@ -1,0 +1,6 @@
+imports:
+  - vendor/acme/standards/deptrac.yaml
+
+deptrac:
+  paths:
+    - ./src
