@@ -10,6 +10,7 @@ use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 final readonly class ComposerManifest
 {
     public const string SCRIPTS_SECTION = 'scripts';
+    public const string CONFIG_SECTION = 'config';
 
     private const string FILE = 'composer.json';
 
