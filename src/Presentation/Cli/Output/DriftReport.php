@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Presentation\Cli;
+namespace AlleKnalle\StandardsSync\Presentation\Cli\Output;
 
 use AlleKnalle\StandardsSync\Core\Plan\Abstention;
 use AlleKnalle\StandardsSync\Core\Plan\Change;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Presentation\Cli;
+namespace Tests\AlleKnalle\StandardsSync\Integration\Presentation\Cli\Output;
 
 use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
 use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
@@ -15,7 +15,7 @@ use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
 use AlleKnalle\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
 use AlleKnalle\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
 use AlleKnalle\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
-use AlleKnalle\StandardsSync\Presentation\Cli\DriftReport;
+use AlleKnalle\StandardsSync\Presentation\Cli\Output\DriftReport;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;

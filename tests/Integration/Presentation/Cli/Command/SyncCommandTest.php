@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Presentation\Cli;
+namespace Tests\AlleKnalle\StandardsSync\Integration\Presentation\Cli\Command;
 
 use AlleKnalle\StandardsSync\Presentation\Cli\Application;
-use AlleKnalle\StandardsSync\Presentation\Cli\DriftReport;
-use AlleKnalle\StandardsSync\Presentation\Cli\SyncCommand;
+use AlleKnalle\StandardsSync\Presentation\Cli\Command\SyncCommand;
+use AlleKnalle\StandardsSync\Presentation\Cli\Output\DriftReport;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Tests\AlleKnalle\StandardsSync\Integration\IntegrationTestCase;
