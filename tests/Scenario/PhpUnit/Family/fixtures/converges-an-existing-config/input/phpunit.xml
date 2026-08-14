@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- our own notes stay ours -->
+<phpunit bootstrap="tests/bootstrap.php" failOnWarning="1">
+    <testsuites>
+        <testsuite name="app">
+            <directory>tests/App</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

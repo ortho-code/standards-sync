@@ -11,6 +11,7 @@ use AlleKnalle\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
 use AlleKnalle\StandardsSync\Testing\Validation\Json5Validator;
 use AlleKnalle\StandardsSync\Testing\Validation\JsonValidator;
 use AlleKnalle\StandardsSync\Testing\Validation\NeonValidator;
+use AlleKnalle\StandardsSync\Testing\Validation\PhpUnitConfigValidator;
 use AlleKnalle\StandardsSync\Testing\Validation\PsalmConfigValidator;
 use AlleKnalle\StandardsSync\Testing\Validation\SyncedFileValidator;
 use AlleKnalle\StandardsSync\Testing\Validation\XmlValidator;
@@ -23,7 +24,7 @@ use RecursiveIteratorIterator;
  * Runs a sync against an on-disk fixture and reports how the result differs from the expected tree.
  * A fixture holds an input tree (a target repo's files before the sync) and an expected tree (its files after); the config is the fixture's own standards-sync.php by default, or one you supply, so the maintainer reads real files to see what a config does.
  * Framework-neutral: it returns the differences, so consumers assert with whatever they use.
- * Synced files are additionally asserted to parse (nette/neon; ext-dom for XML, plus psalm's config.xsd via vimeo/psalm; ext-json for JSON; colinodell/json5 for JSON5; symfony/yaml for YAML), so a writer can never produce syntactically broken output unnoticed; a synced file whose parser is not installed fails loud rather than skipping silently.
+ * Synced files are additionally asserted to parse (nette/neon; ext-dom for XML, plus psalm's config.xsd via vimeo/psalm and phpunit's phpunit.xsd via phpunit/phpunit; ext-json for JSON; colinodell/json5 for JSON5; symfony/yaml for YAML), so a writer can never produce syntactically broken output unnoticed; a synced file whose parser is not installed fails loud rather than skipping silently.
  */
 final class SyncFixtureTester
 {
@@ -44,7 +45,7 @@ final class SyncFixtureTester
         private readonly SyncTester $syncTester = new SyncTester(),
         ?array $validators = null,
     ) {
-        $this->validators = $validators ?? [new NeonValidator(), new XmlValidator(), new PsalmConfigValidator(), new JsonValidator(), new Json5Validator(), new YamlValidator()];
+        $this->validators = $validators ?? [new NeonValidator(), new XmlValidator(), new PsalmConfigValidator(), new PhpUnitConfigValidator(), new JsonValidator(), new Json5Validator(), new YamlValidator()];
     }
 
     /**
