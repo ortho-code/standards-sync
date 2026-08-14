@@ -49,12 +49,37 @@ Rules that target the same file fold in declaration order — each rule receives
 
 The same discipline covers a tool with no import tier (psalm, phpunit): declare its base-config rule (`PsalmBaseConfig`, `PhpUnitBaseConfig`) before its value rules, so an absent config grows from the org template instead of the engine skeleton. And because nothing rides `composer update` for such a tool, **the template is one-shot** — it fires only into nothingness and never edits an existing config, so only values that also have their own rule stay enforced. The template bootstraps; rules converge.
 
+## Structuring a grown standard
+
+A standard covering many tools outgrows one readable method. Structure it by tool family: one private method per family, `enforce()` reduced to the list of calls, the enforcement chain (next section) last. Each family method holds everything its tool's story needs — the rules, the values inline, the family's docblock, and the ordering comment where declaration order carries meaning:
+
+```php
+protected function enforce(Package $package): void
+{
+    $this->enforceEditorConfig($package);
+    $this->enforcePhpStan($package);
+    $this->enforceToolchain($package);
+}
+
+/** The shared ruleset via a native import, with a level floor. */
+private function enforcePhpStan(Package $package): void
+{
+    // The import declares first: the first rule to meet an absent config decides the created base.
+    $this->addRule(new PhpStanIncludedRuleset(ruleset: $package->path('phpstan.neon')));
+    $this->addRule(new PhpStanMinLevel(minLevel: PhpStanLevel::fromInt(6)));
+}
+```
+
+This grouping localizes every ordering constraint from the previous section: import-before-values and template-before-pins order rules within one family's method, and tiers order at the `include()` seam — the call order across families is free, since families target different files.
+
+An org package optimizes for the maintainer who updates the standard, not for machinery: plain declarations, values a reader can change in place. A value used once needs no constant — the rule's named argument already names it; a constant earns its place when several declarations share it, like a marker label used by several blocks.
+
 ## Making the standard enforceable
 
 Synced configs enforce nothing on their own: a repo that never installs the tools, or never runs them, passes every day. Closing that takes three declarations that belong together, and only the first two are engine rules:
 
 1. **`ComposerRequirement`** per tool, so the manifest actually requires it. Writing a requirement leaves `composer.lock` stale, which is deliberate — `composer install` warns, and refuses outright when the package is not in the lock at all, so the gap surfaces loudly rather than silently.
-2. **`ComposerScript`**, one named entry point that runs the tools plus `standards-sync sync --check`, so the configs and the check itself are drift-guarded.
+2. **`ComposerScript`**, one named entry point that runs the tools plus the engine's own check, `standards-sync sync --check`, so the configs and the check itself are drift-guarded. Composer puts its bin-dir on PATH when running scripts, so every entry names the bare binary with no `vendor/bin/` prefix.
 3. **A `ManagedBlock` in the CI config** calling that script. This needs no engine support — `ManagedBlock` works in any comment-bearing format, and CI configs are YAML.
 
 The third one calls the second one *by name*, and nothing in the engine ties them together, so pin them in the package's own test: read the script name back out of the synced manifest and assert the workflow calls it. A renamed script would otherwise leave CI running nothing.
