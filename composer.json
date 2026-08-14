@@ -16,6 +16,7 @@
     "symfony/filesystem": "^8.1"
   },
   "require-dev": {
+    "colinodell/json5": "^3.0",
     "deptrac/deptrac": "^4",
     "nette/neon": "^3.4",
     "phpunit/phpunit": "^12",
