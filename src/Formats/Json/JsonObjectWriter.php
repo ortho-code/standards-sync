@@ -67,6 +67,42 @@ final readonly class JsonObjectWriter
     }
 
     /**
+     * Ensures one string entry in the list at a nested key path: a present entry is kept byte-identical, an absent one is appended in the list's own layout, and a missing member is created holding just the entry.
+     *
+     * @param non-empty-list<string> $path
+     */
+    public static function ensureListEntry(string $content, array $path, string $entry): string
+    {
+        [, $member] = self::walk($content, $path);
+        if ($member === null) {
+            return self::set($content, $path, [$entry]);
+        }
+
+        if ($content[$member->valueStart()] !== '[') {
+            throw new RuntimeException(sprintf('"%s" does not hold a list; "%s" cannot be ensured in it.', implode('.', $path), $entry));
+        }
+
+        $entries = self::scanList($content, $member->valueStart());
+        if (array_any($entries, static fn (array $span): bool => $content[$span[0]] === '"' && self::decode(substr($content, $span[0], $span[1] - $span[0])) === $entry)) {
+            return $content;
+        }
+
+        if ($entries === []) {
+            // A single entry joins an empty list inline: the smallest edit, whatever the surrounding layout.
+            return substr($content, 0, $member->valueStart()) . '[' . self::encode($entry) . ']' . substr($content, $member->valueEnd());
+        }
+
+        [$lastStart, $lastEnd] = $entries[count($entries) - 1];
+        if (self::lineStart($content, $lastStart) === self::lineStart($content, $member->valueStart())) {
+            return substr($content, 0, $lastEnd) . ', ' . self::encode($entry) . substr($content, $lastEnd);
+        }
+
+        return substr($content, 0, $lastEnd)
+            . ',' . Lines::LINE_BREAK . self::lineIndent($content, $lastStart) . self::encode($entry)
+            . substr($content, $lastEnd);
+    }
+
+    /**
      * Removes the member at a nested key path along with its separating comma, leaving an absent path untouched.
      * An object losing its last member collapses to "{}" rather than keeping the empty lines its member stood on.
      *
@@ -176,6 +212,29 @@ final readonly class JsonObjectWriter
         }
 
         return [$object, null, count($path)];
+    }
+
+    /**
+     * Tokenizes one list's value spans in document order.
+     *
+     * @return list<array{int, int}>
+     */
+    private static function scanList(string $content, int $start): array
+    {
+        $spans = [];
+        $index = self::skipWhitespace($content, $start + 1);
+        while (($content[$index] ?? '') !== ']') {
+            $valueStart = $index;
+            $index = self::skipValue($content, $index);
+            $spans[] = [$valueStart, $index];
+
+            $index = self::skipWhitespace($content, $index);
+            if (($content[$index] ?? '') === ',') {
+                $index = self::skipWhitespace($content, $index + 1);
+            }
+        }
+
+        return $spans;
     }
 
     /** Tokenizes one object's members in document order, keyed by their decoded name. */

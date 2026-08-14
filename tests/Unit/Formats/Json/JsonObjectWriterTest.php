@@ -484,6 +484,104 @@ final class JsonObjectWriterTest extends TestCase
         JsonObjectWriter::read($content, ['require-dev', 'phpstan/phpstan']);
     }
 
+    public function testEnsureListEntryKeepsAPresentEntryByteIdenticalAcrossSpellings(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "extends": [
+                        "local>acme\/renovate-config"
+                    ]
+                }
+                JSON
+        );
+
+        self::assertSame($content, JsonObjectWriter::ensureListEntry($content, ['extends'], 'local>acme/renovate-config'));
+    }
+
+    public function testEnsureListEntryAppendsInTheListsOwnLayout(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                {
+                  "extends": [
+                    "config:recommended"
+                  ]
+                }
+                JSON
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                      "extends": [
+                        "config:recommended",
+                        "local>acme/renovate-config"
+                      ]
+                    }
+                    JSON
+            ),
+            JsonObjectWriter::ensureListEntry($content, ['extends'], 'local>acme/renovate-config'),
+        );
+    }
+
+    public function testEnsureListEntryAppendsToAOneLineList(): void
+    {
+        self::assertSame(
+            "{ \"extends\": [\"a\", \"b\"] }\n",
+            JsonObjectWriter::ensureListEntry("{ \"extends\": [\"a\"] }\n", ['extends'], 'b'),
+        );
+    }
+
+    public function testEnsureListEntryFillsAnEmptyListInline(): void
+    {
+        self::assertSame(
+            "{ \"extends\": [\"a\"] }\n",
+            JsonObjectWriter::ensureListEntry("{ \"extends\": [] }\n", ['extends'], 'a'),
+        );
+    }
+
+    public function testEnsureListEntryCreatesTheMissingMember(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                {
+                  "labels": ["dependencies"]
+                }
+                JSON
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                      "labels": ["dependencies"],
+                      "extends": [
+                        "local>acme/renovate-config"
+                      ]
+                    }
+                    JSON
+            ),
+            JsonObjectWriter::ensureListEntry($content, ['extends'], 'local>acme/renovate-config'),
+        );
+    }
+
+    public function testEnsureListEntryRefusesANonListMember(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('"extends" does not hold a list');
+
+        JsonObjectWriter::ensureListEntry("{ \"extends\": true }\n", ['extends'], 'a');
+    }
+
+    public function testEnsureListEntryIsIdempotent(): void
+    {
+        $once = JsonObjectWriter::ensureListEntry("{ \"extends\": [\"a\"] }\n", ['extends'], 'b');
+
+        self::assertSame($once, JsonObjectWriter::ensureListEntry($once, ['extends'], 'b'));
+    }
+
     /** Applying a write twice is the engine's free property test; the writer owes the same guarantee on its own. */
     public function testWritingIsIdempotent(): void
     {
