@@ -8,7 +8,7 @@ Open-sourced once stable — keep this file project-facing (no personal workflow
 
 `docs/` is the living design record **and** the project documentation — the repo stands alone without this file.
 
-- Direction: [rule-model.md](docs/rule-model.md) — the rule-based model is built (R0 contract, R1 fold); the rule library ships the block mechanism (`ManagedBlock`) plus per-tool PHPStan, Rector, ECS, psalm, composer.json and deptrac families; org packages author against `Authoring/` (`Package` + `Standard`). Each tool family's decision record sits beside it (`docs/*-family.md`).
+- Direction: [rule-model.md](docs/rule-model.md) — the rule-based model is built (R0 contract, R1 fold); the rule library ships the block mechanism (`ManagedBlock`) plus per-tool PHPStan, Rector, ECS, psalm, composer.json, deptrac and renovate families; org packages author against `Authoring/` (`Package` + `Standard`). Each tool family's decision record sits beside it (`docs/*-family.md`).
 - Architecture + invariants: [architecture.md](docs/architecture.md) — the pipeline, layers, seams; hold the invariants.
 - Authoring an org package: [authoring-org-packages.md](docs/authoring-org-packages.md).
 - Code + test conventions, commands: [conventions.md](docs/conventions.md).
