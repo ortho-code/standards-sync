@@ -8,6 +8,7 @@ use AlleKnalle\StandardsSync\Core\Engine\TargetResolver;
 use AlleKnalle\StandardsSync\Core\Filesystem\Path;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
+use AlleKnalle\StandardsSync\Rules\Renovate\RenovateConfigFile;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -68,6 +69,26 @@ final class TargetResolverTest extends TestCase
             '/a/distribution.neon' => "one\n",
             '/a/phpstan.neon' => "two\n",
         ])->resolve(Path::fromString('/a'), FileTarget::fromStrings('distribution.neon', 'phpstan.neon'));
+    }
+
+    /** Two renovate grammars beside each other are a confused repo — renovate itself would silently read only the precedence winner. */
+    public function testTwoRenovateGrammarsRefuse(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Both "/a/renovate.json" and "/a/renovate.json5" exist for one target; remove all but one.');
+
+        $this->resolver([
+            '/a/renovate.json' => "{}\n",
+            '/a/renovate.json5' => "{}\n",
+        ])->resolve(Path::fromString('/a'), RenovateConfigFile::target());
+    }
+
+    public function testALoneRenovateFileWinsWhateverTheCreationPreference(): void
+    {
+        $resolved = $this->resolver(['/a/renovate.json5' => "{}\n"])
+            ->resolve(Path::fromString('/a'), RenovateConfigFile::target());
+
+        self::assertSame('/a/renovate.json5', $resolved->path()->value());
     }
 
     /** @param array<string, string> $files */

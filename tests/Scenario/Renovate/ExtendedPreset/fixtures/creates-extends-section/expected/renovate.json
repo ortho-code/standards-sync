@@ -1,0 +1,6 @@
+{
+  "labels": ["dependencies"],
+  "extends": [
+    "local>acme/renovate-config"
+  ]
+}

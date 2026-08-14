@@ -1,0 +1,7 @@
+{
+  // keep majors quiet
+  extends: [
+    'config:recommended',
+    'local>acme/renovate-config',
+  ],
+}

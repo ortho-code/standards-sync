@@ -1,0 +1,6 @@
+{
+  // keep majors quiet
+  extends: [
+    'config:recommended',
+  ],
+}
