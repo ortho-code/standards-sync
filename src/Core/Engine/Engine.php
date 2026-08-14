@@ -12,6 +12,7 @@ use AlleKnalle\StandardsSync\Core\Plan\Change;
 use AlleKnalle\StandardsSync\Core\Plan\ChangeKind;
 use AlleKnalle\StandardsSync\Core\Plan\Plan;
 use AlleKnalle\StandardsSync\Core\Plan\RuleApplication;
+use AlleKnalle\StandardsSync\Core\Rule\AppliesAtPath;
 use AlleKnalle\StandardsSync\Core\Rule\Rule;
 use RuntimeException;
 
@@ -102,7 +103,7 @@ final readonly class Engine
         $content = $current;
         foreach ($rules as $rule) {
             $before = $content;
-            $content = $rule->apply($before);
+            $content = $rule instanceof AppliesAtPath ? $rule->applyAt($target->path(), $before) : $rule->apply($before);
             $applications[] = new RuleApplication($rule, $before, $content);
         }
 
