@@ -19,6 +19,7 @@ Open-sourced once stable — keep this file project-facing (no personal workflow
 
 - **Read `docs/` before working on the engine.** It holds the decisions and *why* they were made. **Propose + get agreement before changing a recorded decision** (never reverse one silently). Record new decisions there: what, why, and what was rejected, dated.
 - **References are one-way.** This file may point at docs and code; nothing in the repo (README, `docs/`, code, comments) may reference this file or any Claude config as the home of knowledge. Sole exception: a factual mention that the repo uses and maintains Claude config at certain paths, where that's genuinely worth stating. Check with `git grep -in claude -- ':!CLAUDE.md'` after doc changes.
+- **No specific org or consumer repos in the repo's text.** Docs, code and comments refer to them only in general form ("the org test package", "a test consumer") — names and local paths of the packages this engine is developed against stay outside the repository.
 - **Any change to core pipeline behaviour must add, update, or remove the matching scenario fixture** — the scenario suite is the behaviour catalog (see conventions).
 - Validate with `composer app-run-tests` and `composer deptrac` after changes.
 
