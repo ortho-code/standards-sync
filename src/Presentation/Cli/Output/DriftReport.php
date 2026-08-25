@@ -17,6 +17,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /** Renders a Plan for humans: the plan's standing notes, then each drifting file with the rules that drifted, plus a summary, or a clean-state notice. */
 final readonly class DriftReport
 {
+    private const string NOTE_LEAD = ' NOTE ';
+
     public function render(Plan $plan, SymfonyStyle $style): void
     {
         foreach ($this->notes($plan) as $note) {
@@ -70,12 +72,12 @@ final readonly class DriftReport
             return null;
         }
 
-        return sprintf(' NOTE %s exists and replaces %s for tool runs; the standard syncs to the dist file.', $shadowedBy->value(), $change->path()->value());
+        return sprintf(self::NOTE_LEAD . '%s exists and replaces %s for tool runs; the standard syncs to the dist file.', $shadowedBy->value(), $change->path()->value());
     }
 
     private function abstentionNote(Abstention $abstention): string
     {
-        return sprintf(' NOTE %s does not exist; nothing was enforced there (%s).', $abstention->path()->value(), implode(', ', $this->ruleNames($abstention->rules())));
+        return sprintf(self::NOTE_LEAD . '%s does not exist; nothing was enforced there (%s).', $abstention->path()->value(), implode(', ', $this->ruleNames($abstention->rules())));
     }
 
     /**

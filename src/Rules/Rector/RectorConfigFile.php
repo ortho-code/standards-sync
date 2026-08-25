@@ -17,6 +17,8 @@ final readonly class RectorConfigFile
 {
     private const array CANDIDATES = ['rector.php', 'rector.dist.php'];
 
+    private const string FLUENT_CHAIN = 'RectorConfig::configure()';
+
     public static function target(): FileTarget
     {
         return FileTarget::fromStrings(...self::CANDIDATES);
@@ -25,8 +27,8 @@ final readonly class RectorConfigFile
     /** The rules manage only the fluent form; a callable-style config is refused loudly rather than half-edited. */
     public static function assertFluentChain(string $content): void
     {
-        if (!str_contains($content, 'RectorConfig::configure()')) {
-            throw new RuntimeException('The Rector config is not a RectorConfig::configure() chain; convert it to the fluent form so the config can be managed.');
+        if (!str_contains($content, self::FLUENT_CHAIN)) {
+            throw new RuntimeException(sprintf('The Rector config is not a %s chain; convert it to the fluent form so the config can be managed.', self::FLUENT_CHAIN));
         }
     }
 
@@ -43,7 +45,7 @@ final readonly class RectorConfigFile
             '',
             'use Rector\Config\RectorConfig;',
             '',
-            'return RectorConfig::configure()',
+            'return ' . self::FLUENT_CHAIN,
             FluentChainWriter::INDENT . $call . ';',
             '',
         ]);

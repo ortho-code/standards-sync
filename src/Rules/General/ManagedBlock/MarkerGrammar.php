@@ -7,6 +7,9 @@ namespace AlleKnalle\StandardsSync\Rules\General\ManagedBlock;
 /** Draws and finds a single label's marker pair for one comment syntax. */
 final readonly class MarkerGrammar
 {
+    private const string OPEN_LINE = '%s >>> %s (managed) >>>';
+    private const string CLOSE_LINE = '%s <<< %s <<<';
+
     public function __construct(
         private MarkerSyntax $syntax,
         private Label $label,
@@ -15,20 +18,17 @@ final readonly class MarkerGrammar
 
     public function open(): string
     {
-        return sprintf('%s >>> %s (managed) >>>', $this->syntax->lead(), $this->label->value());
+        return sprintf(self::OPEN_LINE, $this->syntax->lead(), $this->label->value());
     }
 
     public function close(): string
     {
-        return sprintf('%s <<< %s <<<', $this->syntax->lead(), $this->label->value());
+        return sprintf(self::CLOSE_LINE, $this->syntax->lead(), $this->label->value());
     }
 
-    /** Matches this label's whole block, markers included, across the lines between them. */
+    /** Matches this label's whole block, markers included, across the lines between them — built from the rendered marker lines, so drawing and finding can never drift apart. */
     public function blockPattern(): string
     {
-        $lead = preg_quote($this->syntax->lead(), '#');
-        $label = preg_quote($this->label->value(), '#');
-
-        return sprintf('#^%s >>> %s \(managed\) >>>\R.*?\R%s <<< %s <<<[ \t]*$#ms', $lead, $label, $lead, $label);
+        return sprintf('#^%s\R.*?\R%s[ \t]*$#ms', preg_quote($this->open(), '#'), preg_quote($this->close(), '#'));
     }
 }

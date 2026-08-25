@@ -13,11 +13,17 @@ use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
  */
 final readonly class RenovateConfigFile
 {
+    private const string NAME_JSON = 'renovate.json';
+    private const string NAME_JSON5 = 'renovate.json5';
+
+    private const string EXTENSION_JSON5 = '.json5';
+    private const string EXTENSION_JSONC = '.jsonc';
+
     /** Renovate's static candidate names, in its own precedence order. */
     private const array NAMES = [
-        'renovate.json',
+        self::NAME_JSON,
         'renovate.jsonc',
-        'renovate.json5',
+        self::NAME_JSON5,
         '.github/renovate.json',
         '.github/renovate.jsonc',
         '.github/renovate.json5',
@@ -34,8 +40,8 @@ final readonly class RenovateConfigFile
     public static function target(RenovateConfigFormat $createAs = RenovateConfigFormat::Json): FileTarget
     {
         $created = match ($createAs) {
-            RenovateConfigFormat::Json => 'renovate.json',
-            RenovateConfigFormat::Json5 => 'renovate.json5',
+            RenovateConfigFormat::Json => self::NAME_JSON,
+            RenovateConfigFormat::Json5 => self::NAME_JSON5,
         };
 
         return FileTarget::fromStrings($created, ...array_values(array_filter(self::NAMES, static fn (string $name): bool => $name !== $created)));
@@ -43,11 +49,11 @@ final readonly class RenovateConfigFile
 
     public static function isJson5(Path $path): bool
     {
-        return str_ends_with($path->value(), '.json5');
+        return str_ends_with($path->value(), self::EXTENSION_JSON5);
     }
 
     public static function isJsonc(Path $path): bool
     {
-        return str_ends_with($path->value(), '.jsonc');
+        return str_ends_with($path->value(), self::EXTENSION_JSONC);
     }
 }

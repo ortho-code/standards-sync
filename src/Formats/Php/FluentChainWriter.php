@@ -18,6 +18,8 @@ final readonly class FluentChainWriter
     /** PER coding style indentation, four spaces: the PHP convention, used when the file has no indented line to copy. */
     public const string INDENT = '    ';
 
+    private const string LINE_INDENT = '/^([ \t]*)/';
+
     /**
      * Ensures the block-form array argument of ->method([...]) holds the entry, creating the whole call when absent.
      * Entries are matched on trimmed text with the trailing comma stripped; a single-line array is refused because managing it would need a rewrite of the caller's formatting.
@@ -53,11 +55,11 @@ final readonly class FluentChainWriter
             if (self::entryText($lines[$index]) === $entry) {
                 return $content;
             }
-            preg_match('/^([ \t]*)/', $lines[$index], $match);
+            preg_match(self::LINE_INDENT, $lines[$index], $match);
             $entryIndent ??= $match[1];
         }
 
-        preg_match('/^([ \t]*)/', $lines[$closeLine], $match);
+        preg_match(self::LINE_INDENT, $lines[$closeLine], $match);
         array_splice($lines, $closeLine, 0, [($entryIndent ?? $match[1] . self::unit($lines)) . $entry . ',']);
 
         return Lines::join($lines);
@@ -127,7 +129,7 @@ final readonly class FluentChainWriter
     private static function chainIndent(array $lines, int $lastIndex): string
     {
         if (str_starts_with(ltrim($lines[$lastIndex]), '->')) {
-            preg_match('/^([ \t]*)/', $lines[$lastIndex], $match);
+            preg_match(self::LINE_INDENT, $lines[$lastIndex], $match);
 
             return $match[1];
         }

@@ -19,7 +19,7 @@ use InvalidArgumentException;
  */
 final readonly class PhpUnitPinnedAttributes implements Rule, ExplainsDrift
 {
-    private const array BOOLEAN_SPELLINGS = ['true', 'false'];
+    private const array BOOLEAN_SPELLINGS = [PinnedAttribute::SPELLING_TRUE, PinnedAttribute::SPELLING_FALSE];
 
     /** @var non-empty-list<PinnedAttribute> */
     private array $attributes;

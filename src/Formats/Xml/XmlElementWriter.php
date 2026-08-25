@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AlleKnalle\StandardsSync\Formats\Xml;
 
+use AlleKnalle\StandardsSync\Core\Text\Lines;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -17,6 +18,9 @@ final readonly class XmlElementWriter
 {
     /** Inserted attributes use double quotes — the tools' own generated style; replacements keep the file's. */
     private const string INSERT_QUOTE = '"';
+
+    private const string COMMENT_OPEN = '<!--';
+    private const string COMMENT_CLOSE = '-->';
 
     /** The attribute's raw value as written on the element's open tag, or null when the attribute is absent. */
     public static function readAttribute(string $content, string $element, string $attribute): ?string
@@ -48,7 +52,7 @@ final readonly class XmlElementWriter
             return substr($content, 0, $tag->attributesStart()) . ' ' . $token . substr($content, $tag->attributesStart());
         }
 
-        $lineStart = strrpos(substr($content, 0, $last->start()), "\n");
+        $lineStart = strrpos(substr($content, 0, $last->start()), Lines::LINE_BREAK);
 
         // Inline after the last attribute when it shares a line with the element name; otherwise a fresh line copying that attribute's indentation.
         if ($lineStart === false || $lineStart < $tag->start()) {
@@ -57,7 +61,7 @@ final readonly class XmlElementWriter
 
         preg_match('/^[ \t]*/', substr($content, $lineStart + 1), $indent);
 
-        return substr($content, 0, $last->end()) . "\n" . $indent[0] . $token . substr($content, $last->end());
+        return substr($content, 0, $last->end()) . Lines::LINE_BREAK . $indent[0] . $token . substr($content, $last->end());
     }
 
     /**
@@ -157,13 +161,13 @@ final readonly class XmlElementWriter
     {
         $ranges = [];
         $offset = 0;
-        while (($open = strpos($content, '<!--', $offset)) !== false) {
-            $close = strpos($content, '-->', $open + 4);
+        while (($open = strpos($content, self::COMMENT_OPEN, $offset)) !== false) {
+            $close = strpos($content, self::COMMENT_CLOSE, $open + strlen(self::COMMENT_OPEN));
             if ($close === false) {
                 throw new RuntimeException('An XML comment never closes; the file cannot be managed.');
             }
-            $ranges[] = [$open, $close + 3];
-            $offset = $close + 3;
+            $ranges[] = [$open, $close + strlen(self::COMMENT_CLOSE)];
+            $offset = $close + strlen(self::COMMENT_CLOSE);
         }
 
         return $ranges;

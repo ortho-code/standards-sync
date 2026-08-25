@@ -10,6 +10,9 @@ use AlleKnalle\StandardsSync\Core\RuleSet\RuleSet;
 /** Immutable configuration returned by a standards-sync.php: which roots to sync and which rule sets apply. */
 final readonly class SyncConfig
 {
+    /** The root a config without withRoots() syncs: the directory the sync runs in. */
+    private const string DEFAULT_ROOT = '.';
+
     /**
      * @param list<Path> $roots
      * @param list<RuleSet> $ruleSets
@@ -22,7 +25,7 @@ final readonly class SyncConfig
 
     public static function create(): self
     {
-        return new self([Path::fromString('.')], []);
+        return new self([Path::fromString(self::DEFAULT_ROOT)], []);
     }
 
     /** @param list<string> $roots */

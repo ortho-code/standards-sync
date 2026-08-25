@@ -17,6 +17,11 @@ final readonly class PsalmConfigFile
     /** The one root element a psalm config has; every rule in the family reads and writes its attributes. */
     public const string ROOT_ELEMENT = 'psalm';
 
+    /** The root attribute carrying the error level — psalm's inverted-scale strictness setting. */
+    public const string ERROR_LEVEL = 'errorLevel';
+
+    private const string XMLNS = 'https://getpsalm.org/schema/config';
+
     private const array CANDIDATES = ['psalm.xml', 'psalm.xml.dist', 'psalm.dist.xml'];
 
     public static function target(): FileTarget
@@ -32,7 +37,7 @@ final readonly class PsalmConfigFile
     {
         return Lines::join([
             '<?xml version="1.0"?>',
-            sprintf('<psalm errorLevel="%d" xmlns="https://getpsalm.org/schema/config">', $errorLevel->value()),
+            sprintf('<psalm %s="%d" xmlns="%s">', self::ERROR_LEVEL, $errorLevel->value(), self::XMLNS),
             '    <projectFiles>',
             '        <directory name="src" />',
             '        <ignoreFiles>',

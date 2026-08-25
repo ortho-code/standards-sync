@@ -19,6 +19,8 @@ final readonly class YamlListWriter
 
     private const string COMMENT_LINE = '/^[ \t]*#/';
 
+    private const string ENTRY_PREFIX = '- ';
+
     /**
      * Ensures the entry in the section: a present entry is kept, an absent one is inserted after the section's last entry.
      * A missing section is created at the top of the document holding just the entry; empty content becomes only that section.
@@ -59,14 +61,14 @@ final readonly class YamlListWriter
             }
         }
 
-        array_splice($lines, $lastEntryIndex + 1, 0, [($entryIndent ?? YamlIndent::fromLines($lines)) . '- ' . $entry]);
+        array_splice($lines, $lastEntryIndex + 1, 0, [($entryIndent ?? YamlIndent::fromLines($lines)) . self::ENTRY_PREFIX . $entry]);
 
         return Lines::join($lines);
     }
 
     private static function createSection(string $section, string $entry, string $indent): string
     {
-        return $section . ':' . Lines::LINE_BREAK . $indent . '- ' . $entry . Lines::LINE_BREAK;
+        return $section . ':' . Lines::LINE_BREAK . $indent . self::ENTRY_PREFIX . $entry . Lines::LINE_BREAK;
     }
 
     /** @param list<string> $lines */

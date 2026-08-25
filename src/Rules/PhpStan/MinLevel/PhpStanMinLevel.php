@@ -7,6 +7,7 @@ namespace AlleKnalle\StandardsSync\Rules\PhpStan\MinLevel;
 use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
 use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
 use AlleKnalle\StandardsSync\Core\Rule\Rule;
+use AlleKnalle\StandardsSync\Core\Text\Lines;
 use AlleKnalle\StandardsSync\Formats\Neon\NeonScalarWriter;
 use AlleKnalle\StandardsSync\Rules\PhpStan\PhpStanConfigFile;
 use InvalidArgumentException;
@@ -24,7 +25,7 @@ final readonly class PhpStanMinLevel implements Rule, ExplainsDrift
         private PhpStanLevel $minLevel,
         private ?string $comment = null,
     ) {
-        if ($this->comment !== null && ($this->comment === '' || str_contains($this->comment, "\n"))) {
+        if ($this->comment !== null && ($this->comment === '' || str_contains($this->comment, Lines::LINE_BREAK))) {
             throw new InvalidArgumentException('A rule comment is one non-empty line.');
         }
     }

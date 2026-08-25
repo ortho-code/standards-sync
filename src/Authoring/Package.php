@@ -21,6 +21,10 @@ final readonly class Package
     /** The one directory a package distributes from. */
     private const string TEMPLATES = 'templates';
 
+    private const string MANIFEST = 'composer.json';
+
+    private const string NAME_KEY = 'name';
+
     private Path $directory;
 
     /** Null when the package's files sit directly under the consumer project root (e.g. the package is the root project, as in its own test suite). */
@@ -52,7 +56,7 @@ final readonly class Package
         }
 
         $directory = dirname($file);
-        while (!is_file($directory . '/composer.json')) {
+        while (!is_file($directory . '/' . self::MANIFEST)) {
             $parent = dirname($directory);
             if ($parent === $directory) {
                 throw new RuntimeException(sprintf('No composer.json found above "%s"; construct the Package explicitly.', $file));
@@ -85,14 +89,14 @@ final readonly class Package
 
     private static function packageName(string $directory): string
     {
-        $manifest = $directory . '/composer.json';
+        $manifest = $directory . '/' . self::MANIFEST;
         $raw = file_get_contents($manifest);
         if ($raw === false) {
             throw new RuntimeException(sprintf('Cannot read "%s".', $manifest));
         }
 
         $decoded = json_decode($raw, true);
-        $name = is_array($decoded) ? ($decoded['name'] ?? null) : null;
+        $name = is_array($decoded) ? ($decoded[self::NAME_KEY] ?? null) : null;
         if (!is_string($name) || $name === '') {
             throw new RuntimeException(sprintf('"%s" declares no package name; construct the Package explicitly.', $manifest));
         }

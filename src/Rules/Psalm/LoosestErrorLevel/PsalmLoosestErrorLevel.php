@@ -16,8 +16,6 @@ use AlleKnalle\StandardsSync\Rules\Psalm\PsalmConfigFile;
  */
 final readonly class PsalmLoosestErrorLevel implements Rule, ExplainsDrift
 {
-    private const string ERROR_LEVEL = 'errorLevel';
-
     public function __construct(private PsalmErrorLevel $loosest)
     {
     }
@@ -39,7 +37,7 @@ final readonly class PsalmLoosestErrorLevel implements Rule, ExplainsDrift
         }
 
         // The writer leaves a config already carrying the enforced value byte-identical, so the compliant path needs no branch of its own.
-        return XmlElementWriter::writeAttribute($content, PsalmConfigFile::ROOT_ELEMENT, self::ERROR_LEVEL, (string) $this->enforcedLevel($content)->value());
+        return XmlElementWriter::writeAttribute($content, PsalmConfigFile::ROOT_ELEMENT, PsalmConfigFile::ERROR_LEVEL, (string) $this->enforcedLevel($content)->value());
     }
 
     public function description(): string
@@ -53,7 +51,7 @@ final readonly class PsalmLoosestErrorLevel implements Rule, ExplainsDrift
             return sprintf('There is no Psalm config yet; one is created with error level %d.', $this->loosest->value());
         }
 
-        $written = XmlElementWriter::readAttribute($content, PsalmConfigFile::ROOT_ELEMENT, self::ERROR_LEVEL);
+        $written = XmlElementWriter::readAttribute($content, PsalmConfigFile::ROOT_ELEMENT, PsalmConfigFile::ERROR_LEVEL);
         if ($written === null) {
             return sprintf('No errorLevel is written; the implicit default is made explicit as %d.', $this->enforcedLevel($content)->value());
         }
@@ -69,7 +67,7 @@ final readonly class PsalmLoosestErrorLevel implements Rule, ExplainsDrift
     // The level the config must carry: the written level — or psalm's implicit default when the attribute is absent — capped at the loosest allowed.
     private function enforcedLevel(string $content): PsalmErrorLevel
     {
-        $written = XmlElementWriter::readAttribute($content, PsalmConfigFile::ROOT_ELEMENT, self::ERROR_LEVEL);
+        $written = XmlElementWriter::readAttribute($content, PsalmConfigFile::ROOT_ELEMENT, PsalmConfigFile::ERROR_LEVEL);
         $level = $written === null ? PsalmErrorLevel::createDefault() : PsalmErrorLevel::fromConfigValue($written);
 
         return $level->isAtMost($this->loosest) ? $level : $this->loosest;

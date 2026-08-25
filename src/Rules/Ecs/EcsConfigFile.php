@@ -17,6 +17,8 @@ final readonly class EcsConfigFile
 {
     private const string CANDIDATE = 'ecs.php';
 
+    private const string FLUENT_CHAIN = 'ECSConfig::configure()';
+
     public static function target(): FileTarget
     {
         return FileTarget::fromString(self::CANDIDATE);
@@ -28,8 +30,8 @@ final readonly class EcsConfigFile
      */
     public static function assertFluentChain(string $content): void
     {
-        if (!str_contains($content, 'ECSConfig::configure()')) {
-            throw new RuntimeException('The ECS config is not an ECSConfig::configure() chain; convert it to the fluent form so the config can be managed.');
+        if (!str_contains($content, self::FLUENT_CHAIN)) {
+            throw new RuntimeException(sprintf('The ECS config is not an %s chain; convert it to the fluent form so the config can be managed.', self::FLUENT_CHAIN));
         }
     }
 
@@ -46,7 +48,7 @@ final readonly class EcsConfigFile
             '',
             'use Symplify\EasyCodingStandard\Config\ECSConfig;',
             '',
-            'return ECSConfig::configure()',
+            'return ' . self::FLUENT_CHAIN,
             FluentChainWriter::INDENT . $call . ';',
             '',
         ]);

@@ -15,6 +15,9 @@ use ReflectionClass;
  */
 abstract class ScenarioTestCase extends TestCase
 {
+    /** The conventional fixtures directory beside the concrete test class. */
+    private const string FIXTURES = 'fixtures';
+
     /** @return iterable<string, array{string, ?string}> */
     abstract public static function scenarios(): iterable;
 
@@ -29,6 +32,6 @@ abstract class ScenarioTestCase extends TestCase
 
     private function fixturesDirectory(): string
     {
-        return dirname((string) (new ReflectionClass(static::class))->getFileName()) . '/fixtures';
+        return dirname((string) (new ReflectionClass(static::class))->getFileName()) . '/' . self::FIXTURES;
     }
 }

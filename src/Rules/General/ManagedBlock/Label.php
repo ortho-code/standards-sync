@@ -12,13 +12,15 @@ use InvalidArgumentException;
  */
 final readonly class Label
 {
+    private const string VALID_LABEL = '/^[A-Za-z0-9._-]+$/';
+
     private function __construct(private string $value)
     {
     }
 
     public static function fromString(string $value): self
     {
-        if (preg_match('/^[A-Za-z0-9._-]+$/', $value) !== 1) {
+        if (preg_match(self::VALID_LABEL, $value) !== 1) {
             throw new InvalidArgumentException(sprintf(
                 'A label may only contain letters, digits, dot, underscore and hyphen; got "%s".',
                 $value,

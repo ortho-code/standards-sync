@@ -22,6 +22,12 @@ final readonly class VersionConstraint
 
     private const string JOIN = ' || ';
 
+    /** The operator synthesizing "at least this version" when measuring against a minimum. */
+    private const string AT_LEAST = '>=';
+
+    /** The Intervals::get() bucket holding the numeric ranges (the other bucket holds branch constraints). */
+    private const string NUMERIC_INTERVALS = 'numeric';
+
     private function __construct(
         private string $value,
         private ConstraintInterface $parsed,
@@ -45,7 +51,7 @@ final readonly class VersionConstraint
     /** The lowest version this constraint can resolve to, or null when it names only a branch. */
     public function lowestVersion(): ?string
     {
-        $numeric = Intervals::get($this->parsed)['numeric'];
+        $numeric = Intervals::get($this->parsed)[self::NUMERIC_INTERVALS];
 
         return $numeric === [] ? null : $numeric[0]->getStart()->getVersion();
     }
@@ -54,7 +60,7 @@ final readonly class VersionConstraint
     {
         $lowest = $minimum->lowestVersion() ?? throw new InvalidArgumentException(sprintf('"%s" states no lowest version, so nothing can be measured against it.', $minimum->value));
 
-        return Intervals::isSubsetOf($this->parsed, new VersionParser()->parseConstraints('>=' . $lowest));
+        return Intervals::isSubsetOf($this->parsed, new VersionParser()->parseConstraints(self::AT_LEAST . $lowest));
     }
 
     /**

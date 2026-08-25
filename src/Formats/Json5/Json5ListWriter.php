@@ -27,6 +27,12 @@ final readonly class Json5ListWriter
 
     private const string WHITESPACE = " \t\r" . Lines::LINE_BREAK;
 
+    /** How a double-quoted string renders; the flags shared with the layer's JSON member. */
+    private const int RENDER_FLAGS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR;
+
+    private const string BLOCK_COMMENT_OPEN = '/*';
+    private const string BLOCK_COMMENT_CLOSE = '*/';
+
     /**
      * Ensures the entry in the key's list: a present entry is kept, an absent one is appended in the list's own layout, a missing key is appended to the object, and empty content becomes a document holding just the entry.
      * With $comment the entry's line end is owned — a missing or deviating trailing comment is rewritten; without, a project's own trailing comment survives.
@@ -282,7 +288,7 @@ final readonly class Json5ListWriter
 
     private static function renderDouble(string $text): string
     {
-        return json_encode($text, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        return json_encode($text, self::RENDER_FLAGS);
     }
 
     private static function renderComment(?string $comment): string
@@ -382,12 +388,12 @@ final readonly class Json5ListWriter
         }
 
         if ($next === '*') {
-            $close = strpos($content, '*/', $index + 2);
+            $close = strpos($content, self::BLOCK_COMMENT_CLOSE, $index + strlen(self::BLOCK_COMMENT_OPEN));
             if ($close === false) {
                 throw new RuntimeException('A JSON5 comment never closes; the file cannot be managed.');
             }
 
-            return $close + 2;
+            return $close + strlen(self::BLOCK_COMMENT_CLOSE);
         }
 
         throw new RuntimeException('Unexpected "/" outside a JSON5 comment; the file cannot be managed.');
