@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\PhpUnit;
+namespace StandardsSync\Rules\PhpUnit;
 
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Text\Lines;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Text\Lines;
 
 /**
  * The PHPUnit config file as a rule target, in PHPUnit's own lookup order — shared so no rule re-derives the precedence.

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Xml;
+namespace StandardsSync\Formats\Xml;
 
-use AlleKnalle\StandardsSync\Core\Text\Lines;
+use StandardsSync\Core\Text\Lines;
 use InvalidArgumentException;
 use RuntimeException;
 

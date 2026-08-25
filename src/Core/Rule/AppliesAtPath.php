@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Rule;
+namespace StandardsSync\Core\Rule;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Path;
 
 /**
  * Opt-in seam for rules whose target candidates differ in grammar: the fold calls applyAt() instead of apply(), passing the path the target resolved to.

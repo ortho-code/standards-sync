@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Testing;
+namespace StandardsSync\Testing;
 
-use AlleKnalle\StandardsSync\Core\Text\Lines;
+use StandardsSync\Core\Text\Lines;
 
 /** Builds a test fixture as the file looks on disk: the nowdoc body plus the trailing line break every file ends with. */
 final readonly class FileContent

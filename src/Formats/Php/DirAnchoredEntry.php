@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Php;
+namespace StandardsSync\Formats\Php;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Path;
 use InvalidArgumentException;
 
 /**

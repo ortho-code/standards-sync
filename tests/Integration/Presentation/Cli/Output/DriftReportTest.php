@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Presentation\Cli\Output;
+namespace Tests\StandardsSync\Integration\Presentation\Cli\Output;
 
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\Engine\Engine;
-use AlleKnalle\StandardsSync\Core\Plan\Plan;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-use AlleKnalle\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
-use AlleKnalle\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
-use AlleKnalle\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
-use AlleKnalle\StandardsSync\Presentation\Cli\Output\DriftReport;
+use StandardsSync\Rules\General\ManagedBlock\Label;
+use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\Engine\Engine;
+use StandardsSync\Core\Plan\Plan;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\RuleSet\ComposableRuleSet;
+use StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
+use StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
+use StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+use StandardsSync\Presentation\Cli\Output\DriftReport;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;

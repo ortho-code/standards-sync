@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Documentation\Model;
+namespace StandardsSync\Documentation\Model;
 
 /** One section of scenarios that no single rule owns — a cross-rule composition on a family page, or an engine-level behaviour. */
 final readonly class CompositionSection

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\PhpStan\PinnedValues;
+namespace StandardsSync\Rules\PhpStan\PinnedValues;
 
 /** One pinned scalar: where it lives in the config (as a key path from the document root) and what it must be. */
 final readonly class PinnedValue

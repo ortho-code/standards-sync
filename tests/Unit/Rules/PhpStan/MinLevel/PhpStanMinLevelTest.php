@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\PhpStan\MinLevel;
+namespace Tests\StandardsSync\Unit\Rules\PhpStan\MinLevel;
 
-use AlleKnalle\StandardsSync\Rules\PhpStan\MinLevel\PhpStanLevel;
-use AlleKnalle\StandardsSync\Rules\PhpStan\MinLevel\PhpStanMinLevel;
+use StandardsSync\Rules\PhpStan\MinLevel\PhpStanLevel;
+use StandardsSync\Rules\PhpStan\MinLevel\PhpStanMinLevel;
 use InvalidArgumentException;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

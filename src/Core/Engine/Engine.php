@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Engine;
+namespace StandardsSync\Core\Engine;
 
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\Filesystem\Filesystem;
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Core\Plan\Abstention;
-use AlleKnalle\StandardsSync\Core\Plan\Change;
-use AlleKnalle\StandardsSync\Core\Plan\ChangeKind;
-use AlleKnalle\StandardsSync\Core\Plan\Plan;
-use AlleKnalle\StandardsSync\Core\Plan\RuleApplication;
-use AlleKnalle\StandardsSync\Core\Rule\AppliesAtPath;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\Filesystem\Filesystem;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Plan\Abstention;
+use StandardsSync\Core\Plan\Change;
+use StandardsSync\Core\Plan\ChangeKind;
+use StandardsSync\Core\Plan\Plan;
+use StandardsSync\Core\Plan\RuleApplication;
+use StandardsSync\Core\Rule\AppliesAtPath;
+use StandardsSync\Core\Rule\Rule;
 use RuntimeException;
 
 /**

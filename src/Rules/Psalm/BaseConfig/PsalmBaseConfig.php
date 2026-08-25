@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Psalm\BaseConfig;
+namespace StandardsSync\Rules\Psalm\BaseConfig;
 
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Rules\Psalm\PsalmConfigFile;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Rules\Psalm\PsalmConfigFile;
 use InvalidArgumentException;
 
 /**

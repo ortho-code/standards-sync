@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Renovate;
+namespace StandardsSync\Rules\Renovate;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Rule\FileTarget;
 
 /**
  * The renovate config file, shared by the family's rules so none re-derives the candidate names.

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Testing;
+namespace Tests\StandardsSync\Integration\Testing;
 
-use AlleKnalle\StandardsSync\Testing\SyncFixtureTester;
+use StandardsSync\Testing\SyncFixtureTester;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

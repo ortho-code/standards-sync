@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Filesystem;
+namespace StandardsSync\Core\Filesystem;
 
 use InvalidArgumentException;
 

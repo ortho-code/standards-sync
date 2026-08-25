@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Documentation;
+namespace StandardsSync\Documentation;
 
-use AlleKnalle\StandardsSync\Core\Config\ConfigLoader;
-use AlleKnalle\StandardsSync\Core\Filesystem\Filesystem;
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Core\RuleSet\RuleSet;
-use AlleKnalle\StandardsSync\Documentation\Model\CompositionSection;
-use AlleKnalle\StandardsSync\Documentation\Model\DeclarationGroup;
-use AlleKnalle\StandardsSync\Documentation\Model\ExampleKind;
-use AlleKnalle\StandardsSync\Documentation\Model\FamilyPage;
-use AlleKnalle\StandardsSync\Documentation\Model\FileExample;
-use AlleKnalle\StandardsSync\Documentation\Model\RulePage;
-use AlleKnalle\StandardsSync\Documentation\Model\ScenarioEntry;
-use AlleKnalle\StandardsSync\Documentation\Model\Subsection;
-use AlleKnalle\StandardsSync\Documentation\Source\ClassDescription;
-use AlleKnalle\StandardsSync\Documentation\Source\RuleLibrary;
-use AlleKnalle\StandardsSync\Documentation\Source\ScenarioTestSuite;
-use AlleKnalle\StandardsSync\Infrastructure\Filesystem\DirectoryListing;
-use AlleKnalle\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
-use AlleKnalle\StandardsSync\Testing\ScenarioTestCase;
-use AlleKnalle\StandardsSync\Testing\SyncFixtureTester;
+use StandardsSync\Core\Config\ConfigLoader;
+use StandardsSync\Core\Filesystem\Filesystem;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\RuleSet\RuleSet;
+use StandardsSync\Documentation\Model\CompositionSection;
+use StandardsSync\Documentation\Model\DeclarationGroup;
+use StandardsSync\Documentation\Model\ExampleKind;
+use StandardsSync\Documentation\Model\FamilyPage;
+use StandardsSync\Documentation\Model\FileExample;
+use StandardsSync\Documentation\Model\RulePage;
+use StandardsSync\Documentation\Model\ScenarioEntry;
+use StandardsSync\Documentation\Model\Subsection;
+use StandardsSync\Documentation\Source\ClassDescription;
+use StandardsSync\Documentation\Source\RuleLibrary;
+use StandardsSync\Documentation\Source\ScenarioTestSuite;
+use StandardsSync\Infrastructure\Filesystem\DirectoryListing;
+use StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
+use StandardsSync\Testing\ScenarioTestCase;
+use StandardsSync\Testing\SyncFixtureTester;
 use RuntimeException;
 
 /**
@@ -41,7 +41,7 @@ final readonly class RuleCatalog
 
     /** The scenario suite and the namespace its test classes live under (see the suite layout in docs/conventions.md). */
     private const string SCENARIO_SUITE_DIRECTORY = 'tests/Scenario';
-    private const string SCENARIO_NAMESPACE_PREFIX = 'Tests\\AlleKnalle\\StandardsSync\\Scenario';
+    private const string SCENARIO_NAMESPACE_PREFIX = 'Tests\\StandardsSync\\Scenario';
     private const string SCENARIO_NAMESPACE_SEGMENT = 'Scenario';
 
     /** The tree's reserved segment for engine-level behaviours that are not any rule's own — not a family, so its scenarios get their own page. */
@@ -52,7 +52,7 @@ final readonly class RuleCatalog
 
     /** The rule library the scenario tree mirrors: a rule's namespace names the scenario directory holding its fixtures. */
     private const string RULE_LIBRARY_DIRECTORY = 'src/Rules';
-    private const string RULE_LIBRARY_NAMESPACE = 'AlleKnalle\\StandardsSync\\Rules';
+    private const string RULE_LIBRARY_NAMESPACE = 'StandardsSync\\Rules';
 
     private const string TEST_CLASS_SUFFIX = 'Test';
 

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Psalm\LoosestErrorLevel;
+namespace StandardsSync\Rules\Psalm\LoosestErrorLevel;
 
-use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Formats\Xml\XmlElementWriter;
-use AlleKnalle\StandardsSync\Rules\Psalm\PsalmConfigFile;
+use StandardsSync\Core\Rule\ExplainsDrift;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Formats\Xml\XmlElementWriter;
+use StandardsSync\Rules\Psalm\PsalmConfigFile;
 
 /**
  * Keeps the Psalm error level at or below a loosest allowed value — on psalm's inverted scale (1 strictest, 8 loosest) the numeric ceiling is the semantic strictness floor.

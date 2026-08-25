@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Php;
+namespace StandardsSync\Formats\Php;
 
-use AlleKnalle\StandardsSync\Core\Text\Indent;
-use AlleKnalle\StandardsSync\Core\Text\Lines;
+use StandardsSync\Core\Text\Indent;
+use StandardsSync\Core\Text\Lines;
 use RuntimeException;
 
 /**

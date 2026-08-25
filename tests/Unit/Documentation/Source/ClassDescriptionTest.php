@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Documentation\Source;
+namespace Tests\StandardsSync\Unit\Documentation\Source;
 
-use AlleKnalle\StandardsSync\Documentation\Source\ClassDescription;
+use StandardsSync\Documentation\Source\ClassDescription;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

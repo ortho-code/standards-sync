@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Plan;
+namespace StandardsSync\Core\Plan;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Path;
 
 /** The diff for one file: what is on disk now versus the desired text, and which rules produced it. */
 final readonly class Change

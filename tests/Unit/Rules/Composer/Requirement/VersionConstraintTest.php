@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\Composer\Requirement;
+namespace Tests\StandardsSync\Unit\Rules\Composer\Requirement;
 
-use AlleKnalle\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+use StandardsSync\Rules\Composer\Requirement\VersionConstraint;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

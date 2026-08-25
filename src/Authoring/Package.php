@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Authoring;
+namespace StandardsSync\Authoring;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Path;
 use Composer\InstalledVersions;
 use ReflectionClass;
 use RuntimeException;

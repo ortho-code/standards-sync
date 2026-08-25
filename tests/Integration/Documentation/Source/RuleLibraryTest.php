@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Documentation\Source;
+namespace Tests\StandardsSync\Integration\Documentation\Source;
 
-use AlleKnalle\StandardsSync\Documentation\Source\RuleLibrary;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Documentation\Source\RuleLibrary;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use RuntimeException;
-use Tests\AlleKnalle\StandardsSync\Integration\IntegrationTestCase;
+use Tests\StandardsSync\Integration\IntegrationTestCase;
 
 #[CoversClass(RuleLibrary::class)]
 final class RuleLibraryTest extends IntegrationTestCase
@@ -28,7 +28,7 @@ final class RuleLibraryTest extends IntegrationTestCase
 
         RuleLibrary::fromDirectory(
             $this->workspace() . '/library',
-            'Tests\AlleKnalle\StandardsSync\Integration\Documentation\Source\WorkspaceFixture',
+            'Tests\StandardsSync\Integration\Documentation\Source\WorkspaceFixture',
         );
     }
 }

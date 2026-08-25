@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Deptrac\ImportedDepfile;
+namespace StandardsSync\Rules\Deptrac\ImportedDepfile;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Formats\Yaml\YamlListWriter;
-use AlleKnalle\StandardsSync\Rules\Deptrac\DeptracConfigFile;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Rule\ExplainsDrift;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Formats\Yaml\YamlListWriter;
+use StandardsSync\Rules\Deptrac\DeptracConfigFile;
 
 /**
  * Ensures the deptrac config imports a given depfile, as a targeted edit that leaves the rest of the file untouched.

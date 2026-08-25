@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\PhpStan\IncludedRuleset;
+namespace Tests\StandardsSync\Unit\Rules\PhpStan\IncludedRuleset;
 
-use AlleKnalle\StandardsSync\Rules\PhpStan\IncludedRuleset\PhpStanIncludedRuleset;
+use StandardsSync\Rules\PhpStan\IncludedRuleset\PhpStanIncludedRuleset;
 use InvalidArgumentException;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Rule;
+namespace StandardsSync\Core\Rule;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Path;
 use InvalidArgumentException;
 
 /**

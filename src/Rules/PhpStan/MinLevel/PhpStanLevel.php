@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\PhpStan\MinLevel;
+namespace StandardsSync\Rules\PhpStan\MinLevel;
 
-use AlleKnalle\StandardsSync\Formats\Neon\NeonValue;
+use StandardsSync\Formats\Neon\NeonValue;
 use InvalidArgumentException;
 
 /**

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Documentation\Model;
+namespace StandardsSync\Documentation\Model;
 
 /** One file's before/after demonstration within a scenario (a null side means the file is absent on that side). */
 final readonly class FileExample

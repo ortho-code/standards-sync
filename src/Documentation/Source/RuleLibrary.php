@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Documentation\Source;
+namespace StandardsSync\Documentation\Source;
 
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\Rule\Rule;
 use ReflectionClass;
 use RuntimeException;
 

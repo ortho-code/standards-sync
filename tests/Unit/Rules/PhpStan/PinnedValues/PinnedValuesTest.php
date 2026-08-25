@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\PhpStan\PinnedValues;
+namespace Tests\StandardsSync\Unit\Rules\PhpStan\PinnedValues;
 
-use AlleKnalle\StandardsSync\Rules\PhpStan\PinnedValues\PinnedValue;
-use AlleKnalle\StandardsSync\Rules\PhpStan\PinnedValues\PinnedValues;
+use StandardsSync\Rules\PhpStan\PinnedValues\PinnedValue;
+use StandardsSync\Rules\PhpStan\PinnedValues\PinnedValues;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

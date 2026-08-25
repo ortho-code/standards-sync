@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Psalm;
+namespace StandardsSync\Rules\Psalm;
 
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Text\Lines;
-use AlleKnalle\StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmErrorLevel;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Text\Lines;
+use StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmErrorLevel;
 
 /**
  * The Psalm config file as a rule target, in Psalm's own lookup order — shared so no rule re-derives the precedence.

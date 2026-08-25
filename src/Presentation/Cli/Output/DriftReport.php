@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Presentation\Cli\Output;
+namespace StandardsSync\Presentation\Cli\Output;
 
-use AlleKnalle\StandardsSync\Core\Plan\Abstention;
-use AlleKnalle\StandardsSync\Core\Plan\Change;
-use AlleKnalle\StandardsSync\Core\Plan\ChangeKind;
-use AlleKnalle\StandardsSync\Core\Plan\Plan;
-use AlleKnalle\StandardsSync\Core\Plan\RuleApplication;
-use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\Plan\Abstention;
+use StandardsSync\Core\Plan\Change;
+use StandardsSync\Core\Plan\ChangeKind;
+use StandardsSync\Core\Plan\Plan;
+use StandardsSync\Core\Plan\RuleApplication;
+use StandardsSync\Core\Rule\ExplainsDrift;
+use StandardsSync\Core\Rule\Rule;
 use ReflectionClass;
 use Symfony\Component\Console\Style\SymfonyStyle;
 

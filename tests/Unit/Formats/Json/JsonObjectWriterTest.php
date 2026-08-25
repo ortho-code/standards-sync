@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Formats\Json;
+namespace Tests\StandardsSync\Unit\Formats\Json;
 
-use AlleKnalle\StandardsSync\Formats\Json\JsonObjectWriter;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Formats\Json\JsonObjectWriter;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

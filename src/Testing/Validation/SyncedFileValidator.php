@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Testing\Validation;
+namespace StandardsSync\Testing\Validation;
 
 /**
  * One format's — or tool's — validity check over synced output.

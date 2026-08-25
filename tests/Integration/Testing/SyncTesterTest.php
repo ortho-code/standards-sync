@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Testing;
+namespace Tests\StandardsSync\Integration\Testing;
 
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-use AlleKnalle\StandardsSync\Testing\SyncTester;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Rules\General\ManagedBlock\Label;
+use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\RuleSet\ComposableRuleSet;
+use StandardsSync\Testing\SyncTester;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

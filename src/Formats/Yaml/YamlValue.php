@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Yaml;
+namespace StandardsSync\Formats\Yaml;
 
 /**
  * Yaml's scalar value grammar: how a written value unquotes, and where a trailing comment starts.

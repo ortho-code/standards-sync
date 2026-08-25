@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Renovate\ExtendedPreset;
+namespace StandardsSync\Rules\Renovate\ExtendedPreset;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Core\Rule\AppliesAtPath;
-use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Core\Text\Lines;
-use AlleKnalle\StandardsSync\Formats\Json\JsonObjectWriter;
-use AlleKnalle\StandardsSync\Formats\Json5\Json5ListWriter;
-use AlleKnalle\StandardsSync\Rules\Renovate\RenovateConfigFile;
-use AlleKnalle\StandardsSync\Rules\Renovate\RenovateConfigFormat;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Rule\AppliesAtPath;
+use StandardsSync\Core\Rule\ExplainsDrift;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\Text\Lines;
+use StandardsSync\Formats\Json\JsonObjectWriter;
+use StandardsSync\Formats\Json5\Json5ListWriter;
+use StandardsSync\Rules\Renovate\RenovateConfigFile;
+use StandardsSync\Rules\Renovate\RenovateConfigFormat;
 use InvalidArgumentException;
 use JsonException;
 use RuntimeException;

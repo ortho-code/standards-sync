@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Infrastructure\Filesystem;
+namespace StandardsSync\Infrastructure\Filesystem;
 
 use FilesystemIterator;
 use RecursiveDirectoryIterator;

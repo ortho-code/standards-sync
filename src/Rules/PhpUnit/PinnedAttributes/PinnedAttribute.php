@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\PhpUnit\PinnedAttributes;
+namespace StandardsSync\Rules\PhpUnit\PinnedAttributes;
 
 use InvalidArgumentException;
 

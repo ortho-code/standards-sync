@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Documentation\Source;
+namespace StandardsSync\Documentation\Source;
 
-use AlleKnalle\StandardsSync\Testing\ScenarioTestCase;
+use StandardsSync\Testing\ScenarioTestCase;
 use RuntimeException;
 
 /** The scenario test classes found under a suite directory, resolved through its PSR-4 namespace prefix. */

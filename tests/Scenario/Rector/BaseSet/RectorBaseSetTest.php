@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Scenario\Rector\BaseSet;
+namespace Tests\StandardsSync\Scenario\Rector\BaseSet;
 
-use AlleKnalle\StandardsSync\Testing\ScenarioTestCase;
+use StandardsSync\Testing\ScenarioTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 /** The Rector import as targeted edits: the withSets entry rides along with whatever the config already has. */

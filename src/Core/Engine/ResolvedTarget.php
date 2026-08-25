@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Engine;
+namespace StandardsSync\Core\Engine;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Path;
 
 /** A FileTarget resolved against one root: the concrete path and the content currently there (null when the file is absent). */
 final readonly class ResolvedTarget

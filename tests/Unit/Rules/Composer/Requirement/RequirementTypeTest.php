@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\Composer\Requirement;
+namespace Tests\StandardsSync\Unit\Rules\Composer\Requirement;
 
-use AlleKnalle\StandardsSync\Rules\Composer\Requirement\RequirementType;
+use StandardsSync\Rules\Composer\Requirement\RequirementType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

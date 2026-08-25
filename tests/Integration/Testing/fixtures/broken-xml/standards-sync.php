@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\RuleSet\ComposableRuleSet;
 
 // A rule that deliberately syncs broken XML, so the tester's well-formedness tier has something to catch.
 return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {

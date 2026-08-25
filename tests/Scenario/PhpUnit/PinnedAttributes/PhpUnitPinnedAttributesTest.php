@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Scenario\PhpUnit\PinnedAttributes;
+namespace Tests\StandardsSync\Scenario\PhpUnit\PinnedAttributes;
 
-use AlleKnalle\StandardsSync\Testing\ScenarioTestCase;
+use StandardsSync\Testing\ScenarioTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 #[CoversNothing]

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Yaml;
+namespace StandardsSync\Formats\Yaml;
 
-use AlleKnalle\StandardsSync\Core\Text\Lines;
+use StandardsSync\Core\Text\Lines;
 use RuntimeException;
 
 /**

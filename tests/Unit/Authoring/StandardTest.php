@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Authoring;
+namespace Tests\StandardsSync\Unit\Authoring;
 
-use AlleKnalle\StandardsSync\Authoring\Package;
-use AlleKnalle\StandardsSync\Authoring\Standard;
-use AlleKnalle\StandardsSync\Rules\PhpStan\IncludedRuleset\PhpStanIncludedRuleset;
+use StandardsSync\Authoring\Package;
+use StandardsSync\Authoring\Standard;
+use StandardsSync\Rules\PhpStan\IncludedRuleset\PhpStanIncludedRuleset;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

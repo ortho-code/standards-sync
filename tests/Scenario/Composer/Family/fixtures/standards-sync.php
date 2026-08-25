@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-use AlleKnalle\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
-use AlleKnalle\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
-use AlleKnalle\StandardsSync\Rules\Composer\Script\ComposerScript;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\RuleSet\ComposableRuleSet;
+use StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
+use StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+use StandardsSync\Rules\Composer\Script\ComposerScript;
 
 return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
     public function __construct()

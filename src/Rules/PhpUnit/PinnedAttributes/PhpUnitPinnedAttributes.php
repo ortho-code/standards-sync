@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\PhpUnit\PinnedAttributes;
+namespace StandardsSync\Rules\PhpUnit\PinnedAttributes;
 
-use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Formats\Xml\XmlElementWriter;
-use AlleKnalle\StandardsSync\Rules\PhpUnit\PhpUnitConfigFile;
+use StandardsSync\Core\Rule\ExplainsDrift;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Formats\Xml\XmlElementWriter;
+use StandardsSync\Rules\PhpUnit\PhpUnitConfigFile;
 use InvalidArgumentException;
 
 /**

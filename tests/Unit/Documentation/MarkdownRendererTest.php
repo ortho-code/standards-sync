@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Documentation;
+namespace Tests\StandardsSync\Unit\Documentation;
 
-use AlleKnalle\StandardsSync\Documentation\MarkdownRenderer;
-use AlleKnalle\StandardsSync\Documentation\Model\CompositionSection;
-use AlleKnalle\StandardsSync\Documentation\Model\DeclarationGroup;
-use AlleKnalle\StandardsSync\Documentation\Model\ExampleKind;
-use AlleKnalle\StandardsSync\Documentation\Model\FamilyPage;
-use AlleKnalle\StandardsSync\Documentation\Model\FileExample;
-use AlleKnalle\StandardsSync\Documentation\Model\RulePage;
-use AlleKnalle\StandardsSync\Documentation\Model\ScenarioEntry;
-use AlleKnalle\StandardsSync\Documentation\Model\Subsection;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Documentation\MarkdownRenderer;
+use StandardsSync\Documentation\Model\CompositionSection;
+use StandardsSync\Documentation\Model\DeclarationGroup;
+use StandardsSync\Documentation\Model\ExampleKind;
+use StandardsSync\Documentation\Model\FamilyPage;
+use StandardsSync\Documentation\Model\FileExample;
+use StandardsSync\Documentation\Model\RulePage;
+use StandardsSync\Documentation\Model\ScenarioEntry;
+use StandardsSync\Documentation\Model\Subsection;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -27,7 +27,7 @@ final class MarkdownRendererTest extends TestCase
 
             declare(strict_types=1);
 
-            use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
+            use StandardsSync\Core\Config\SyncConfig;
 
             // A comment kept.
             return config();

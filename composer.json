@@ -1,5 +1,5 @@
 {
-  "name": "alleknalle/standards-sync",
+  "name": "standards-sync/standards-sync",
   "description": "Keeps shared config files in sync across repositories",
   "type": "library",
   "license": "MIT",
@@ -34,12 +34,12 @@
   },
   "autoload": {
     "psr-4": {
-      "AlleKnalle\\StandardsSync\\": "src/"
+      "StandardsSync\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Tests\\AlleKnalle\\StandardsSync\\": "tests/"
+      "Tests\\StandardsSync\\": "tests/"
     }
   },
   "scripts": {

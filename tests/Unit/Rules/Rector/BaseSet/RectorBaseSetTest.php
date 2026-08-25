@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\Rector\BaseSet;
+namespace Tests\StandardsSync\Unit\Rules\Rector\BaseSet;
 
-use AlleKnalle\StandardsSync\Rules\Rector\BaseSet\RectorBaseSet;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Rules\Rector\BaseSet\RectorBaseSet;
+use StandardsSync\Testing\FileContent;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

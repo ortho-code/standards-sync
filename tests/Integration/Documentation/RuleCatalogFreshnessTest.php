@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Documentation;
+namespace Tests\StandardsSync\Integration\Documentation;
 
-use AlleKnalle\StandardsSync\Documentation\RuleCatalog;
-use AlleKnalle\StandardsSync\Documentation\Source\RuleLibrary;
-use AlleKnalle\StandardsSync\Documentation\Source\ScenarioTestSuite;
+use StandardsSync\Documentation\RuleCatalog;
+use StandardsSync\Documentation\Source\RuleLibrary;
+use StandardsSync\Documentation\Source\ScenarioTestSuite;
 use FilesystemIterator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

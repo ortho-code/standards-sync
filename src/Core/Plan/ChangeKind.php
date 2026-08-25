@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Plan;
+namespace StandardsSync\Core\Plan;
 
 enum ChangeKind
 {

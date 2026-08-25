@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\PhpStan\PinnedValues;
+namespace StandardsSync\Rules\PhpStan\PinnedValues;
 
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Formats\Neon\NeonScalarWriter;
-use AlleKnalle\StandardsSync\Rules\PhpStan\PhpStanConfigFile;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Formats\Neon\NeonScalarWriter;
+use StandardsSync\Rules\PhpStan\PhpStanConfigFile;
 
 /**
  * Pins exact values in the PHPStan config: deviations are rewritten on every sync, so consumers cannot override them.

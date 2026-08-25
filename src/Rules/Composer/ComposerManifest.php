@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Composer;
+namespace StandardsSync\Rules\Composer;
 
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\FileTarget;
 
 /** The composer manifest as a rule target — one candidate, since composer has no dist variant — and the sections composer rules write into. */
 final readonly class ComposerManifest

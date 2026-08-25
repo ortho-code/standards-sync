@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\Psalm\BaseConfig;
+namespace Tests\StandardsSync\Unit\Rules\Psalm\BaseConfig;
 
-use AlleKnalle\StandardsSync\Rules\Psalm\BaseConfig\PsalmBaseConfig;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Rules\Psalm\BaseConfig\PsalmBaseConfig;
+use StandardsSync\Testing\FileContent;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Scenario\Composer\Family;
+namespace Tests\StandardsSync\Scenario\Composer\Family;
 
-use AlleKnalle\StandardsSync\Testing\ScenarioTestCase;
+use StandardsSync\Testing\ScenarioTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 #[CoversNothing]

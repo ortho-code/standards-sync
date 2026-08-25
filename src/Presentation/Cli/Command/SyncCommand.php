@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Presentation\Cli\Command;
+namespace StandardsSync\Presentation\Cli\Command;
 
-use AlleKnalle\StandardsSync\Core\Config\ConfigLoader;
-use AlleKnalle\StandardsSync\Core\Engine\Engine;
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
-use AlleKnalle\StandardsSync\Presentation\Cli\Output\DriftReport;
+use StandardsSync\Core\Config\ConfigLoader;
+use StandardsSync\Core\Engine\Engine;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
+use StandardsSync\Presentation\Cli\Output\DriftReport;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

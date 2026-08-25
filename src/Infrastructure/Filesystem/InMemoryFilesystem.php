@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Infrastructure\Filesystem;
+namespace StandardsSync\Infrastructure\Filesystem;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Filesystem;
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Filesystem;
+use StandardsSync\Core\Filesystem\Path;
 
 /** Filesystem adapter that keeps files in an array and records every write; backs disk-free syncs (tests, previews). */
 final class InMemoryFilesystem implements Filesystem

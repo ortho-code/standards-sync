@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\PhpUnit\BaseConfig;
+namespace StandardsSync\Rules\PhpUnit\BaseConfig;
 
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Rules\PhpUnit\PhpUnitConfigFile;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Rules\PhpUnit\PhpUnitConfigFile;
 use InvalidArgumentException;
 
 /**

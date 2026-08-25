@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-use AlleKnalle\StandardsSync\Rules\PhpUnit\BaseConfig\PhpUnitBaseConfig;
-use AlleKnalle\StandardsSync\Rules\PhpUnit\PinnedAttributes\PhpUnitPinnedAttributes;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\RuleSet\ComposableRuleSet;
+use StandardsSync\Rules\PhpUnit\BaseConfig\PhpUnitBaseConfig;
+use StandardsSync\Rules\PhpUnit\PinnedAttributes\PhpUnitPinnedAttributes;
 
 // The base config is declared first: the first rule to meet the absent config decides the created base — the org template, not the engine skeleton.
 // The blank line before the closing marker keeps the trailing line break every file ends with.

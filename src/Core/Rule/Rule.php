@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Rule;
+namespace StandardsSync\Core\Rule;
 
 /**
  * The unifying primitive: one pure content transform against one target file.

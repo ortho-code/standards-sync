@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Testing;
+namespace StandardsSync\Testing;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Path;
 
 /** One file whose synced content did not match the fixture's expected tree (a null side means the file was only present on the other side). */
 final readonly class Mismatch

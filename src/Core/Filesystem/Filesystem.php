@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Filesystem;
+namespace StandardsSync\Core\Filesystem;
 
 /** The one I/O boundary: read and write file contents by path. */
 interface Filesystem

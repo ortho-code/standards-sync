@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Yaml;
+namespace StandardsSync\Formats\Yaml;
 
-use AlleKnalle\StandardsSync\Core\Text\Indent;
+use StandardsSync\Core\Text\Indent;
 
 /** Yaml's indentation: two spaces by convention — yaml forbids tabs as indentation — used when the file has no indented line to copy. */
 final readonly class YamlIndent

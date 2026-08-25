@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\PhpStan\IncludedRuleset;
+namespace StandardsSync\Rules\PhpStan\IncludedRuleset;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Formats\Neon\NeonListWriter;
-use AlleKnalle\StandardsSync\Rules\PhpStan\PhpStanConfigFile;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Rule\ExplainsDrift;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Formats\Neon\NeonListWriter;
+use StandardsSync\Rules\PhpStan\PhpStanConfigFile;
 
 /**
  * Ensures the PHPStan config includes a given file, as a targeted edit that leaves the rest of the file untouched.

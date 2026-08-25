@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Documentation;
+namespace StandardsSync\Documentation;
 
-use AlleKnalle\StandardsSync\Core\Text\Lines;
-use AlleKnalle\StandardsSync\Documentation\Model\CompositionSection;
-use AlleKnalle\StandardsSync\Documentation\Model\ExampleKind;
-use AlleKnalle\StandardsSync\Documentation\Model\FamilyPage;
-use AlleKnalle\StandardsSync\Documentation\Model\FileExample;
-use AlleKnalle\StandardsSync\Documentation\Model\RulePage;
-use AlleKnalle\StandardsSync\Documentation\Model\Subsection;
+use StandardsSync\Core\Text\Lines;
+use StandardsSync\Documentation\Model\CompositionSection;
+use StandardsSync\Documentation\Model\ExampleKind;
+use StandardsSync\Documentation\Model\FamilyPage;
+use StandardsSync\Documentation\Model\FileExample;
+use StandardsSync\Documentation\Model\RulePage;
+use StandardsSync\Documentation\Model\Subsection;
 
 /** Renders the catalog model as markdown pages: deterministic output, fenced file contents, links back into the fixture tree. */
 final readonly class MarkdownRenderer

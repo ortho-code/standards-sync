@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Text;
+namespace StandardsSync\Core\Text;
 
 /**
  * The engine's canonical line convention: content is LF-separated.

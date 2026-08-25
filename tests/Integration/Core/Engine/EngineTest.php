@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Core\Engine;
+namespace Tests\StandardsSync\Integration\Core\Engine;
 
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\Engine\Engine;
-use AlleKnalle\StandardsSync\Core\Plan\Change;
-use AlleKnalle\StandardsSync\Core\Plan\ChangeKind;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-use AlleKnalle\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
+use StandardsSync\Rules\General\ManagedBlock\Label;
+use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\Engine\Engine;
+use StandardsSync\Core\Plan\Change;
+use StandardsSync\Core\Plan\ChangeKind;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\RuleSet\ComposableRuleSet;
+use StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
 use Closure;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

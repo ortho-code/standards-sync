@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Presentation\Cli\Command;
+namespace Tests\StandardsSync\Integration\Presentation\Cli\Command;
 
-use AlleKnalle\StandardsSync\Presentation\Cli\Application;
-use AlleKnalle\StandardsSync\Presentation\Cli\Command\SyncCommand;
-use AlleKnalle\StandardsSync\Presentation\Cli\Output\DriftReport;
+use StandardsSync\Presentation\Cli\Application;
+use StandardsSync\Presentation\Cli\Command\SyncCommand;
+use StandardsSync\Presentation\Cli\Output\DriftReport;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
-use Tests\AlleKnalle\StandardsSync\Integration\IntegrationTestCase;
+use Tests\StandardsSync\Integration\IntegrationTestCase;
 
 /** Drives the console application against a temp fixture: exit codes, no-write-in-check, apply-then-clean, help. */
 #[CoversClass(SyncCommand::class)]
@@ -22,11 +22,11 @@ final class SyncCommandTest extends IntegrationTestCase
 
         declare(strict_types=1);
 
-        use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
-        use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
-        use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-        use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-        use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
+        use StandardsSync\Rules\General\ManagedBlock\Label;
+        use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+        use StandardsSync\Core\Config\SyncConfig;
+        use StandardsSync\Core\Rule\FileTarget;
+        use StandardsSync\Core\RuleSet\ComposableRuleSet;
 
         $ruleSet = new class extends ComposableRuleSet {
             public function __construct()
@@ -47,10 +47,10 @@ final class SyncCommandTest extends IntegrationTestCase
 
         declare(strict_types=1);
 
-        use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-        use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-        use AlleKnalle\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
-        use AlleKnalle\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+        use StandardsSync\Core\Config\SyncConfig;
+        use StandardsSync\Core\RuleSet\ComposableRuleSet;
+        use StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
+        use StandardsSync\Rules\Composer\Requirement\VersionConstraint;
 
         $ruleSet = new class extends ComposableRuleSet {
             public function __construct()

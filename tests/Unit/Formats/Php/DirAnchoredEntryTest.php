@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Formats\Php;
+namespace Tests\StandardsSync\Unit\Formats\Php;
 
-use AlleKnalle\StandardsSync\Formats\Php\DirAnchoredEntry;
+use StandardsSync\Formats\Php\DirAnchoredEntry;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

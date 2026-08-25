@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Testing;
+namespace StandardsSync\Testing;
 
-use AlleKnalle\StandardsSync\Core\Config\ConfigLoader;
-use AlleKnalle\StandardsSync\Core\Filesystem\Filesystem;
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Infrastructure\Filesystem\DirectoryListing;
-use AlleKnalle\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
-use AlleKnalle\StandardsSync\Testing\Validation\Json5Validator;
-use AlleKnalle\StandardsSync\Testing\Validation\JsonValidator;
-use AlleKnalle\StandardsSync\Testing\Validation\NeonValidator;
-use AlleKnalle\StandardsSync\Testing\Validation\PhpUnitConfigValidator;
-use AlleKnalle\StandardsSync\Testing\Validation\PsalmConfigValidator;
-use AlleKnalle\StandardsSync\Testing\Validation\SyncedFileValidator;
-use AlleKnalle\StandardsSync\Testing\Validation\XmlValidator;
-use AlleKnalle\StandardsSync\Testing\Validation\YamlValidator;
+use StandardsSync\Core\Config\ConfigLoader;
+use StandardsSync\Core\Filesystem\Filesystem;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Infrastructure\Filesystem\DirectoryListing;
+use StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
+use StandardsSync\Testing\Validation\Json5Validator;
+use StandardsSync\Testing\Validation\JsonValidator;
+use StandardsSync\Testing\Validation\NeonValidator;
+use StandardsSync\Testing\Validation\PhpUnitConfigValidator;
+use StandardsSync\Testing\Validation\PsalmConfigValidator;
+use StandardsSync\Testing\Validation\SyncedFileValidator;
+use StandardsSync\Testing\Validation\XmlValidator;
+use StandardsSync\Testing\Validation\YamlValidator;
 
 /**
  * Runs a sync against an on-disk fixture and reports how the result differs from the expected tree.

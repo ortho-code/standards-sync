@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Testing\Validation;
+namespace Tests\StandardsSync\Unit\Testing\Validation;
 
-use AlleKnalle\StandardsSync\Testing\Validation\XmlValidator;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Testing\Validation\XmlValidator;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

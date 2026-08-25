@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\RuleSet;
+namespace StandardsSync\Core\RuleSet;
 
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\Rule\Rule;
 
 /**
  * Base rule set that collects rules and composes other rule sets.

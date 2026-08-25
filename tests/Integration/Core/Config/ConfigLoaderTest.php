@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Core\Config;
+namespace Tests\StandardsSync\Integration\Core\Config;
 
-use AlleKnalle\StandardsSync\Core\Config\ConfigLoader;
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Config\ConfigLoader;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\Filesystem\Path;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
-use Tests\AlleKnalle\StandardsSync\Integration\IntegrationTestCase;
+use Tests\StandardsSync\Integration\IntegrationTestCase;
 
 #[CoversClass(ConfigLoader::class)]
 final class ConfigLoaderTest extends IntegrationTestCase
 {
     public function testLoadsAFileThatReturnsSyncConfig(): void
     {
-        $path = $this->writeConfig('<?php return \AlleKnalle\StandardsSync\Core\Config\SyncConfig::create();');
+        $path = $this->writeConfig('<?php return \StandardsSync\Core\Config\SyncConfig::create();');
 
         self::assertInstanceOf(SyncConfig::class, (new ConfigLoader())->loadFrom($path));
     }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Infrastructure\Filesystem;
+namespace StandardsSync\Infrastructure\Filesystem;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Filesystem;
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Filesystem;
+use StandardsSync\Core\Filesystem\Path;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystemComponent;
 
 /** Filesystem adapter backed by symfony/filesystem; the pipeline's one reader and writer of disk. */

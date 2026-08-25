@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Plan;
+namespace StandardsSync\Core\Plan;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Rule\Rule;
 
 /**
  * A file none of its rules had an opinion about: it does not exist, and no rule wanted to create it.

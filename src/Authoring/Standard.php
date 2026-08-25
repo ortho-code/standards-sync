@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Authoring;
+namespace StandardsSync\Authoring;
 
-use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
+use StandardsSync\Core\RuleSet\ComposableRuleSet;
 
 /**
  * Base for the rule set an org package ships: the org's standard.

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Json5;
+namespace StandardsSync\Formats\Json5;
 
-use AlleKnalle\StandardsSync\Core\Text\Lines;
-use AlleKnalle\StandardsSync\Formats\Json\JsonMember;
-use AlleKnalle\StandardsSync\Formats\Json\JsonObject;
+use StandardsSync\Core\Text\Lines;
+use StandardsSync\Formats\Json\JsonMember;
+use StandardsSync\Formats\Json\JsonObject;
 use RuntimeException;
 
 /**

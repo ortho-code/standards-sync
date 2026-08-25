@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\PhpUnit\PinnedAttributes;
+namespace Tests\StandardsSync\Unit\Rules\PhpUnit\PinnedAttributes;
 
-use AlleKnalle\StandardsSync\Rules\PhpUnit\PinnedAttributes\PhpUnitPinnedAttributes;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Rules\PhpUnit\PinnedAttributes\PhpUnitPinnedAttributes;
+use StandardsSync\Testing\FileContent;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

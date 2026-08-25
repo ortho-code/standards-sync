@@ -3,7 +3,7 @@
 
 declare(strict_types=1);
 
-use AlleKnalle\StandardsSync\Presentation\Cli\Application;
+use StandardsSync\Presentation\Cli\Application;
 
 // Composer's bin proxy sets $_composer_autoload_path to the invoking project's autoloader; prefer it so a symlinked install still loads the consumer's classes.
 // Fall back to the layouts this bin can run from: installed as a dependency, a standalone checkout, then the invoking project.

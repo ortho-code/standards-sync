@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Documentation\Model;
+namespace StandardsSync\Documentation\Model;
 
 /** One rule's catalog page: its family (the index's grouping key), name, general description, and its scenarios. */
 final readonly class RulePage

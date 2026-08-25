@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\General\ManagedBlock;
+namespace StandardsSync\Rules\General\ManagedBlock;
 
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Core\Text\Lines;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\Text\Lines;
 use InvalidArgumentException;
 
 /**

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-use AlleKnalle\StandardsSync\Rules\Psalm\BaseConfig\PsalmBaseConfig;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\RuleSet\ComposableRuleSet;
+use StandardsSync\Rules\Psalm\BaseConfig\PsalmBaseConfig;
 
 // The template is inlined here; a real org package reads it from templates/ through Package.
 // The blank line before the closing marker keeps the trailing line break every file ends with.

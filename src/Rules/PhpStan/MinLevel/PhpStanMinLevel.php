@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\PhpStan\MinLevel;
+namespace StandardsSync\Rules\PhpStan\MinLevel;
 
-use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Core\Text\Lines;
-use AlleKnalle\StandardsSync\Formats\Neon\NeonScalarWriter;
-use AlleKnalle\StandardsSync\Rules\PhpStan\PhpStanConfigFile;
+use StandardsSync\Core\Rule\ExplainsDrift;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\Text\Lines;
+use StandardsSync\Formats\Neon\NeonScalarWriter;
+use StandardsSync\Rules\PhpStan\PhpStanConfigFile;
 use InvalidArgumentException;
 
 /**

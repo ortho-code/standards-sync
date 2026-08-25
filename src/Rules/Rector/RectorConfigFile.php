@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Rector;
+namespace StandardsSync\Rules\Rector;
 
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Text\Lines;
-use AlleKnalle\StandardsSync\Formats\Php\FluentChainWriter;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Text\Lines;
+use StandardsSync\Formats\Php\FluentChainWriter;
 use RuntimeException;
 
 /**

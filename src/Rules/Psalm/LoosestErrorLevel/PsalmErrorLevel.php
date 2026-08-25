@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Psalm\LoosestErrorLevel;
+namespace StandardsSync\Rules\Psalm\LoosestErrorLevel;
 
 use InvalidArgumentException;
 

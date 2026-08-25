@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\Composer\ConfigSetting;
+namespace Tests\StandardsSync\Unit\Rules\Composer\ConfigSetting;
 
-use AlleKnalle\StandardsSync\Rules\Composer\ConfigSetting\ComposerConfigSetting;
+use StandardsSync\Rules\Composer\ConfigSetting\ComposerConfigSetting;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

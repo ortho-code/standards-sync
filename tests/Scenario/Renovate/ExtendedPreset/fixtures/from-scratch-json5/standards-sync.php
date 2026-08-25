@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-use AlleKnalle\StandardsSync\Rules\Renovate\ExtendedPreset\RenovateExtendedPreset;
-use AlleKnalle\StandardsSync\Rules\Renovate\RenovateConfigFormat;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\RuleSet\ComposableRuleSet;
+use StandardsSync\Rules\Renovate\ExtendedPreset\RenovateExtendedPreset;
+use StandardsSync\Rules\Renovate\RenovateConfigFormat;
 
 return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
     public function __construct()

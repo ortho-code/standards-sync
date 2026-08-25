@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Config;
+namespace StandardsSync\Core\Config;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Core\RuleSet\RuleSet;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\RuleSet\RuleSet;
 
 /** Immutable configuration returned by a standards-sync.php: which roots to sync and which rule sets apply. */
 final readonly class SyncConfig

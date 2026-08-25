@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\Psalm\LoosestErrorLevel;
+namespace Tests\StandardsSync\Unit\Rules\Psalm\LoosestErrorLevel;
 
-use AlleKnalle\StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmErrorLevel;
-use AlleKnalle\StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmLoosestErrorLevel;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmErrorLevel;
+use StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmLoosestErrorLevel;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

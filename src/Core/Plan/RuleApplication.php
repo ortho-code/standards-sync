@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Plan;
+namespace StandardsSync\Core\Plan;
 
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
+use StandardsSync\Core\Rule\Rule;
 
 /** One rule's step in a file's fold: the content it saw and the content it returned. */
 final readonly class RuleApplication

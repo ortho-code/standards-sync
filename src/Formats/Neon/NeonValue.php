@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Neon;
+namespace StandardsSync\Formats\Neon;
 
 use RuntimeException;
 

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Composer\Requirement;
+namespace StandardsSync\Rules\Composer\Requirement;
 
-use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Formats\Json\JsonObjectWriter;
-use AlleKnalle\StandardsSync\Rules\Composer\ComposerManifest;
+use StandardsSync\Core\Rule\ExplainsDrift;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Formats\Json\JsonObjectWriter;
+use StandardsSync\Rules\Composer\ComposerManifest;
 use InvalidArgumentException;
 use RuntimeException;
 

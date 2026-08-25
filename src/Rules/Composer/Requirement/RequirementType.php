@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Composer\Requirement;
+namespace StandardsSync\Rules\Composer\Requirement;
 
 /** What a required package is needed for, named as composer names its two requirement sections. */
 enum RequirementType: string

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Scenario\PhpStan\Family;
+namespace Tests\StandardsSync\Scenario\PhpStan\Family;
 
-use AlleKnalle\StandardsSync\Testing\ScenarioTestCase;
+use StandardsSync\Testing\ScenarioTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 /** The phpstan rules composed in one fold: the import creates the config, the floor then judges real content instead of abstaining. */

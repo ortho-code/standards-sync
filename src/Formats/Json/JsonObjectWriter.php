@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Json;
+namespace StandardsSync\Formats\Json;
 
-use AlleKnalle\StandardsSync\Core\Text\Lines;
+use StandardsSync\Core\Text\Lines;
 use JsonException;
 use RuntimeException;
 use stdClass;

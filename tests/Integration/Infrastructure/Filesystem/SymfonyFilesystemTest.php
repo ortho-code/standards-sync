@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Integration\Infrastructure\Filesystem;
+namespace Tests\StandardsSync\Integration\Infrastructure\Filesystem;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Tests\AlleKnalle\StandardsSync\Integration\IntegrationTestCase;
+use Tests\StandardsSync\Integration\IntegrationTestCase;
 
 #[CoversClass(SymfonyFilesystem::class)]
 final class SymfonyFilesystemTest extends IntegrationTestCase

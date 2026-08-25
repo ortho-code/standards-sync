@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Core\Config;
+namespace StandardsSync\Core\Config;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Path;
 use RuntimeException;
 
 /** Loads a standards-sync.php and asserts it returns a SyncConfig. */

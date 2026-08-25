@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\General\ManagedBlock;
+namespace Tests\StandardsSync\Unit\Rules\General\ManagedBlock;
 
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Rules\General\ManagedBlock\Label;
+use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use StandardsSync\Core\Rule\FileTarget;
 use InvalidArgumentException;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

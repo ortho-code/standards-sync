@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Json;
+namespace StandardsSync\Formats\Json;
 
 /** One JSON object as it sits in the document: the span from its opening to its closing brace, and its members in document order. */
 final readonly class JsonObject

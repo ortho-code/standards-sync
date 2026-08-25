@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Rector\BaseSet;
+namespace StandardsSync\Rules\Rector\BaseSet;
 
-use AlleKnalle\StandardsSync\Core\Rule\ExplainsDrift;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\Rule\Rule;
-use AlleKnalle\StandardsSync\Formats\Php\DirAnchoredEntry;
-use AlleKnalle\StandardsSync\Formats\Php\FluentChainWriter;
-use AlleKnalle\StandardsSync\Rules\Rector\RectorConfigFile;
+use StandardsSync\Core\Rule\ExplainsDrift;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Rule\Rule;
+use StandardsSync\Formats\Php\DirAnchoredEntry;
+use StandardsSync\Formats\Php\FluentChainWriter;
+use StandardsSync\Rules\Rector\RectorConfigFile;
 
 /**
  * Ensures the Rector config registers a given set file in withSets(), as a targeted edit that leaves the rest of the config untouched.

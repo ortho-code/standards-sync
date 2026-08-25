@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Formats\Yaml;
+namespace Tests\StandardsSync\Unit\Formats\Yaml;
 
-use AlleKnalle\StandardsSync\Formats\Yaml\YamlIndent;
+use StandardsSync\Formats\Yaml\YamlIndent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

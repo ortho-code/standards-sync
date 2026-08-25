@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Formats\Xml;
+namespace StandardsSync\Formats\Xml;
 
 /** One attribute written on an element's open tag: the raw value, the quote character it is written with, and the spans it occupies in the document. */
 final readonly class XmlAttribute

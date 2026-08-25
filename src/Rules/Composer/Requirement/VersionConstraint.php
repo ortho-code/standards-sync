@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\Composer\Requirement;
+namespace StandardsSync\Rules\Composer\Requirement;
 
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Intervals;

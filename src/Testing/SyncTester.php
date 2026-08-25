@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Testing;
+namespace StandardsSync\Testing;
 
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\Engine\Engine;
-use AlleKnalle\StandardsSync\Core\Plan\Plan;
-use AlleKnalle\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\Engine\Engine;
+use StandardsSync\Core\Plan\Plan;
+use StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
 
 /**
  * Runs a sync in memory so a package can test its config without temp directories.

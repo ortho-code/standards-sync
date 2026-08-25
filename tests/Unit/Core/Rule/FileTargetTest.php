@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Core\Rule;
+namespace Tests\StandardsSync\Unit\Core\Rule;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Rule\FileTarget;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

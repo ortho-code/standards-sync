@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use AlleKnalle\StandardsSync\Authoring\Package;
-use AlleKnalle\StandardsSync\Core\Config\SyncConfig;
-use AlleKnalle\StandardsSync\Core\Rule\FileTarget;
-use AlleKnalle\StandardsSync\Core\RuleSet\ComposableRuleSet;
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\Label;
-use AlleKnalle\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use StandardsSync\Authoring\Package;
+use StandardsSync\Core\Config\SyncConfig;
+use StandardsSync\Core\Rule\FileTarget;
+use StandardsSync\Core\RuleSet\ComposableRuleSet;
+use StandardsSync\Rules\General\ManagedBlock\Label;
+use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 
 $package = new Package(__DIR__, '');
 

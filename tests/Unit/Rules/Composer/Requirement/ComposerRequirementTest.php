@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\AlleKnalle\StandardsSync\Unit\Rules\Composer\Requirement;
+namespace Tests\StandardsSync\Unit\Rules\Composer\Requirement;
 
-use AlleKnalle\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
-use AlleKnalle\StandardsSync\Rules\Composer\Requirement\RequirementType;
-use AlleKnalle\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
-use AlleKnalle\StandardsSync\Testing\FileContent;
+use StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
+use StandardsSync\Rules\Composer\Requirement\RequirementType;
+use StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+use StandardsSync\Testing\FileContent;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

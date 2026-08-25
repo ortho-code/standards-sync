@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Testing\Validation;
+namespace StandardsSync\Testing\Validation;
 
 use Composer\InstalledVersions;
 use DOMDocument;

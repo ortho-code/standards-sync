@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace AlleKnalle\StandardsSync\Rules\General\ManagedBlock;
+namespace StandardsSync\Rules\General\ManagedBlock;
 
-use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use StandardsSync\Core\Filesystem\Path;
 use InvalidArgumentException;
 
 /** Comment lead used to draw a managed block's markers, chosen per file type. */
