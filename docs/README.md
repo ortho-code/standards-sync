@@ -19,3 +19,4 @@ The living design record and project documentation for this engine — findings,
 - [distribution.md](distribution.md) — naming, publishing, versioning, delivery modes, and how consumers control the pace of change.
 - [authoring-org-packages.md](authoring-org-packages.md) — what a consumer org package declares, where its distributed content lives, and how it tests itself.
 - [conventions.md](conventions.md) — code and test conventions, the scenario-catalog rule, and the commands.
+- [rules/](rules/README.md) — the generated rule catalog: a page per shipped rule with its scenarios as before/after examples, plus family pages for cross-rule compositions; regenerated from the rule library and scenario suite (`composer app-generate-rule-catalog`), never edited by hand.

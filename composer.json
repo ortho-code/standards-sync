@@ -55,6 +55,9 @@
     "app-run-tests-scenario": [
       "vendor/bin/phpunit --testsuite scenario"
     ],
+    "app-generate-rule-catalog": [
+      "@php bin/generate-rule-catalog"
+    ],
     "deptrac": [
       "vendor/bin/deptrac --no-cache --fail-on-uncovered"
     ]

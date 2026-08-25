@@ -1,0 +1,39 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use AlleKnalle\StandardsSync\Documentation\RuleCatalog;
+
+// Development-only: regenerates the rule catalog from the rule library and the scenario suite, so it always runs from the engine checkout.
+require __DIR__ . '/../vendor/autoload.php';
+
+$root = dirname(__DIR__);
+$pages = RuleCatalog::fromProject($root)->pages();
+
+$directory = $root . '/' . RuleCatalog::DIRECTORY;
+if (is_dir($directory)) {
+    // Sweep pages that no longer exist, then the empty family folders they leave behind.
+    $entries = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST,
+    );
+    foreach ($entries as $entry) {
+        $path = $entry->getPathname();
+        if ($entry->isFile() && str_ends_with($path, '.md') && !isset($pages[substr($path, strlen($directory) + 1)])) {
+            unlink($path);
+        }
+        if ($entry->isDir() && count(scandir($path) ?: []) === 2) {
+            rmdir($path);
+        }
+    }
+}
+foreach ($pages as $filename => $content) {
+    $path = $directory . '/' . $filename;
+    if (!is_dir(dirname($path))) {
+        mkdir(dirname($path), 0777, true);
+    }
+    file_put_contents($path, $content);
+}
+
+printf('Generated %d pages into %s.%s', count($pages), RuleCatalog::DIRECTORY, PHP_EOL);

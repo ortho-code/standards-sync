@@ -65,6 +65,13 @@ deptrac:
           value: src/Testing/.*
         - type: classNameRegex
           value: '#^AlleKnalle\\StandardsSync\\Testing\\#'
+    # Generates the rule-catalog docs from the scenario suite: the fixtures feed tests and docs alike, so this layer may read the test scaffolding.
+    - name: Documentation
+      collectors:
+        - type: directory
+          value: src/Documentation/.*
+        - type: classNameRegex
+          value: '#^AlleKnalle\\StandardsSync\\Documentation\\#'
     # Any class outside our own namespace, i.e. every third-party dependency (Symfony today); keeps Core provably free of vendor code.
     - name: Vendor
       collectors:
@@ -95,4 +102,8 @@ deptrac:
       - Core
       - Infrastructure
       - Vendor
+    Documentation:
+      - Core
+      - Testing
+      - Infrastructure
     Vendor: ~

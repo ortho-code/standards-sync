@@ -11,6 +11,7 @@ Open-sourced once stable — keep this file project-facing (no personal workflow
 - Direction: [rule-model.md](docs/rule-model.md) — the rule-based model is built (R0 contract, R1 fold); the rule library ships the block mechanism (`ManagedBlock`) plus per-tool PHPStan, Rector, ECS, psalm, composer.json, deptrac, renovate and phpunit families; org packages author against `Authoring/` (`Package` + `Standard`). Each tool family's decision record sits beside it (`docs/*-family.md`).
 - Architecture + invariants: [architecture.md](docs/architecture.md) — the pipeline, layers, seams; hold the invariants.
 - Authoring an org package: [authoring-org-packages.md](docs/authoring-org-packages.md).
+- Rule catalog (generated, never hand-edited): [docs/rules/](docs/rules/README.md) — regenerate with `composer app-generate-rule-catalog` after any scenario fixture or provider change; a freshness test fails while it is stale.
 - Code + test conventions, commands: [conventions.md](docs/conventions.md).
 - Requirements, prior approaches/art, distribution: see the [docs index](docs/README.md).
 

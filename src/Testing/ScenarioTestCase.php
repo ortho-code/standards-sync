@@ -24,13 +24,14 @@ abstract class ScenarioTestCase extends TestCase
     #[DataProvider('scenarios')]
     public function testSyncMatchesTheFixture(string $scenario, ?string $config): void
     {
-        $fixtures = $this->fixturesDirectory();
+        $fixtures = static::fixturesDirectory();
         $configFile = $config !== null ? $fixtures . '/' . $config : null;
 
         self::assertSame([], (new SyncFixtureTester())->diff($fixtures . '/' . $scenario, $configFile));
     }
 
-    private function fixturesDirectory(): string
+    /** The fixtures directory beside the concrete test class. */
+    public static function fixturesDirectory(): string
     {
         return dirname((string) (new ReflectionClass(static::class))->getFileName()) . '/' . self::FIXTURES;
     }

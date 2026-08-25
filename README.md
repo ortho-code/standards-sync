@@ -2,7 +2,7 @@
 
 Keeps shared config files in sync across repositories. An org package declares *which* files to sync and *what* they contain; this engine understands the formats and writes them — today as managed marker blocks, with drift detection via `sync --check`.
 
-**Status: pre-release.** The rule-based model is built: the engine folds pure `Rule` transforms per file. The rule library ships managed marker blocks (`ManagedBlock`), the PHPStan family (`PhpStanIncludedRuleset`, `PhpStanMinLevel` — "the level is a floor: raise it if lower, never touch a stricter project" — and `PhpStanPinnedValues`), and the Rector and ECS base sets (`RectorBaseSet`, `EcsBaseSet`). Org packages declare their standard against the `Authoring/` layer: a class extending `Standard`, whose rules read and reference the package's distributed `templates/` content through the self-locating `Package`. The design record lives in [`docs/`](docs/README.md).
+**Status: pre-release.** The rule-based model is built: the engine folds pure `Rule` transforms per file. The rule library ships the managed marker block mechanism (`ManagedBlock`) and per-tool families for PHPStan, Rector, ECS, Psalm, composer.json, Deptrac, Renovate and PHPUnit. Org packages declare their standard against the `Authoring/` layer: a class extending `Standard`, whose rules read and reference the package's distributed `templates/` content through the self-locating `Package`. Every shipped rule is documented with real before/after examples in the generated [rule catalog](docs/rules/README.md); the design record lives in [`docs/`](docs/README.md).
 
 ## Usage (current state)
 

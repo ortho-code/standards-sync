@@ -23,5 +23,6 @@
 ## Commands
 
 - Tests: `composer app-run-tests` (all three suites), `composer app-run-tests-unit`, `composer app-run-tests-integration`, `composer app-run-tests-scenario`.
+- Rule catalog: `composer app-generate-rule-catalog` regenerates `docs/rules/` (a folder per family: a page per rule, plus a `README.md` holding the cross-rule compositions where they exist; engine-level behaviours on a top-level `engine.md`) from the rule library and the scenario suite; an integration freshness test fails while the committed pages are stale — and refuses loudly for a rule without scenario coverage — so run it after any rule, fixture or provider change.
 - Test strictness (fail on any warning/deprecation/notice/risky, stop on first defect) lives in `phpunit.xml.dist`, not in the scripts.
 - Architecture: `composer deptrac` — fails on any cross-layer violation or uncovered class.

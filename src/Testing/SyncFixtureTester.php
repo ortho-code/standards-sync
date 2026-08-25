@@ -7,6 +7,7 @@ namespace AlleKnalle\StandardsSync\Testing;
 use AlleKnalle\StandardsSync\Core\Config\ConfigLoader;
 use AlleKnalle\StandardsSync\Core\Filesystem\Filesystem;
 use AlleKnalle\StandardsSync\Core\Filesystem\Path;
+use AlleKnalle\StandardsSync\Infrastructure\Filesystem\DirectoryListing;
 use AlleKnalle\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
 use AlleKnalle\StandardsSync\Testing\Validation\Json5Validator;
 use AlleKnalle\StandardsSync\Testing\Validation\JsonValidator;
@@ -16,9 +17,6 @@ use AlleKnalle\StandardsSync\Testing\Validation\PsalmConfigValidator;
 use AlleKnalle\StandardsSync\Testing\Validation\SyncedFileValidator;
 use AlleKnalle\StandardsSync\Testing\Validation\XmlValidator;
 use AlleKnalle\StandardsSync\Testing\Validation\YamlValidator;
-use FilesystemIterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 
 /**
  * Runs a sync against an on-disk fixture and reports how the result differs from the expected tree.
@@ -32,9 +30,9 @@ final class SyncFixtureTester
     private const string ROOT = '.';
 
     /** The config file loaded from a fixture by default, and the subdirectories holding its before and after trees. */
-    private const string CONFIG = 'standards-sync.php';
-    private const string INPUT = 'input';
-    private const string EXPECTED = 'expected';
+    public const string CONFIG = 'standards-sync.php';
+    public const string INPUT = 'input';
+    public const string EXPECTED = 'expected';
 
     /** @var list<SyncedFileValidator> */
     private readonly array $validators;
@@ -95,7 +93,7 @@ final class SyncFixtureTester
     private function readTree(Path $directory, Path $root): array
     {
         $tree = [];
-        foreach ($this->relativePaths($directory) as $relativePath) {
+        foreach (DirectoryListing::fromDirectory($directory->value())->relativePaths() as $relativePath) {
             $content = $this->filesystem->read($directory->join(Path::fromString($relativePath)));
             if ($content !== null) {
                 $tree[$root->join(Path::fromString($relativePath))->value()] = $content;
@@ -123,24 +121,5 @@ final class SyncFixtureTester
         }
 
         return $mismatches;
-    }
-
-    /** @return list<string> */
-    private function relativePaths(Path $directory): array
-    {
-        $path = $directory->value();
-        if (!is_dir($path)) {
-            return [];
-        }
-
-        $paths = [];
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
-        );
-        foreach ($files as $file) {
-            $paths[] = substr($file->getPathname(), strlen($path) + 1);
-        }
-
-        return $paths;
     }
 }
