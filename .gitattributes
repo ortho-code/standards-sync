@@ -1,0 +1,10 @@
+/.editorconfig export-ignore
+/.gitattributes export-ignore
+/.github export-ignore
+/.gitignore export-ignore
+/CLAUDE.md export-ignore
+/deptrac.yaml export-ignore
+/docker-compose.yml export-ignore
+/docs export-ignore
+/phpunit.xml.dist export-ignore
+/tests export-ignore
