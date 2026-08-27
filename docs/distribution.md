@@ -30,6 +30,10 @@ Manual first: `sync` / `sync --check` run by hand and in CI, and that is enough 
 - **PR bot** (renovate-style) — runs sync and opens a PR with the diff. Preferred first when org-wide rollout arrives: reviewable, no local mutation, no `allow-plugins` trust grant (see the security posture in [requirements.md](requirements.md)).
 - **Composer plugin** (apply on composer events) — the only propagation bound to the `require` itself, but the widest trust surface; opt-in if ever built.
 
+## Release status (decided 2026-08-25)
+
+The first tag is **v0.x, without a compatibility promise** — SemVer's v0 semantics apply, so v0 minors may break. The BC-surface audit (API vs. internal, per class — the contract-first/never-first split in [conventions.md](conventions.md)) runs before the first v1 tag, which is where the versioning commitments below begin to bind. The engine's channel is a public Packagist tag; publishing follows once the building blocks — docs, CI, composer metadata — are verified.
+
 ## Versioning and the pace of change
 
 The standard evolves (line length 120→140, a new rule, a stricter floor). Consumers receive changes on `composer update`, so they need a way to control the pace:
