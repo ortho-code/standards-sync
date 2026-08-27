@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Documentation\Model;
+namespace OrthoCode\StandardsSync\Documentation\Model;
 
 /** One thematic slice of a section's scenarios; a null title renders the slice inline, without a heading of its own. */
 final readonly class Subsection

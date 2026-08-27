@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\General\ManagedBlock;
+namespace OrthoCode\StandardsSync\Rules\General\ManagedBlock;
 
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\Text\Lines;
 use InvalidArgumentException;
 
 /**

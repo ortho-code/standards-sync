@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Presentation\Cli\Command;
+namespace OrthoCode\StandardsSync\Presentation\Cli\Command;
 
-use StandardsSync\Core\Config\ConfigLoader;
-use StandardsSync\Core\Engine\Engine;
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
-use StandardsSync\Presentation\Cli\Output\DriftReport;
+use OrthoCode\StandardsSync\Core\Config\ConfigLoader;
+use OrthoCode\StandardsSync\Core\Engine\Engine;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
+use OrthoCode\StandardsSync\Presentation\Cli\Output\DriftReport;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

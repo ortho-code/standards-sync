@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Testing\Validation;
+namespace Tests\OrthoCode\StandardsSync\Unit\Testing\Validation;
 
-use StandardsSync\Testing\FileContent;
-use StandardsSync\Testing\Validation\PsalmConfigValidator;
+use OrthoCode\StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Testing\Validation\PsalmConfigValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

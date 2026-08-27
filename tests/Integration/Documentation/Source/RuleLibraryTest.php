@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration\Documentation\Source;
+namespace Tests\OrthoCode\StandardsSync\Integration\Documentation\Source;
 
-use StandardsSync\Documentation\Source\RuleLibrary;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Documentation\Source\RuleLibrary;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use RuntimeException;
-use Tests\StandardsSync\Integration\IntegrationTestCase;
+use Tests\OrthoCode\StandardsSync\Integration\IntegrationTestCase;
 
 #[CoversClass(RuleLibrary::class)]
 final class RuleLibraryTest extends IntegrationTestCase
@@ -28,7 +28,7 @@ final class RuleLibraryTest extends IntegrationTestCase
 
         RuleLibrary::fromDirectory(
             $this->workspace() . '/library',
-            'Tests\StandardsSync\Integration\Documentation\Source\WorkspaceFixture',
+            'Tests\OrthoCode\StandardsSync\Integration\Documentation\Source\WorkspaceFixture',
         );
     }
 }

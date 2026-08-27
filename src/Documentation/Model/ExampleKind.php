@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Documentation\Model;
+namespace OrthoCode\StandardsSync\Documentation\Model;
 
 /** How a scenario's expected tree relates to its input tree for one file. */
 enum ExampleKind

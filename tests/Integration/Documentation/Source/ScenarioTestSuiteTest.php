@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration\Documentation\Source;
+namespace Tests\OrthoCode\StandardsSync\Integration\Documentation\Source;
 
-use StandardsSync\Documentation\Source\ScenarioTestSuite;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Documentation\Source\ScenarioTestSuite;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use RuntimeException;
-use Tests\StandardsSync\Integration\IntegrationTestCase;
+use Tests\OrthoCode\StandardsSync\Integration\IntegrationTestCase;
 
 /** The refusal is generated into a temp workspace: a committed *Test.php fixture would be scanned by phpunit itself. */
 #[CoversClass(ScenarioTestSuite::class)]
@@ -21,7 +21,7 @@ final class ScenarioTestSuiteTest extends IntegrationTestCase
 
             declare(strict_types=1);
 
-            namespace Tests\StandardsSync\Integration\Documentation\Source\WorkspaceFixture;
+            namespace Tests\OrthoCode\StandardsSync\Integration\Documentation\Source\WorkspaceFixture;
 
             final class BogusTest
             {
@@ -30,11 +30,11 @@ final class ScenarioTestSuiteTest extends IntegrationTestCase
         require $file;
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not resolve to a StandardsSync\Testing\ScenarioTestCase subclass');
+        $this->expectExceptionMessage('does not resolve to a OrthoCode\StandardsSync\Testing\ScenarioTestCase subclass');
 
         ScenarioTestSuite::fromDirectory(
             $this->workspace() . '/suite',
-            'Tests\StandardsSync\Integration\Documentation\Source\WorkspaceFixture',
+            'Tests\OrthoCode\StandardsSync\Integration\Documentation\Source\WorkspaceFixture',
         );
     }
 }

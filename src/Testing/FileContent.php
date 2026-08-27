@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Testing;
+namespace OrthoCode\StandardsSync\Testing;
 
-use StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Core\Text\Lines;
 
 /** Builds a test fixture as the file looks on disk: the nowdoc body plus the trailing line break every file ends with. */
 final readonly class FileContent

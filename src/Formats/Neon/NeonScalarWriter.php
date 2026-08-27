@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Formats\Neon;
+namespace OrthoCode\StandardsSync\Formats\Neon;
 
-use StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Core\Text\Lines;
 use RuntimeException;
 
 /**

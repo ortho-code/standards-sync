@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Formats\Neon;
+namespace OrthoCode\StandardsSync\Formats\Neon;
 
 use RuntimeException;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Testing\Validation;
+namespace OrthoCode\StandardsSync\Testing\Validation;
 
 use JsonException;
 use RuntimeException;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Documentation\Source;
+namespace OrthoCode\StandardsSync\Documentation\Source;
 
-use StandardsSync\Infrastructure\Filesystem\DirectoryListing;
+use OrthoCode\StandardsSync\Infrastructure\Filesystem\DirectoryListing;
 
 /** The class names a PSR-4 directory promises: every .php file under the root, mapped through the namespace prefix. */
 final readonly class Psr4Classes

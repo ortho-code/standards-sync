@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Filesystem;
+namespace OrthoCode\StandardsSync\Core\Filesystem;
 
 /** The one I/O boundary: read and write file contents by path. */
 interface Filesystem

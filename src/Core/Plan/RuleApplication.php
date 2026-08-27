@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Plan;
+namespace OrthoCode\StandardsSync\Core\Plan;
 
-use StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
 
 /** One rule's step in a file's fold: the content it saw and the content it returned. */
 final readonly class RuleApplication

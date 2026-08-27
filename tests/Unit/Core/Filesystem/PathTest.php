@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Core\Filesystem;
+namespace Tests\OrthoCode\StandardsSync\Unit\Core\Filesystem;
 
-use StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

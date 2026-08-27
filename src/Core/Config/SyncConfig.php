@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Config;
+namespace OrthoCode\StandardsSync\Core\Config;
 
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Core\RuleSet\RuleSet;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\RuleSet\RuleSet;
 
 /** Immutable configuration returned by a standards-sync.php: which roots to sync and which rule sets apply. */
 final readonly class SyncConfig

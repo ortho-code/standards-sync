@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Documentation;
+namespace OrthoCode\StandardsSync\Documentation;
 
-use StandardsSync\Core\Text\Lines;
-use StandardsSync\Documentation\Model\CompositionSection;
-use StandardsSync\Documentation\Model\ExampleKind;
-use StandardsSync\Documentation\Model\FamilyPage;
-use StandardsSync\Documentation\Model\FileExample;
-use StandardsSync\Documentation\Model\RulePage;
-use StandardsSync\Documentation\Model\Subsection;
+use OrthoCode\StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Documentation\Model\CompositionSection;
+use OrthoCode\StandardsSync\Documentation\Model\ExampleKind;
+use OrthoCode\StandardsSync\Documentation\Model\FamilyPage;
+use OrthoCode\StandardsSync\Documentation\Model\FileExample;
+use OrthoCode\StandardsSync\Documentation\Model\RulePage;
+use OrthoCode\StandardsSync\Documentation\Model\Subsection;
 
 /** Renders the catalog model as markdown pages: deterministic output, fenced file contents, links back into the fixture tree. */
 final readonly class MarkdownRenderer

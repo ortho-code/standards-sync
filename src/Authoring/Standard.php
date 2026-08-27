@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Authoring;
+namespace OrthoCode\StandardsSync\Authoring;
 
-use StandardsSync\Core\RuleSet\ComposableRuleSet;
+use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
 
 /**
  * Base for the rule set an org package ships: the org's standard.

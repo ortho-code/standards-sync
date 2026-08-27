@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use StandardsSync\Authoring\Package;
-use StandardsSync\Core\Config\SyncConfig;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\RuleSet\ComposableRuleSet;
-use StandardsSync\Rules\General\ManagedBlock\Label;
-use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use OrthoCode\StandardsSync\Authoring\Package;
+use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\Label;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 
 // The fixture is its own package: distributed content in templates/, sitting at the (virtual) consumer root.
 $package = new Package(__DIR__, '');

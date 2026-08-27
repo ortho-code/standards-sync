@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\General\ManagedBlock;
+namespace OrthoCode\StandardsSync\Rules\General\ManagedBlock;
 
 use InvalidArgumentException;
 

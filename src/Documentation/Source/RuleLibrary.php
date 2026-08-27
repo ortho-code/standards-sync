@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Documentation\Source;
+namespace OrthoCode\StandardsSync\Documentation\Source;
 
-use StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
 use ReflectionClass;
 use RuntimeException;
 

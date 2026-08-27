@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Rule;
+namespace OrthoCode\StandardsSync\Core\Rule;
 
-use StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
 use InvalidArgumentException;
 
 /**

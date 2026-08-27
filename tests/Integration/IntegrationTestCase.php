@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration;
+namespace Tests\OrthoCode\StandardsSync\Integration;
 
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;

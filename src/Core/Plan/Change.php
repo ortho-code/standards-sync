@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Plan;
+namespace OrthoCode\StandardsSync\Core\Plan;
 
-use StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
 
 /** The diff for one file: what is on disk now versus the desired text, and which rules produced it. */
 final readonly class Change

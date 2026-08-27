@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Core\Rule;
+namespace Tests\OrthoCode\StandardsSync\Unit\Core\Rule;
 
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

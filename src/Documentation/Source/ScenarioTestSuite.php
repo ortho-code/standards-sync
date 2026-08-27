@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Documentation\Source;
+namespace OrthoCode\StandardsSync\Documentation\Source;
 
-use StandardsSync\Testing\ScenarioTestCase;
+use OrthoCode\StandardsSync\Testing\ScenarioTestCase;
 use RuntimeException;
 
 /** The scenario test classes found under a suite directory, resolved through its PSR-4 namespace prefix. */

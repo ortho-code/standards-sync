@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\PhpStan\PinnedValues;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\PhpStan\PinnedValues;
 
-use StandardsSync\Rules\PhpStan\PinnedValues\PhpStanPinnedValues;
-use StandardsSync\Rules\PhpStan\PinnedValues\PinnedValues;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Rules\PhpStan\PinnedValues\PhpStanPinnedValues;
+use OrthoCode\StandardsSync\Rules\PhpStan\PinnedValues\PinnedValues;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

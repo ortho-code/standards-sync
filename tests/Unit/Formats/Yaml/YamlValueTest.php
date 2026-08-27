@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Formats\Yaml;
+namespace Tests\OrthoCode\StandardsSync\Unit\Formats\Yaml;
 
-use StandardsSync\Formats\Yaml\YamlValue;
+use OrthoCode\StandardsSync\Formats\Yaml\YamlValue;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

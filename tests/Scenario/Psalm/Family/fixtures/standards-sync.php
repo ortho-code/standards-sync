@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use StandardsSync\Core\Config\SyncConfig;
-use StandardsSync\Core\RuleSet\ComposableRuleSet;
-use StandardsSync\Rules\Psalm\BaseConfig\PsalmBaseConfig;
-use StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmErrorLevel;
-use StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmLoosestErrorLevel;
+use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
+use OrthoCode\StandardsSync\Rules\Psalm\BaseConfig\PsalmBaseConfig;
+use OrthoCode\StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmErrorLevel;
+use OrthoCode\StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmLoosestErrorLevel;
 
 // The base config is declared first: the first rule to meet the absent config decides the created base — the org template, not the engine skeleton.
 // The blank line before the closing marker keeps the trailing line break every file ends with.

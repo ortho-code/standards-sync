@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Formats\Json5;
+namespace OrthoCode\StandardsSync\Formats\Json5;
 
-use StandardsSync\Core\Text\Lines;
-use StandardsSync\Formats\Json\JsonMember;
-use StandardsSync\Formats\Json\JsonObject;
+use OrthoCode\StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Formats\Json\JsonMember;
+use OrthoCode\StandardsSync\Formats\Json\JsonObject;
 use RuntimeException;
 
 /**

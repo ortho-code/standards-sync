@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Formats\Json5;
+namespace Tests\OrthoCode\StandardsSync\Unit\Formats\Json5;
 
-use StandardsSync\Formats\Json5\Json5ListWriter;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Formats\Json5\Json5ListWriter;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

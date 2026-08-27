@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration\Core\Engine;
+namespace Tests\OrthoCode\StandardsSync\Integration\Core\Engine;
 
-use StandardsSync\Rules\General\ManagedBlock\Label;
-use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
-use StandardsSync\Core\Config\SyncConfig;
-use StandardsSync\Core\Engine\Engine;
-use StandardsSync\Core\Plan\Change;
-use StandardsSync\Core\Plan\ChangeKind;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Core\RuleSet\ComposableRuleSet;
-use StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\Label;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+use OrthoCode\StandardsSync\Core\Engine\Engine;
+use OrthoCode\StandardsSync\Core\Plan\Change;
+use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
+use OrthoCode\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
 use Closure;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Documentation\Source;
+namespace OrthoCode\StandardsSync\Documentation\Source;
 
-use StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Core\Text\Lines;
 use ReflectionClass;
 
 /** A class's docblock as plain prose: delimiters and line leads stripped, tag lines dropped, blank lines kept as paragraph breaks. */

@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration\Presentation\Cli\Output;
+namespace Tests\OrthoCode\StandardsSync\Integration\Presentation\Cli\Output;
 
-use StandardsSync\Rules\General\ManagedBlock\Label;
-use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
-use StandardsSync\Core\Config\SyncConfig;
-use StandardsSync\Core\Engine\Engine;
-use StandardsSync\Core\Plan\Plan;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Core\RuleSet\ComposableRuleSet;
-use StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
-use StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
-use StandardsSync\Rules\Composer\Requirement\VersionConstraint;
-use StandardsSync\Presentation\Cli\Output\DriftReport;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\Label;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+use OrthoCode\StandardsSync\Core\Engine\Engine;
+use OrthoCode\StandardsSync\Core\Plan\Plan;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
+use OrthoCode\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
+use OrthoCode\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
+use OrthoCode\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+use OrthoCode\StandardsSync\Presentation\Cli\Output\DriftReport;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;

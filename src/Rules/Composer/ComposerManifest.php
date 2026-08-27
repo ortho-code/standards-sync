@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Composer;
+namespace OrthoCode\StandardsSync\Rules\Composer;
 
-use StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 
 /** The composer manifest as a rule target — one candidate, since composer has no dist variant — and the sections composer rules write into. */
 final readonly class ComposerManifest

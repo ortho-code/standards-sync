@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Formats\Xml;
+namespace OrthoCode\StandardsSync\Formats\Xml;
 
 /** An element's open tag as it sits in the document: where it starts, where its attributes begin, and the attributes it writes in document order. */
 final readonly class XmlOpenTag

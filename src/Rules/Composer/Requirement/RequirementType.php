@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Composer\Requirement;
+namespace OrthoCode\StandardsSync\Rules\Composer\Requirement;
 
 /** What a required package is needed for, named as composer names its two requirement sections. */
 enum RequirementType: string

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use StandardsSync\Core\Config\SyncConfig;
-use StandardsSync\Core\RuleSet\ComposableRuleSet;
-use StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
-use StandardsSync\Rules\Composer\Requirement\VersionConstraint;
-use StandardsSync\Rules\Composer\Script\ComposerScript;
+use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
+use OrthoCode\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
+use OrthoCode\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+use OrthoCode\StandardsSync\Rules\Composer\Script\ComposerScript;
 
 return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
     public function __construct()

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Documentation\Model;
+namespace OrthoCode\StandardsSync\Documentation\Model;
 
 /** One family's catalog page: the names of its rule pages and its cross-rule composition scenarios. */
 final readonly class FamilyPage

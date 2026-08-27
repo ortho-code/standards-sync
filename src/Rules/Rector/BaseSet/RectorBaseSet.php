@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Rector\BaseSet;
+namespace OrthoCode\StandardsSync\Rules\Rector\BaseSet;
 
-use StandardsSync\Core\Rule\ExplainsDrift;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Formats\Php\DirAnchoredEntry;
-use StandardsSync\Formats\Php\FluentChainWriter;
-use StandardsSync\Rules\Rector\RectorConfigFile;
+use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Formats\Php\DirAnchoredEntry;
+use OrthoCode\StandardsSync\Formats\Php\FluentChainWriter;
+use OrthoCode\StandardsSync\Rules\Rector\RectorConfigFile;
 
 /**
  * Ensures the Rector config registers a given set file in withSets(), as a targeted edit that leaves the rest of the config untouched.

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Composer\Requirement;
+namespace OrthoCode\StandardsSync\Rules\Composer\Requirement;
 
-use StandardsSync\Core\Rule\ExplainsDrift;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Formats\Json\JsonObjectWriter;
-use StandardsSync\Rules\Composer\ComposerManifest;
+use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Formats\Json\JsonObjectWriter;
+use OrthoCode\StandardsSync\Rules\Composer\ComposerManifest;
 use InvalidArgumentException;
 use RuntimeException;
 

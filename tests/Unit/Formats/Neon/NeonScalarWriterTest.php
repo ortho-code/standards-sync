@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Formats\Neon;
+namespace Tests\OrthoCode\StandardsSync\Unit\Formats\Neon;
 
-use StandardsSync\Formats\Neon\NeonScalarWriter;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Formats\Neon\NeonScalarWriter;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

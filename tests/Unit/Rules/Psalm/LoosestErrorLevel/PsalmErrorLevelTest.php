@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\Psalm\LoosestErrorLevel;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\Psalm\LoosestErrorLevel;
 
-use StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmErrorLevel;
+use OrthoCode\StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmErrorLevel;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

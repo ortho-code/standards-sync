@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration\Core\Engine;
+namespace Tests\OrthoCode\StandardsSync\Integration\Core\Engine;
 
-use StandardsSync\Core\Engine\TargetResolver;
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
-use StandardsSync\Rules\Renovate\RenovateConfigFile;
+use OrthoCode\StandardsSync\Core\Engine\TargetResolver;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
+use OrthoCode\StandardsSync\Rules\Renovate\RenovateConfigFile;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

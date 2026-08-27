@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Engine;
+namespace OrthoCode\StandardsSync\Core\Engine;
 
-use StandardsSync\Core\Config\SyncConfig;
-use StandardsSync\Core\Filesystem\Filesystem;
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Core\Plan\Abstention;
-use StandardsSync\Core\Plan\Change;
-use StandardsSync\Core\Plan\ChangeKind;
-use StandardsSync\Core\Plan\Plan;
-use StandardsSync\Core\Plan\RuleApplication;
-use StandardsSync\Core\Rule\AppliesAtPath;
-use StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+use OrthoCode\StandardsSync\Core\Filesystem\Filesystem;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Plan\Abstention;
+use OrthoCode\StandardsSync\Core\Plan\Change;
+use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
+use OrthoCode\StandardsSync\Core\Plan\Plan;
+use OrthoCode\StandardsSync\Core\Plan\RuleApplication;
+use OrthoCode\StandardsSync\Core\Rule\AppliesAtPath;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
 use RuntimeException;
 
 /**

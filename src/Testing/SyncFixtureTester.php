@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Testing;
+namespace OrthoCode\StandardsSync\Testing;
 
-use StandardsSync\Core\Config\ConfigLoader;
-use StandardsSync\Core\Filesystem\Filesystem;
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Infrastructure\Filesystem\DirectoryListing;
-use StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
-use StandardsSync\Testing\Validation\Json5Validator;
-use StandardsSync\Testing\Validation\JsonValidator;
-use StandardsSync\Testing\Validation\NeonValidator;
-use StandardsSync\Testing\Validation\PhpUnitConfigValidator;
-use StandardsSync\Testing\Validation\PsalmConfigValidator;
-use StandardsSync\Testing\Validation\SyncedFileValidator;
-use StandardsSync\Testing\Validation\XmlValidator;
-use StandardsSync\Testing\Validation\YamlValidator;
+use OrthoCode\StandardsSync\Core\Config\ConfigLoader;
+use OrthoCode\StandardsSync\Core\Filesystem\Filesystem;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Infrastructure\Filesystem\DirectoryListing;
+use OrthoCode\StandardsSync\Infrastructure\Filesystem\SymfonyFilesystem;
+use OrthoCode\StandardsSync\Testing\Validation\Json5Validator;
+use OrthoCode\StandardsSync\Testing\Validation\JsonValidator;
+use OrthoCode\StandardsSync\Testing\Validation\NeonValidator;
+use OrthoCode\StandardsSync\Testing\Validation\PhpUnitConfigValidator;
+use OrthoCode\StandardsSync\Testing\Validation\PsalmConfigValidator;
+use OrthoCode\StandardsSync\Testing\Validation\SyncedFileValidator;
+use OrthoCode\StandardsSync\Testing\Validation\XmlValidator;
+use OrthoCode\StandardsSync\Testing\Validation\YamlValidator;
 
 /**
  * Runs a sync against an on-disk fixture and reports how the result differs from the expected tree.

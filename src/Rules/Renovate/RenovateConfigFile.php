@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Renovate;
+namespace OrthoCode\StandardsSync\Rules\Renovate;
 
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 
 /**
  * The renovate config file, shared by the family's rules so none re-derives the candidate names.

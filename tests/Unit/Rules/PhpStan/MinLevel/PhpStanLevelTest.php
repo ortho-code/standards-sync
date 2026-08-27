@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\PhpStan\MinLevel;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\PhpStan\MinLevel;
 
-use StandardsSync\Rules\PhpStan\MinLevel\PhpStanLevel;
+use OrthoCode\StandardsSync\Rules\PhpStan\MinLevel\PhpStanLevel;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

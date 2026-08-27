@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Scenario\Renovate\ExtendedPreset;
+namespace Tests\OrthoCode\StandardsSync\Scenario\Renovate\ExtendedPreset;
 
-use StandardsSync\Testing\ScenarioTestCase;
+use OrthoCode\StandardsSync\Testing\ScenarioTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 #[CoversNothing]

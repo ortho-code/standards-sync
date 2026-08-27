@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Formats\Json;
+namespace OrthoCode\StandardsSync\Formats\Json;
 
 /** One member of a JSON object: the spans its text and its value occupy in the document. */
 final readonly class JsonMember

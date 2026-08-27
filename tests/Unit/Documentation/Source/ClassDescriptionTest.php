@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Documentation\Source;
+namespace Tests\OrthoCode\StandardsSync\Unit\Documentation\Source;
 
-use StandardsSync\Documentation\Source\ClassDescription;
+use OrthoCode\StandardsSync\Documentation\Source\ClassDescription;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

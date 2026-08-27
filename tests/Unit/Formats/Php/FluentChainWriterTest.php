@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Formats\Php;
+namespace Tests\OrthoCode\StandardsSync\Unit\Formats\Php;
 
-use StandardsSync\Formats\Php\FluentChainWriter;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Formats\Php\FluentChainWriter;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

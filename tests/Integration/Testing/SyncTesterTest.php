@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration\Testing;
+namespace Tests\OrthoCode\StandardsSync\Integration\Testing;
 
-use StandardsSync\Rules\General\ManagedBlock\Label;
-use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
-use StandardsSync\Core\Config\SyncConfig;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\RuleSet\ComposableRuleSet;
-use StandardsSync\Testing\SyncTester;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\Label;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
+use OrthoCode\StandardsSync\Testing\SyncTester;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

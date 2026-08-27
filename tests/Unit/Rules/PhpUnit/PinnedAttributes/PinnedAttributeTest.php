@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\PhpUnit\PinnedAttributes;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\PhpUnit\PinnedAttributes;
 
-use StandardsSync\Rules\PhpUnit\PinnedAttributes\PinnedAttribute;
+use OrthoCode\StandardsSync\Rules\PhpUnit\PinnedAttributes\PinnedAttribute;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

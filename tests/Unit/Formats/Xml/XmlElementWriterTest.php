@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Formats\Xml;
+namespace Tests\OrthoCode\StandardsSync\Unit\Formats\Xml;
 
-use StandardsSync\Formats\Xml\XmlElementWriter;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Formats\Xml\XmlElementWriter;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

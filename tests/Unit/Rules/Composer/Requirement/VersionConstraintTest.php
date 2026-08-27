@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\Composer\Requirement;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\Composer\Requirement;
 
-use StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+use OrthoCode\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

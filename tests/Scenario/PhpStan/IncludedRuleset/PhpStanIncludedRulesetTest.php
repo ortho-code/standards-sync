@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Scenario\PhpStan\IncludedRuleset;
+namespace Tests\OrthoCode\StandardsSync\Scenario\PhpStan\IncludedRuleset;
 
-use StandardsSync\Testing\ScenarioTestCase;
+use OrthoCode\StandardsSync\Testing\ScenarioTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 #[CoversNothing]

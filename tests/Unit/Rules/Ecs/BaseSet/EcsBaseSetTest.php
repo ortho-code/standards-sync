@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\Ecs\BaseSet;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\Ecs\BaseSet;
 
-use StandardsSync\Rules\Ecs\BaseSet\EcsBaseSet;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Rules\Ecs\BaseSet\EcsBaseSet;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

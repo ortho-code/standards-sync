@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Psalm\BaseConfig;
+namespace OrthoCode\StandardsSync\Rules\Psalm\BaseConfig;
 
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Rules\Psalm\PsalmConfigFile;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Rules\Psalm\PsalmConfigFile;
 use InvalidArgumentException;
 
 /**

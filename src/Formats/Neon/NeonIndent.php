@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Formats\Neon;
+namespace OrthoCode\StandardsSync\Formats\Neon;
 
-use StandardsSync\Core\Text\Indent;
+use OrthoCode\StandardsSync\Core\Text\Indent;
 
 /** Neon's indentation: the documented default is a tab, used when the file has no indented line to copy. */
 final readonly class NeonIndent

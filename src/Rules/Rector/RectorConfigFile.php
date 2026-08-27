@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Rector;
+namespace OrthoCode\StandardsSync\Rules\Rector;
 
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Text\Lines;
-use StandardsSync\Formats\Php\FluentChainWriter;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Formats\Php\FluentChainWriter;
 use RuntimeException;
 
 /**

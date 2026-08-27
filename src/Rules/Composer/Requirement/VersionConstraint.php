@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Composer\Requirement;
+namespace OrthoCode\StandardsSync\Rules\Composer\Requirement;
 
 use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Intervals;

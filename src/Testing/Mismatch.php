@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Testing;
+namespace OrthoCode\StandardsSync\Testing;
 
-use StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
 
 /** One file whose synced content did not match the fixture's expected tree (a null side means the file was only present on the other side). */
 final readonly class Mismatch

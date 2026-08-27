@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Text;
+namespace OrthoCode\StandardsSync\Core\Text;
 
 /**
  * The engine's canonical line convention: content is LF-separated.

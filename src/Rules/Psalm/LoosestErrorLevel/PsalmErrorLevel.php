@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Psalm\LoosestErrorLevel;
+namespace OrthoCode\StandardsSync\Rules\Psalm\LoosestErrorLevel;
 
 use InvalidArgumentException;
 

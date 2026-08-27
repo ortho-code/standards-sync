@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration\Authoring;
+namespace Tests\OrthoCode\StandardsSync\Integration\Authoring;
 
-use StandardsSync\Authoring\Package;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Authoring\Package;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystemComponent;
-use Tests\StandardsSync\Integration\IntegrationTestCase;
+use Tests\OrthoCode\StandardsSync\Integration\IntegrationTestCase;
 
 #[CoversClass(Package::class)]
 final class PackageTest extends IntegrationTestCase

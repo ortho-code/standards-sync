@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Authoring;
+namespace Tests\OrthoCode\StandardsSync\Unit\Authoring;
 
-use StandardsSync\Authoring\Package;
+use OrthoCode\StandardsSync\Authoring\Package;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

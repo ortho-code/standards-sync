@@ -11,14 +11,14 @@ deptrac:
         - type: directory
           value: src/Core/.*
         - type: classNameRegex
-          value: '#^StandardsSync\\Core\\#'
+          value: '#^OrthoCode\\StandardsSync\\Core\\#'
     # Format-editing machinery shared across rule families (neon today); the engine stays format-blind.
     - name: Formats
       collectors:
         - type: directory
           value: src/Formats/.*
         - type: classNameRegex
-          value: '#^StandardsSync\\Formats\\#'
+          value: '#^OrthoCode\\StandardsSync\\Formats\\#'
     # The shipped rule library: concrete rules per mechanism (Block) or per tool (PhpStan), built on the Core contract.
     # Core must never reference a concrete rule; the reverse edge is the open/closed promise, checked.
     - name: Rules
@@ -43,40 +43,40 @@ deptrac:
         - type: directory
           value: src/Authoring/.*
         - type: classNameRegex
-          value: '#^StandardsSync\\Authoring\\#'
+          value: '#^OrthoCode\\StandardsSync\\Authoring\\#'
     # Driven adapters: the Symfony-backed Filesystem implementation of the Core port.
     - name: Infrastructure
       collectors:
         - type: directory
           value: src/Infrastructure/.*
         - type: classNameRegex
-          value: '#^StandardsSync\\Infrastructure\\#'
+          value: '#^OrthoCode\\StandardsSync\\Infrastructure\\#'
     # Driving adapters: the console delivery mechanism and its drift report.
     - name: Presentation
       collectors:
         - type: directory
           value: src/Presentation/.*
         - type: classNameRegex
-          value: '#^StandardsSync\\Presentation\\#'
+          value: '#^OrthoCode\\StandardsSync\\Presentation\\#'
     # Shipped test scaffolding: the framework-neutral SyncTester org packages use to test their own config.
     - name: Testing
       collectors:
         - type: directory
           value: src/Testing/.*
         - type: classNameRegex
-          value: '#^StandardsSync\\Testing\\#'
+          value: '#^OrthoCode\\StandardsSync\\Testing\\#'
     # Generates the rule-catalog docs from the scenario suite: the fixtures feed tests and docs alike, so this layer may read the test scaffolding.
     - name: Documentation
       collectors:
         - type: directory
           value: src/Documentation/.*
         - type: classNameRegex
-          value: '#^StandardsSync\\Documentation\\#'
+          value: '#^OrthoCode\\StandardsSync\\Documentation\\#'
     # Any class outside our own namespace, i.e. every third-party dependency (Symfony today); keeps Core provably free of vendor code.
     - name: Vendor
       collectors:
         - type: classNameRegex
-          value: '#^(?!StandardsSync\\)[^\\]+\\#'
+          value: '#^(?!OrthoCode\\StandardsSync\\)[^\\]+\\#'
   ruleset:
     Core: ~
     Authoring:

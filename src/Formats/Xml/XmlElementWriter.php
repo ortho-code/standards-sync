@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Formats\Xml;
+namespace OrthoCode\StandardsSync\Formats\Xml;
 
-use StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Core\Text\Lines;
 use InvalidArgumentException;
 use RuntimeException;
 

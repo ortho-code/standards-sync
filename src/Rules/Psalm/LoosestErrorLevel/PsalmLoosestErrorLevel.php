@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Psalm\LoosestErrorLevel;
+namespace OrthoCode\StandardsSync\Rules\Psalm\LoosestErrorLevel;
 
-use StandardsSync\Core\Rule\ExplainsDrift;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Formats\Xml\XmlElementWriter;
-use StandardsSync\Rules\Psalm\PsalmConfigFile;
+use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Formats\Xml\XmlElementWriter;
+use OrthoCode\StandardsSync\Rules\Psalm\PsalmConfigFile;
 
 /**
  * Keeps the Psalm error level at or below a loosest allowed value — on psalm's inverted scale (1 strictest, 8 loosest) the numeric ceiling is the semantic strictness floor.

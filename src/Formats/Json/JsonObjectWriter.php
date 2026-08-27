@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Formats\Json;
+namespace OrthoCode\StandardsSync\Formats\Json;
 
-use StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Core\Text\Lines;
 use JsonException;
 use RuntimeException;
 use stdClass;

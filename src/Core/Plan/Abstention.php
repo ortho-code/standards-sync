@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Plan;
+namespace OrthoCode\StandardsSync\Core\Plan;
 
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
 
 /**
  * A file none of its rules had an opinion about: it does not exist, and no rule wanted to create it.

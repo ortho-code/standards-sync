@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Scenario\Composer\Family;
+namespace Tests\OrthoCode\StandardsSync\Scenario\Composer\Family;
 
-use StandardsSync\Testing\ScenarioTestCase;
+use OrthoCode\StandardsSync\Testing\ScenarioTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 #[CoversNothing]

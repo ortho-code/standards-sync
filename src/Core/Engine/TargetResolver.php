@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Engine;
+namespace OrthoCode\StandardsSync\Core\Engine;
 
-use StandardsSync\Core\Filesystem\Filesystem;
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Filesystem\Filesystem;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use RuntimeException;
 
 /**

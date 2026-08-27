@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Formats\Neon;
+namespace Tests\OrthoCode\StandardsSync\Unit\Formats\Neon;
 
-use StandardsSync\Formats\Neon\NeonValue;
+use OrthoCode\StandardsSync\Formats\Neon\NeonValue;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

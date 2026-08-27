@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Scenario\Ecs\Family;
+namespace Tests\OrthoCode\StandardsSync\Scenario\Ecs\Family;
 
-use StandardsSync\Testing\ScenarioTestCase;
+use OrthoCode\StandardsSync\Testing\ScenarioTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 /** Two org tiers layering their base sets in one fold: the base tier's rule creates the config, the second tier's rule adds its entry after it — additive, with the tool's registration order letting the later set win conflicts. */

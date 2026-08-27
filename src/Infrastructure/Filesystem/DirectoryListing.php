@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Infrastructure\Filesystem;
+namespace OrthoCode\StandardsSync\Infrastructure\Filesystem;
 
 use FilesystemIterator;
 use RecursiveDirectoryIterator;

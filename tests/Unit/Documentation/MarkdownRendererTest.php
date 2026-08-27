@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Documentation;
+namespace Tests\OrthoCode\StandardsSync\Unit\Documentation;
 
-use StandardsSync\Documentation\MarkdownRenderer;
-use StandardsSync\Documentation\Model\CompositionSection;
-use StandardsSync\Documentation\Model\DeclarationGroup;
-use StandardsSync\Documentation\Model\ExampleKind;
-use StandardsSync\Documentation\Model\FamilyPage;
-use StandardsSync\Documentation\Model\FileExample;
-use StandardsSync\Documentation\Model\RulePage;
-use StandardsSync\Documentation\Model\ScenarioEntry;
-use StandardsSync\Documentation\Model\Subsection;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Documentation\MarkdownRenderer;
+use OrthoCode\StandardsSync\Documentation\Model\CompositionSection;
+use OrthoCode\StandardsSync\Documentation\Model\DeclarationGroup;
+use OrthoCode\StandardsSync\Documentation\Model\ExampleKind;
+use OrthoCode\StandardsSync\Documentation\Model\FamilyPage;
+use OrthoCode\StandardsSync\Documentation\Model\FileExample;
+use OrthoCode\StandardsSync\Documentation\Model\RulePage;
+use OrthoCode\StandardsSync\Documentation\Model\ScenarioEntry;
+use OrthoCode\StandardsSync\Documentation\Model\Subsection;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -27,7 +27,7 @@ final class MarkdownRendererTest extends TestCase
 
             declare(strict_types=1);
 
-            use StandardsSync\Core\Config\SyncConfig;
+            use OrthoCode\StandardsSync\Core\Config\SyncConfig;
 
             // A comment kept.
             return config();

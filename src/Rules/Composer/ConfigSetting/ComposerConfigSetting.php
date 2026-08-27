@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Composer\ConfigSetting;
+namespace OrthoCode\StandardsSync\Rules\Composer\ConfigSetting;
 
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Formats\Json\JsonObjectWriter;
-use StandardsSync\Rules\Composer\ComposerManifest;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Formats\Json\JsonObjectWriter;
+use OrthoCode\StandardsSync\Rules\Composer\ComposerManifest;
 use InvalidArgumentException;
 
 /**

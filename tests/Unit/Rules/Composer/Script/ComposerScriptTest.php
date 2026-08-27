@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\Composer\Script;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\Composer\Script;
 
-use StandardsSync\Rules\Composer\Script\ComposerScript;
+use OrthoCode\StandardsSync\Rules\Composer\Script\ComposerScript;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

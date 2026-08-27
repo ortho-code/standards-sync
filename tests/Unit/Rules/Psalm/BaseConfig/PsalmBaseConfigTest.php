@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\Psalm\BaseConfig;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\Psalm\BaseConfig;
 
-use StandardsSync\Rules\Psalm\BaseConfig\PsalmBaseConfig;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Rules\Psalm\BaseConfig\PsalmBaseConfig;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

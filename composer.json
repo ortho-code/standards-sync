@@ -1,5 +1,5 @@
 {
-  "name": "standards-sync/standards-sync",
+  "name": "ortho-code/standards-sync",
   "description": "Keeps shared config files in sync across repositories",
   "type": "library",
   "license": "MIT",
@@ -34,12 +34,12 @@
   },
   "autoload": {
     "psr-4": {
-      "StandardsSync\\": "src/"
+      "OrthoCode\\StandardsSync\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Tests\\StandardsSync\\": "tests/"
+      "Tests\\OrthoCode\\StandardsSync\\": "tests/"
     }
   },
   "scripts": {

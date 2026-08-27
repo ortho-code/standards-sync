@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\General\ManagedBlock;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\General\ManagedBlock;
 
-use StandardsSync\Rules\General\ManagedBlock\Label;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\Label;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration\Presentation\Cli\Command;
+namespace Tests\OrthoCode\StandardsSync\Integration\Presentation\Cli\Command;
 
-use StandardsSync\Presentation\Cli\Application;
-use StandardsSync\Presentation\Cli\Command\SyncCommand;
-use StandardsSync\Presentation\Cli\Output\DriftReport;
+use OrthoCode\StandardsSync\Presentation\Cli\Application;
+use OrthoCode\StandardsSync\Presentation\Cli\Command\SyncCommand;
+use OrthoCode\StandardsSync\Presentation\Cli\Output\DriftReport;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
-use Tests\StandardsSync\Integration\IntegrationTestCase;
+use Tests\OrthoCode\StandardsSync\Integration\IntegrationTestCase;
 
 /** Drives the console application against a temp fixture: exit codes, no-write-in-check, apply-then-clean, help. */
 #[CoversClass(SyncCommand::class)]
@@ -22,11 +22,11 @@ final class SyncCommandTest extends IntegrationTestCase
 
         declare(strict_types=1);
 
-        use StandardsSync\Rules\General\ManagedBlock\Label;
-        use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
-        use StandardsSync\Core\Config\SyncConfig;
-        use StandardsSync\Core\Rule\FileTarget;
-        use StandardsSync\Core\RuleSet\ComposableRuleSet;
+        use OrthoCode\StandardsSync\Rules\General\ManagedBlock\Label;
+        use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+        use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+        use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+        use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
 
         $ruleSet = new class extends ComposableRuleSet {
             public function __construct()
@@ -47,10 +47,10 @@ final class SyncCommandTest extends IntegrationTestCase
 
         declare(strict_types=1);
 
-        use StandardsSync\Core\Config\SyncConfig;
-        use StandardsSync\Core\RuleSet\ComposableRuleSet;
-        use StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
-        use StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+        use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+        use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
+        use OrthoCode\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
+        use OrthoCode\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
 
         $ruleSet = new class extends ComposableRuleSet {
             public function __construct()

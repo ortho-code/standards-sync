@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Documentation\Model;
+namespace OrthoCode\StandardsSync\Documentation\Model;
 
 /** The scenarios sharing one standards-sync.php declaration, with the declaration's source and what its rules report as. */
 final readonly class DeclarationGroup

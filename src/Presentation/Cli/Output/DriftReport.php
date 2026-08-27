@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Presentation\Cli\Output;
+namespace OrthoCode\StandardsSync\Presentation\Cli\Output;
 
-use StandardsSync\Core\Plan\Abstention;
-use StandardsSync\Core\Plan\Change;
-use StandardsSync\Core\Plan\ChangeKind;
-use StandardsSync\Core\Plan\Plan;
-use StandardsSync\Core\Plan\RuleApplication;
-use StandardsSync\Core\Rule\ExplainsDrift;
-use StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\Plan\Abstention;
+use OrthoCode\StandardsSync\Core\Plan\Change;
+use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
+use OrthoCode\StandardsSync\Core\Plan\Plan;
+use OrthoCode\StandardsSync\Core\Plan\RuleApplication;
+use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
 use ReflectionClass;
 use Symfony\Component\Console\Style\SymfonyStyle;
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\RuleSet;
+namespace OrthoCode\StandardsSync\Core\RuleSet;
 
-use StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
 
 interface RuleSet
 {

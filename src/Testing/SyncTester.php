@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Testing;
+namespace OrthoCode\StandardsSync\Testing;
 
-use StandardsSync\Core\Config\SyncConfig;
-use StandardsSync\Core\Engine\Engine;
-use StandardsSync\Core\Plan\Plan;
-use StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
+use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+use OrthoCode\StandardsSync\Core\Engine\Engine;
+use OrthoCode\StandardsSync\Core\Plan\Plan;
+use OrthoCode\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
 
 /**
  * Runs a sync in memory so a package can test its config without temp directories.

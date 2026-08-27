@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Formats\Json;
+namespace Tests\OrthoCode\StandardsSync\Unit\Formats\Json;
 
-use StandardsSync\Formats\Json\JsonObjectWriter;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Formats\Json\JsonObjectWriter;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

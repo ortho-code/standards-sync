@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Renovate\ExtendedPreset;
+namespace OrthoCode\StandardsSync\Rules\Renovate\ExtendedPreset;
 
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Core\Rule\AppliesAtPath;
-use StandardsSync\Core\Rule\ExplainsDrift;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Core\Text\Lines;
-use StandardsSync\Formats\Json\JsonObjectWriter;
-use StandardsSync\Formats\Json5\Json5ListWriter;
-use StandardsSync\Rules\Renovate\RenovateConfigFile;
-use StandardsSync\Rules\Renovate\RenovateConfigFormat;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Rule\AppliesAtPath;
+use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Formats\Json\JsonObjectWriter;
+use OrthoCode\StandardsSync\Formats\Json5\Json5ListWriter;
+use OrthoCode\StandardsSync\Rules\Renovate\RenovateConfigFile;
+use OrthoCode\StandardsSync\Rules\Renovate\RenovateConfigFormat;
 use InvalidArgumentException;
 use JsonException;
 use RuntimeException;

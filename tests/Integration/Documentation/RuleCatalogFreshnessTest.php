@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration\Documentation;
+namespace Tests\OrthoCode\StandardsSync\Integration\Documentation;
 
-use StandardsSync\Documentation\RuleCatalog;
-use StandardsSync\Documentation\Source\RuleLibrary;
-use StandardsSync\Documentation\Source\ScenarioTestSuite;
+use OrthoCode\StandardsSync\Documentation\RuleCatalog;
+use OrthoCode\StandardsSync\Documentation\Source\RuleLibrary;
+use OrthoCode\StandardsSync\Documentation\Source\ScenarioTestSuite;
 use FilesystemIterator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

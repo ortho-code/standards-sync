@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Infrastructure\Filesystem;
+namespace OrthoCode\StandardsSync\Infrastructure\Filesystem;
 
-use StandardsSync\Core\Filesystem\Filesystem;
-use StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Filesystem\Filesystem;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
 
 /** Filesystem adapter that keeps files in an array and records every write; backs disk-free syncs (tests, previews). */
 final class InMemoryFilesystem implements Filesystem

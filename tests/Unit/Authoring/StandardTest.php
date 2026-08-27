@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Authoring;
+namespace Tests\OrthoCode\StandardsSync\Unit\Authoring;
 
-use StandardsSync\Authoring\Package;
-use StandardsSync\Authoring\Standard;
-use StandardsSync\Rules\PhpStan\IncludedRuleset\PhpStanIncludedRuleset;
+use OrthoCode\StandardsSync\Authoring\Package;
+use OrthoCode\StandardsSync\Authoring\Standard;
+use OrthoCode\StandardsSync\Rules\PhpStan\IncludedRuleset\PhpStanIncludedRuleset;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

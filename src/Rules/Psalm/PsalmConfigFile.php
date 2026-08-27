@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Psalm;
+namespace OrthoCode\StandardsSync\Rules\Psalm;
 
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Text\Lines;
-use StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmErrorLevel;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Rules\Psalm\LoosestErrorLevel\PsalmErrorLevel;
 
 /**
  * The Psalm config file as a rule target, in Psalm's own lookup order — shared so no rule re-derives the precedence.

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\PhpUnit;
+namespace OrthoCode\StandardsSync\Rules\PhpUnit;
 
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Text\Lines;
 
 /**
  * The PHPUnit config file as a rule target, in PHPUnit's own lookup order — shared so no rule re-derives the precedence.

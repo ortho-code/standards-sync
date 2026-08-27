@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use StandardsSync\Core\Config\SyncConfig;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Core\RuleSet\ComposableRuleSet;
+use OrthoCode\StandardsSync\Core\Config\SyncConfig;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
 
 // A rule that deliberately syncs broken XML, so the tester's well-formedness tier has something to catch.
 return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {

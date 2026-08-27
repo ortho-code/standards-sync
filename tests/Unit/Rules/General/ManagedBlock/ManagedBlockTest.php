@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\General\ManagedBlock;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\General\ManagedBlock;
 
-use StandardsSync\Rules\General\ManagedBlock\Label;
-use StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
-use StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\Label;
+use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use InvalidArgumentException;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

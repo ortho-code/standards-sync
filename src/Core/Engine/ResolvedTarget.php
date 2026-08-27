@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Engine;
+namespace OrthoCode\StandardsSync\Core\Engine;
 
-use StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
 
 /** A FileTarget resolved against one root: the concrete path and the content currently there (null when the file is absent). */
 final readonly class ResolvedTarget

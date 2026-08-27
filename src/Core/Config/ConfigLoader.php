@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Config;
+namespace OrthoCode\StandardsSync\Core\Config;
 
-use StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
 use RuntimeException;
 
 /** Loads a standards-sync.php and asserts it returns a SyncConfig. */

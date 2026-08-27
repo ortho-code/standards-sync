@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Authoring;
+namespace OrthoCode\StandardsSync\Authoring;
 
-use StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
 use Composer\InstalledVersions;
 use ReflectionClass;
 use RuntimeException;

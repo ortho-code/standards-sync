@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Deptrac;
+namespace OrthoCode\StandardsSync\Rules\Deptrac;
 
-use StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 
 /** The deptrac config file as a rule target: deptrac reads a single default candidate, deptrac.yaml in the working directory — shared so no rule re-derives it. */
 final readonly class DeptracConfigFile

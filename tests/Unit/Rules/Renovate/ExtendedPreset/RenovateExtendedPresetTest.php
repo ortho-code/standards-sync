@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Unit\Rules\Renovate\ExtendedPreset;
+namespace Tests\OrthoCode\StandardsSync\Unit\Rules\Renovate\ExtendedPreset;
 
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Rules\Renovate\ExtendedPreset\RenovateExtendedPreset;
-use StandardsSync\Rules\Renovate\RenovateConfigFormat;
-use StandardsSync\Testing\FileContent;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Rules\Renovate\ExtendedPreset\RenovateExtendedPreset;
+use OrthoCode\StandardsSync\Rules\Renovate\RenovateConfigFormat;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

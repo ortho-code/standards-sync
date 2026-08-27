@@ -3,7 +3,7 @@
 
 declare(strict_types=1);
 
-use StandardsSync\Documentation\RuleCatalog;
+use OrthoCode\StandardsSync\Documentation\RuleCatalog;
 
 // Development-only: regenerates the rule catalog from the rule library and the scenario suite, so it always runs from the engine checkout.
 require __DIR__ . '/../vendor/autoload.php';

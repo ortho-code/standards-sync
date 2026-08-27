@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\PhpStan\MinLevel;
+namespace OrthoCode\StandardsSync\Rules\PhpStan\MinLevel;
 
-use StandardsSync\Core\Rule\ExplainsDrift;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Core\Text\Lines;
-use StandardsSync\Formats\Neon\NeonScalarWriter;
-use StandardsSync\Rules\PhpStan\PhpStanConfigFile;
+use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Formats\Neon\NeonScalarWriter;
+use OrthoCode\StandardsSync\Rules\PhpStan\PhpStanConfigFile;
 use InvalidArgumentException;
 
 /**

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\Deptrac\ImportedDepfile;
+namespace OrthoCode\StandardsSync\Rules\Deptrac\ImportedDepfile;
 
-use StandardsSync\Core\Filesystem\Path;
-use StandardsSync\Core\Rule\ExplainsDrift;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Formats\Yaml\YamlListWriter;
-use StandardsSync\Rules\Deptrac\DeptracConfigFile;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Formats\Yaml\YamlListWriter;
+use OrthoCode\StandardsSync\Rules\Deptrac\DeptracConfigFile;
 
 /**
  * Ensures the deptrac config imports a given depfile, as a targeted edit that leaves the rest of the file untouched.

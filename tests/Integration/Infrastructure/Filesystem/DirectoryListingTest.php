@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\StandardsSync\Integration\Infrastructure\Filesystem;
+namespace Tests\OrthoCode\StandardsSync\Integration\Infrastructure\Filesystem;
 
-use StandardsSync\Infrastructure\Filesystem\DirectoryListing;
+use OrthoCode\StandardsSync\Infrastructure\Filesystem\DirectoryListing;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Tests\StandardsSync\Integration\IntegrationTestCase;
+use Tests\OrthoCode\StandardsSync\Integration\IntegrationTestCase;
 
 #[CoversClass(DirectoryListing::class)]
 final class DirectoryListingTest extends IntegrationTestCase

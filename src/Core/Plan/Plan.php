@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Plan;
+namespace OrthoCode\StandardsSync\Core\Plan;
 
 final readonly class Plan
 {

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\PhpUnit\PinnedAttributes;
+namespace OrthoCode\StandardsSync\Rules\PhpUnit\PinnedAttributes;
 
-use StandardsSync\Core\Rule\ExplainsDrift;
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Formats\Xml\XmlElementWriter;
-use StandardsSync\Rules\PhpUnit\PhpUnitConfigFile;
+use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Formats\Xml\XmlElementWriter;
+use OrthoCode\StandardsSync\Rules\PhpUnit\PhpUnitConfigFile;
 use InvalidArgumentException;
 
 /**

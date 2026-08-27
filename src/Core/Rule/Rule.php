@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Core\Rule;
+namespace OrthoCode\StandardsSync\Core\Rule;
 
 /**
  * The unifying primitive: one pure content transform against one target file.

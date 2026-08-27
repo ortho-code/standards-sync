@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\General\ManagedBlock;
+namespace OrthoCode\StandardsSync\Rules\General\ManagedBlock;
 
-use StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
 use InvalidArgumentException;
 
 /** Comment lead used to draw a managed block's markers, chosen per file type. */

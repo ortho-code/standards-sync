@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\PhpUnit\BaseConfig;
+namespace OrthoCode\StandardsSync\Rules\PhpUnit\BaseConfig;
 
-use StandardsSync\Core\Rule\FileTarget;
-use StandardsSync\Core\Rule\Rule;
-use StandardsSync\Rules\PhpUnit\PhpUnitConfigFile;
+use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Rule\Rule;
+use OrthoCode\StandardsSync\Rules\PhpUnit\PhpUnitConfigFile;
 use InvalidArgumentException;
 
 /**

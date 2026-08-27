@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\PhpStan\PinnedValues;
+namespace OrthoCode\StandardsSync\Rules\PhpStan\PinnedValues;
 
 /** One pinned scalar: where it lives in the config (as a key path from the document root) and what it must be. */
 final readonly class PinnedValue

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Rules\PhpStan\PinnedValues;
+namespace OrthoCode\StandardsSync\Rules\PhpStan\PinnedValues;
 
 use InvalidArgumentException;
 

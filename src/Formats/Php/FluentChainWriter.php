@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StandardsSync\Formats\Php;
+namespace OrthoCode\StandardsSync\Formats\Php;
 
-use StandardsSync\Core\Text\Indent;
-use StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Core\Text\Indent;
+use OrthoCode\StandardsSync\Core\Text\Lines;
 use RuntimeException;
 
 /**
