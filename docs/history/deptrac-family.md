@@ -47,3 +47,9 @@ The design pass the agreed entry called for. No real consuming org was named at 
 
 **Built the same date:** `Formats/Yaml` (`YamlListWriter`, `YamlValue`, `YamlIndent`) with direct unit tests; `Rules/Deptrac/ImportedDepfile/DeptracImportedDepfile` + `DeptracConfigFile`; the `ImportedDepfile` scenario fixtures (from-scratch, insert-into-section, creates-section, already-imported); `YamlValidator` wired into `SyncFixtureTester`'s default list. Org wiring (the template, the tool requirement, the check command) follows as its own phase. **Wired 2026-08-12**, verified live in the test consumers.
 
+## Verified 2026-08-28 — a layerless depfile analyses clean
+
+Probed against deptrac 4.7.1: a depfile holding `paths:` and no `layers:` or `ruleset:` at all analyses successfully — exit 0, zero violations, zero uncovered — and still exits 0 under `--fail-on-uncovered`. Uncovered counts classes a declared layer failed to claim, so with no layers declared there is nothing to be uncovered by.
+
+The consequence for an org standard: requiring the tool and running it in a check script imposes no shared layer model on consumers. An org with no architecture worth sharing can still make deptrac a required, running part of the standard and leave every repo's layers to that repo, and the import rule stays available for the day shared layers exist. A repo with no depfile at all still fails loudly, which is the intended nudge rather than a silent pass.
+
