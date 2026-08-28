@@ -26,7 +26,7 @@ An org package requires `ortho-code/standards-sync`, extends `Standard`, declare
 Managed blocks are labelled marker regions — the inside is owned by the standard and synced, everything outside belongs to the repo:
 
 ```
-# >>> acme-standards (managed) >>>
+# >>> acme-standards - managed >>>
 ...synced content...
 # <<< acme-standards <<<
 ```

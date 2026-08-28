@@ -7,7 +7,7 @@ namespace OrthoCode\StandardsSync\Rules\General\ManagedBlock;
 /** Draws and finds a single label's marker pair for one comment syntax. */
 final readonly class MarkerGrammar
 {
-    private const string OPEN_LINE = '%s >>> %s (managed) >>>';
+    private const string OPEN_LINE = '%s >>> %s - managed >>>';
     private const string CLOSE_LINE = '%s <<< %s <<<';
 
     public function __construct(

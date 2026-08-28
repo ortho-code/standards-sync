@@ -37,7 +37,7 @@ final class ManagedBlockTest extends TestCase
             null,
             FileContent::fromString(
                 <<<'FILE'
-                    # >>> test (managed) >>>
+                    # >>> test - managed >>>
                     root = true
                     # <<< test <<<
                     FILE
@@ -51,7 +51,7 @@ final class ManagedBlockTest extends TestCase
                 <<<'FILE'
                     existing
 
-                    # >>> test (managed) >>>
+                    # >>> test - managed >>>
                     ignored/
                     # <<< test <<<
                     FILE
@@ -63,7 +63,7 @@ final class ManagedBlockTest extends TestCase
             FileContent::fromString(
                 <<<'FILE'
                     top
-                    # >>> test (managed) >>>
+                    # >>> test - managed >>>
                     old
                     # <<< test <<<
                     bottom
@@ -72,7 +72,7 @@ final class ManagedBlockTest extends TestCase
             FileContent::fromString(
                 <<<'FILE'
                     top
-                    # >>> test (managed) >>>
+                    # >>> test - managed >>>
                     new
                     # <<< test <<<
                     bottom
@@ -84,14 +84,14 @@ final class ManagedBlockTest extends TestCase
             'root = true',
             FileContent::fromString(
                 <<<'FILE'
-                    # >>> test (managed) >>>
+                    # >>> test - managed >>>
                     root = true
                     # <<< test <<<
                     FILE
             ),
             FileContent::fromString(
                 <<<'FILE'
-                    # >>> test (managed) >>>
+                    # >>> test - managed >>>
                     root = true
                     # <<< test <<<
                     FILE
@@ -108,10 +108,10 @@ final class ManagedBlockTest extends TestCase
     /** @return iterable<string, array{string, string}> */
     public static function commentSyntaxByFileType(): iterable
     {
-        yield 'hash for an unlisted extension' => ['.editorconfig', '# >>> test (managed) >>>'];
-        yield 'double slash for javascript' => ['eslint.config.js', '// >>> test (managed) >>>'];
-        yield 'semicolon for ini' => ['php.ini', '; >>> test (managed) >>>'];
-        yield 'a distribution suffix does not hide the real type' => ['php.ini.dist', '; >>> test (managed) >>>'];
+        yield 'hash for an unlisted extension' => ['.editorconfig', '# >>> test - managed >>>'];
+        yield 'double slash for javascript' => ['eslint.config.js', '// >>> test - managed >>>'];
+        yield 'semicolon for ini' => ['php.ini', '; >>> test - managed >>>'];
+        yield 'a distribution suffix does not hide the real type' => ['php.ini.dist', '; >>> test - managed >>>'];
     }
 
     public function testRejectsATargetWithoutLineComments(): void
@@ -134,8 +134,8 @@ final class ManagedBlockTest extends TestCase
     {
         $result = $this->rule('x', 'two', 'b')->apply($this->rule('x', 'one', 'a')->apply(null));
 
-        self::assertStringContainsString('# >>> one (managed) >>>', (string) $result);
-        self::assertStringContainsString('# >>> two (managed) >>>', (string) $result);
+        self::assertStringContainsString('# >>> one - managed >>>', (string) $result);
+        self::assertStringContainsString('# >>> two - managed >>>', (string) $result);
     }
 
     public function testReplacesAnExistingSameLabelBlockWhicheverRuleProducedIt(): void

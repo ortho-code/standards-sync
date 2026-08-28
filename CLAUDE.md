@@ -1,6 +1,6 @@
 # standards-sync — the sync engine
 
-PHP/composer engine that keeps config files in sync across repos via **managed blocks**: per-package labelled marker regions (e.g. `# >>> <label> (managed) >>>` … `# <<< <label> <<<`) whose inside is owned and synced, whose outside belongs to the repo.
+PHP/composer engine that keeps config files in sync across repos via **managed blocks**: per-package labelled marker regions (e.g. `# >>> <label> - managed >>>` … `# <<< <label> <<<`) whose inside is owned and synced, whose outside belongs to the repo.
 Org packages declare *which* files to sync and *what* they contain; this engine understands the formats and writes them.
 Public and published; keep this file project-facing (no personal workflow prefs).
 

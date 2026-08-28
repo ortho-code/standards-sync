@@ -34,7 +34,7 @@ Fixture: [`tests/Scenario/General/ManagedBlock/fixtures/editorconfig/preserves-l
 
 ```ini
 top
-# >>> test (managed) >>>
+# >>> test - managed >>>
 old
 # <<< test <<<
 bottom
@@ -44,7 +44,7 @@ bottom
 
 ```ini
 top
-# >>> test (managed) >>>
+# >>> test - managed >>>
 root = true
 # <<< test <<<
 bottom
@@ -57,7 +57,7 @@ Fixture: [`tests/Scenario/General/ManagedBlock/fixtures/editorconfig/idempotent`
 `.editorconfig` **stays byte-identical**:
 
 ```ini
-# >>> test (managed) >>>
+# >>> test - managed >>>
 root = true
 # <<< test <<<
 ```
@@ -69,7 +69,7 @@ Fixture: [`tests/Scenario/General/ManagedBlock/fixtures/editorconfig/overwrites-
 **Before** — `.editorconfig`:
 
 ```ini
-# >>> test (managed) >>>
+# >>> test - managed >>>
 root = false
 indent_size = 2
 # <<< test <<<
@@ -78,7 +78,7 @@ indent_size = 2
 **After:**
 
 ```ini
-# >>> test (managed) >>>
+# >>> test - managed >>>
 root = true
 # <<< test <<<
 ```
@@ -120,11 +120,11 @@ Fixture: [`tests/Scenario/General/ManagedBlock/fixtures/co-management/multi-labe
 **Creates** `.gitignore`:
 
 ```
-# >>> ci (managed) >>>
+# >>> ci - managed >>>
 /build/
 # <<< ci <<<
 
-# >>> framework (managed) >>>
+# >>> framework - managed >>>
 /vendor/
 # <<< framework <<<
 ```
@@ -158,7 +158,7 @@ Fixture: [`tests/Scenario/General/ManagedBlock/fixtures/editorconfig/from-scratc
 **Creates** `.editorconfig`:
 
 ```ini
-# >>> test (managed) >>>
+# >>> test - managed >>>
 root = true
 # <<< test <<<
 ```
@@ -197,7 +197,7 @@ existing
 ```
 existing
 
-# >>> test (managed) >>>
+# >>> test - managed >>>
 ignored/
 # <<< test <<<
 ```

@@ -101,8 +101,8 @@ final class EngineTest extends TestCase
         self::assertCount(1, $changes);
         $desired = $changes[0]->desired();
         self::assertLessThan(
-            (int) strpos($desired, '# >>> two (managed) >>>'),
-            (int) strpos($desired, '# >>> one (managed) >>>'),
+            (int) strpos($desired, '# >>> two - managed >>>'),
+            (int) strpos($desired, '# >>> one - managed >>>'),
         );
     }
 
