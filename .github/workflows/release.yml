@@ -1,0 +1,33 @@
+name: Release
+
+# Tag-driven, because a release should be a deliberate act rather than a side effect of pushing. `ci.yml` still covers every push and pull request; this only runs for a version tag.
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      # The release notes ARE the changelog entry, not a generated commit list: the changelog is written for the projects consuming the standard, and a commit list is not.
+      # Extracts the section for this tag — everything from its own heading up to the next one.
+      - run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            $0 ~ "^## " v "( |$)" { found = 1; print; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          # An empty section means the tag was pushed without writing its entry. Fail rather than publish a release that says nothing about itself.
+          if [ ! -s notes.md ]; then
+            echo "CHANGELOG.md has no section for $version" >&2
+            exit 1
+          fi
+          cat notes.md
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}
