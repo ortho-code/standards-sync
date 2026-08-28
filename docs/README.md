@@ -4,8 +4,8 @@ The living design record and project documentation for this engine — findings,
 
 ## Working conventions — read before changing anything
 
-- **Re-read these docs before working on the engine.** They hold the decisions and *why* they were made. Steering without them risks re-litigating settled calls or quietly contradicting them.
-- **Propose and get agreement before changing a recorded decision.** If a decision here no longer fits, say so explicitly — what you'd change and why — and get a yes before editing code or these docs. Never reverse a decision silently.
+- **Re-read these docs before working on the engine.** They hold the decisions and *why* they were made. Working without them risks re-litigating settled calls or quietly contradicting them.
+- **Propose and get agreement before changing a recorded decision.** If a decision here no longer fits, say so explicitly — what you'd change and why — and reach agreement with the maintainers (an issue or PR discussion) before editing code or these docs. Never reverse a decision silently.
 - **Record new decisions where they live**, dated, with the reasoning and the alternatives rejected — so the next reader inherits the *why*, not just the outcome. (Lightweight ADR style; no separate log to keep in sync.)
 
 ## Index

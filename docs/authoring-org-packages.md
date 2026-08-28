@@ -97,4 +97,4 @@ Use the shipped `Testing/` helpers:
 new Acme(package: new Package(dirname(__DIR__, 2), 'vendor/acme/acme-coding-standards'))
 ```
 
-The test org package is the worked example.
+The [rule catalog](rules/README.md) holds worked before/after examples for every shipped rule.

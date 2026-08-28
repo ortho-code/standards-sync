@@ -2,7 +2,7 @@
 
 PHP/composer engine that keeps config files in sync across repos via **managed blocks**: per-package labelled marker regions (e.g. `# >>> <label> (managed) >>>` … `# <<< <label> <<<`) whose inside is owned and synced, whose outside belongs to the repo.
 Org packages declare *which* files to sync and *what* they contain; this engine understands the formats and writes them.
-Open-sourced once stable — keep this file project-facing (no personal workflow prefs).
+Public and published; keep this file project-facing (no personal workflow prefs).
 
 ## Where things are documented
 
@@ -18,8 +18,8 @@ Open-sourced once stable — keep this file project-facing (no personal workflow
 ## Working rules
 
 - **Read `docs/` before working on the engine.** It holds the decisions and *why* they were made. **Propose + get agreement before changing a recorded decision** (never reverse one silently). Record new decisions there: what, why, and what was rejected, dated.
-- **References are one-way.** This file may point at docs and code; nothing in the repo (README, `docs/`, code, comments) may reference this file or any Claude config as the home of knowledge. Sole exception: a factual mention that the repo uses and maintains Claude config at certain paths, where that's genuinely worth stating. Check with `git grep -in claude -- ':!CLAUDE.md'` after doc changes.
-- **No specific org or consumer repos in the repo's text.** Docs, code and comments refer to them only in general form ("the org test package", "a test consumer") — names and local paths of the packages this engine is developed against stay outside the repository.
+- **References are one-way.** This file may point at docs and code; nothing in the repo (README, `docs/`, code, comments) may reference this file or any Claude config as the home of knowledge. Sole exception: a factual mention that the repo uses and maintains Claude config at certain paths, where that's genuinely worth stating. Check with `git grep -in claude -- ':!CLAUDE.md' ':!.gitattributes'` after doc changes (the `.gitattributes` export-ignore line is the recorded factual exception).
+- **Examples stay generic.** Docs, fixtures and comments use placeholder names (`acme`) and speak of "an org" or "a consumer" — never a real organisation.
 - **Any change to core pipeline behaviour must add, update, or remove the matching scenario fixture** — the scenario suite is the behaviour catalog (see conventions).
 - Validate with `composer app-run-tests` and `composer deptrac` after changes.
 

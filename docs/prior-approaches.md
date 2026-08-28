@@ -13,7 +13,7 @@ The branches, tags, and the `old/` tree named here live in the private predecess
 
 ## Approach A — Symfony console app, one class per tool
 
-A plain-PHP helper that grew into a full `symfony/console` micro-application (`Kernel` + `MicroKernelTrait`, `bin/bvcs` on `symfony/runtime`). One class per tool in `src/Tool/` (`EditorConfig`, `PhpStan`, `Composer`, …), each implementing `ToolUpdateInterface::update()`; `UpdateService`/`RemoveService` iterated a DI-wired tool list. Canonical files lived in the package's `dist/`. Config was **not consumer-declarable** — the standard was hardcoded into the package; a consumer only chose *when* to run it. Sync was **whole-file copy with overwrite**. Invoked manually and via a Composer hook (`hooks/Composer/PostPackageUpdate.php` → `passthru(... bin/bvcs ...)`).
+A plain-PHP helper that grew into a full `symfony/console` micro-application (`Kernel` + `MicroKernelTrait`, a console binary on `symfony/runtime`). One class per tool in `src/Tool/` (`EditorConfig`, `PhpStan`, `Composer`, …), each implementing `ToolUpdateInterface::update()`; `UpdateService`/`RemoveService` iterated a DI-wired tool list. Canonical files lived in the package's `dist/`. Config was **not consumer-declarable** — the standard was hardcoded into the package; a consumer only chose *when* to run it. Sync was **whole-file copy with overwrite**. Invoked manually and via a Composer hook (`hooks/Composer/PostPackageUpdate.php` → a `passthru()` of that binary).
 
 Why abandoned:
 - A whole Symfony framework inside a dev dependency, for what is a file copier — heavy and awkward.

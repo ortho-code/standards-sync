@@ -13,7 +13,7 @@ How the packages are published and how consumers control how fast the standard c
 ## Packages
 
 - **Engine** (`standards-sync`, this repo) — the reusable pipeline + rule types. Published to Packagist; org packages depend on it.
-- **Org package(s)** — depend on the engine, return a `SyncConfig`, ship the actual standard. Named freely (see Naming); one per organisation; can compose a hierarchy via `include()`. The current test/example org package plays this role until a real one exists.
+- **Org package(s)** — depend on the engine, return a `SyncConfig`, ship the actual standard. Named freely (see Naming); one per organisation; can compose a hierarchy via `include()`.
 
 ## One package, tool-runtime-free rules (decided 2026-07-23)
 
@@ -21,11 +21,11 @@ Every tool family (phpstan, rector, …) ships in this one engine package, becau
 
 ## Local dev vs published
 
-Local co-development uses a composer **`path` repo with `symlink: true`** (org → engine), and `composer.lock` is gitignored in both. That is a dev convenience; the release path is a **public Packagist tag** for the engine (and the org package, if public). The private-packagist mirror was dropped for local dev (it 401'd without a token); the real channel is still to be decided — including whether the org package is public or lives in a private registry / VCS repo, and how a private engine is distributed.
+For local co-development, a composer **`path` repo with `symlink: true`** (org → engine) works well — gitignoring `composer.lock` in the org package keeps the link live. Either way it is a dev convenience; the release path is a **public Packagist tag** for the engine (and an org package, if public). Whether an org package is public or lives in a private registry / VCS repo is that org's own channel decision.
 
 ## Delivery modes (roadmap, decided 2026-07-15)
 
-Manual first: `sync` / `sync --check` run by hand and in CI, and that is enough for the current scale. Two automated modes are on the roadmap, deliberately not near-term:
+Manual first: `sync` / `sync --check` run by hand and in CI, and that is enough for now. Two automated modes are on the roadmap, deliberately not near-term:
 
 - **PR bot** (renovate-style) — runs sync and opens a PR with the diff. Preferred first when org-wide rollout arrives: reviewable, no local mutation, no `allow-plugins` trust grant (see the security posture in [requirements.md](requirements.md)).
 - **Composer plugin** (apply on composer events) — the only propagation bound to the `require` itself, but the widest trust surface; opt-in if ever built.
