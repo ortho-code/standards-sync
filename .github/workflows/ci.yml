@@ -1,12 +1,13 @@
 name: CI
 
+# What the shared standard's own workflow does not cover. Everything else — the style, analysis and test runs — is `composer app-checks` in standards.yml.
 on:
   push:
     branches: [main]
   pull_request:
 
 jobs:
-  tests:
+  engine:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,7 +18,8 @@ jobs:
       - uses: ramsey/composer-install@v3
       - name: Manifest
         run: composer validate --strict
-      - name: Tests
-        run: composer app-run-tests
       - name: Architecture
         run: composer deptrac
+      # Composer puts a dependency's binaries on the script PATH, never the root package's own, so this repository cannot run the standard's `app-sync-check`; it invokes the same check directly instead.
+      - name: Standard
+        run: php bin/standards-sync sync --check
