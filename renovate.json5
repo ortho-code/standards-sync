@@ -1,0 +1,5 @@
+{
+    "extends": [
+        "local>ortho-code/coding-standards:renovate-package-preset" // ortho-code coding standards; sync re-adds this entry
+    ]
+}

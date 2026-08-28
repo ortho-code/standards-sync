@@ -1,6 +1,7 @@
+# >>> ortho-code - managed >>>
 name: Release
 
-# Tag-driven, because a release should be a deliberate act rather than a side effect of pushing. `ci.yml` still covers every push and pull request; this only runs for a version tag.
+# Tag-driven, because a release should be a deliberate act rather than a side effect of pushing.
 on:
   push:
     tags:
@@ -13,7 +14,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      # The release notes ARE the changelog entry, not a generated commit list: the changelog is written for the projects consuming the standard, and a commit list is not.
+      # The release notes ARE the changelog entry, not a generated commit list: the changelog is written for the people consuming the package, and a commit list is not.
       # Extracts the section for this tag — everything from its own heading up to the next one.
       - run: |
           version="${GITHUB_REF_NAME#v}"
@@ -31,3 +32,4 @@ jobs:
           gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md
         env:
           GH_TOKEN: ${{ github.token }}
+# <<< ortho-code <<<

@@ -27,7 +27,8 @@
          stopOnWarning="true"
          stopOnRisky="true"
          stopOnDeprecation="true"
-         stopOnNotice="true">
+         stopOnNotice="true"
+         failOnPhpunitWarning="true">
     <php>
         <ini name="error_reporting" value="-1"/>
     </php>

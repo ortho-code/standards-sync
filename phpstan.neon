@@ -1,0 +1,13 @@
+includes:
+	- vendor/ortho-code/coding-standards/templates/package/phpstan.neon
+
+parameters:
+	treatPhpDocTypesAsCertain: false
+	level: 6
+	paths:
+		- src
+	ignoreErrors:
+		# Rule::apply(?string): ?string is the contract, where null means abstain. A rule that never abstains today must still declare the wide type, or gaining an abstention later becomes a signature change.
+		-
+			identifier: return.unusedType
+			path: src/Rules/*
