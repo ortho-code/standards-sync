@@ -2,7 +2,7 @@
 
 What changed in each release, for the projects consuming the standard through an org package.
 
-## Unreleased
+## 0.2.0 — 2026-08-28
 
 **Breaking:** the opening marker of a managed block changed from `# >>> <label> (managed) >>>` to `# >>> <label> - managed >>>`. The parentheses make the line unparseable for tools that read a config file with PHP's INI parser, which is how some tools read `.editorconfig`.
 
