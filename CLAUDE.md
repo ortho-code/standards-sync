@@ -8,7 +8,7 @@ Public and published; keep this file project-facing (no personal workflow prefs)
 
 `docs/` is the living design record **and** the project documentation — the repo stands alone without this file.
 
-- Direction: [rule-model.md](docs/rule-model.md) — the rule-based model is built (R0 contract, R1 fold); the rule library ships the block mechanism (`ManagedBlock`) plus per-tool PHPStan, Rector, ECS, psalm, composer.json, deptrac, renovate and phpunit families; org packages author against `Authoring/` (`Package` + `Standard`). Each tool family's decision record sits beside it (`docs/*-family.md`).
+- Design: [design.md](docs/design.md) — the current design core (the `Rule` contract, the tiers, resolution, composition, the `Authoring/` layer); what is ahead in [roadmap.md](docs/roadmap.md). The dated decision trail — per topic and per tool family — lives in [docs/history/](docs/history/README.md).
 - Architecture + invariants: [architecture.md](docs/architecture.md) — the pipeline, layers, seams; hold the invariants.
 - Authoring an org package: [authoring-org-packages.md](docs/authoring-org-packages.md).
 - Rule catalog (generated, never hand-edited): [docs/rules/](docs/rules/README.md) — regenerate with `composer app-generate-rule-catalog` after any scenario fixture or provider change; a freshness test fails while it is stale.

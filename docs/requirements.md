@@ -17,7 +17,7 @@ When mutating in place, preserve the target's line endings (LF/CRLF), indentatio
 
 ## Targeted edits, not parse-dump round-trips (Tier B)
 
-A value-aware rule edits exactly its one key with a narrow, format-preserving edit — textual or token-level where a format library can't round-trip faithfully. Never parse the whole file and dump it back: a round-trip reformats content the rule doesn't own, violating the style-preservation requirement above and drowning the real change in churn. This is also the concrete guardrail against rebuilding the universal parse-and-merge framework that sank the earlier attempt (see [prior-approaches.md](prior-approaches.md)).
+A value-aware rule edits exactly its one key with a narrow, format-preserving edit — textual or token-level where a format library can't round-trip faithfully. Never parse the whole file and dump it back: a round-trip reformats content the rule doesn't own, violating the style-preservation requirement above and drowning the real change in churn. This is also the concrete guardrail against rebuilding the universal parse-and-merge framework that sank the earlier attempt (see [prior-approaches.md](history/prior-approaches.md)).
 
 ## Enforcement model — `--check` in CI is the backstop
 

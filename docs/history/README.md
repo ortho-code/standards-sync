@@ -1,0 +1,5 @@
+# The decision trail
+
+The dated record of how the engine got here: every decision with its date, its reasoning, and the alternatives rejected. Entries are **append-only** — a later entry supersedes an earlier one and says so; nothing is rewritten. The current state distilled from this trail lives one level up in [docs/](../README.md).
+
+**Restructured 2026-08-28.** The record and the current-state documentation were one interleaved genre until this date — dated entries carrying the living exposition between them. The split moved the trail here and distilled the current state into [design.md](../design.md), [roadmap.md](../roadmap.md), and the existing current pages. This deliberately narrows the earlier "no hand-written state pages" decision (recorded under Testing rules in [rule-model.md](rule-model.md)): the generated catalog remains the only current view *of the rule library*, while the design core and the roadmap gained hand-written current pages. Rejected alternative: the status quo — the mixed record had reached its recorded structural limit, and its process narration was where private context kept creeping into a now-public repo.

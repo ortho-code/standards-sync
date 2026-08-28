@@ -6,7 +6,7 @@ Keeps shared config files in sync across repositories. An org package declares *
 
 ## Floors, not copies
 
-A shared standard usually travels as a copied config file or an importable default, and both leak: a copy *downgrades* a stricter project the moment it lands, and an import ships a default the consumer can silently drop below. This engine's value rules are **floors** — a project below the minimum is raised on the next sync, a stricter project is never touched. A PHPStan level floor of 6 raises a project at level 4, leaves a project at level 8 alone, and creates a config carrying the floor where none exists. The studied alternatives and their trade-offs are in [prior-art.md](docs/prior-art.md).
+A shared standard usually travels as a copied config file or an importable default, and both leak: a copy *downgrades* a stricter project the moment it lands, and an import ships a default the consumer can silently drop below. This engine's value rules are **floors** — a project below the minimum is raised on the next sync, a stricter project is never touched. A PHPStan level floor of 6 raises a project at level 4, leaves a project at level 8 alone, and creates a config carrying the floor where none exists. The studied alternatives and their trade-offs are in [prior-art.md](docs/history/prior-art.md).
 
 ## Using a standard
 
