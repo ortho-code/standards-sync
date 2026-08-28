@@ -29,7 +29,7 @@ Manual first: `sync` / `sync --check` run by hand and in CI, and that is enough 
 
 ## Release status
 
-The current line is **v0.x, without a compatibility promise** — SemVer's v0 semantics apply, so v0 minors may break. The BC-surface audit (API vs. internal, per class — the contract-first/never-first split in [conventions.md](conventions.md)) runs before the first v1 tag, which is where the versioning commitments below begin to bind. The engine is published as public Packagist tags; what each release changed is in the [changelog](../CHANGELOG.md).
+The current line is **v0.x, without a compatibility promise** — SemVer's v0 semantics apply, so v0 minors may break. The BC-surface audit (API vs. internal, per class — the contract-first/never-first split in [conventions.md](conventions.md), and the rendered output too, since recognising what earlier versions wrote is a compatibility surface of its own — see the invariant in [architecture.md](architecture.md)) runs before the first v1 tag, which is where the versioning commitments below begin to bind. The engine is published as public Packagist tags; what each release changed is in the [changelog](../CHANGELOG.md).
 
 ## Versioning and the pace of change
 
