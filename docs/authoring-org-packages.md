@@ -57,7 +57,16 @@ Three facts govern how they behave in a consumer:
 
 - Writing a requirement leaves `composer.lock` stale: `composer install` warns, and refuses outright when the package is not in the lock at all, so the gap surfaces rather than passing silently.
 - Composer puts its bin-dir on PATH when running scripts, so a script entry names the bare binary with no `vendor/bin/` prefix.
+- That bin-dir holds the binaries of a project's *dependencies*, never the root package's own. A package that ships a tool and also adopts a standard that runs it therefore cannot invoke it by bare name — the script fails with `<tool>: not found` while every other script works. Linking the package's own binary into the bin-dir from a `post-install-cmd` resolves it, and is the only case where a consumer needs anything beyond the three rules above.
 - Nothing in the engine ties a CI config's call to the name `ComposerScript` declares. The two are matched only by the text of the call, so a renamed script leaves the CI file calling a script that no longer exists.
+
+## What the mechanism does not do
+
+Three limits an org package meets sooner or later. Each is a property of the engine as it stands, and each has a recorded direction in [roadmap.md](roadmap.md).
+
+- **A block cannot be extended, only accepted or replaced.** A consumer writes outside the block, and in a line-oriented file that is enough because concatenation is composition — a `.gitignore` keeps working when a repo adds its own lines. In a single-document format it is not: a workflow's block owns the whole file, since a second top-level mapping after it is invalid YAML. A repository needing a variation adds its own file beside the synced one, or the standard ships something callable — a reusable workflow rather than a fixed one.
+- **Rules are disabled by class, not per declaration.** `withoutRule(ComposerScript::class)` drops every script the standard declares, not one of them; the same goes for every block under `ManagedBlock`. A consumer that needs to opt out of exactly one declaration has no way to say so.
+- **Sync adds; it never retracts.** A rule recognises its own prior output by matching what the current version renders, and nothing records what an earlier version wrote. So changing a rendered reference — moving a distributed template, renaming a preset, altering marker decoration — does not update consumers: it stops recognising the old text and writes a second copy beside it. Treat any such change as breaking, and migrate the old entries by hand.
 
 ## Testing an org package
 
