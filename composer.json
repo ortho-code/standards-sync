@@ -46,6 +46,12 @@
     }
   },
   "scripts": {
+    "post-install-cmd": [
+      "@php -r \"file_exists('vendor/bin/standards-sync') or symlink('../../bin/standards-sync', 'vendor/bin/standards-sync');\""
+    ],
+    "post-update-cmd": [
+      "@php -r \"file_exists('vendor/bin/standards-sync') or symlink('../../bin/standards-sync', 'vendor/bin/standards-sync');\""
+    ],
     "app-run-tests": [
       "phpunit"
     ],

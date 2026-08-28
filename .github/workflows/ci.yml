@@ -20,6 +20,3 @@ jobs:
         run: composer validate --strict
       - name: Architecture
         run: composer deptrac
-      # Composer puts a dependency's binaries on the script PATH, never the root package's own, so this repository cannot run the standard's `app-sync-check`; it invokes the same check directly instead.
-      - name: Standard
-        run: php bin/standards-sync sync --check

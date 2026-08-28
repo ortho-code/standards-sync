@@ -21,7 +21,8 @@ Public and published; keep this file project-facing (no personal workflow prefs)
 - **References are one-way.** This file may point at docs and code; nothing in the repo (README, `docs/`, code, comments) may reference this file or any Claude config as the home of knowledge. Sole exception: a factual mention that the repo uses and maintains Claude config at certain paths, where that's genuinely worth stating. Check with `git grep -in claude -- ':!CLAUDE.md' ':!.gitattributes'` after doc changes (the `.gitattributes` export-ignore line is the recorded factual exception).
 - **Examples stay generic.** Docs, fixtures and comments use placeholder names (`acme`) and speak of "an org" or "a consumer" — never a real organisation.
 - **Any change to core pipeline behaviour must add, update, or remove the matching scenario fixture** — the scenario suite is the behaviour catalog (see conventions).
-- Validate with `composer app-run-tests` and `composer deptrac` after changes.
+- **This repository consumes its own standard** (`ortho-code/coding-standards`), so its `.editorconfig`, `.gitignore`, tool configs and both workflows are synced output rather than hand-written; `standards-sync.php` declares it. Validate with `composer app-checks` — the sync check, ECS, PHPStan, Psalm, Rector and the tests — plus `composer validate --strict` and `composer deptrac`, which the standard does not cover.
+- The `post-install-cmd` links this package's own binary into composer's bin-dir. Composer puts only *dependencies'* binaries there, so without it the standard's `standards-sync sync --check` script cannot find the very tool this repository ships; see the bin-dir note in [authoring-org-packages.md](docs/authoring-org-packages.md).
 
 ## Branching
 
