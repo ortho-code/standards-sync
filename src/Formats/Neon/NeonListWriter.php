@@ -41,7 +41,8 @@ final readonly class NeonListWriter
         // Scan the section's entries: done when the entry is already there, otherwise remember where the section ends.
         $lastEntryIndex = $sectionIndex;
         $entryIndent = null;
-        for ($index = $sectionIndex + 1; $index < count($lines); $index++) {
+        $counter = count($lines);
+        for ($index = $sectionIndex + 1; $index < $counter; $index++) {
             if (preg_match(self::ENTRY_LINE, $lines[$index], $match) === 1) {
                 // A consumer-annotated entry is still that entry: the trailing comment is not part of the value.
                 if (NeonValue::unquote(NeonValue::splitTrailingComment($match[2])[0]) === NeonValue::unquote($entry)) {
@@ -73,11 +74,11 @@ final readonly class NeonListWriter
     /** @param list<string> $lines */
     private static function sectionIndex(array $lines, string $section): ?int
     {
-        if (array_any($lines, static fn (string $line): bool => (self::headerValue($line, $section) ?? '') !== '')) {
+        if (array_any($lines, static fn(string $line): bool => (self::headerValue($line, $section) ?? '') !== '')) {
             throw new RuntimeException(sprintf('The "%s:" section is not a block list; convert it to one "- entry" per line so the entry can be managed.', $section));
         }
 
-        return array_find_key($lines, static fn (string $line): bool => self::headerValue($line, $section) === '');
+        return array_find_key($lines, static fn(string $line): bool => self::headerValue($line, $section) === '');
     }
 
     /** The value text on the section's header line, trailing comment stripped — or null when the line is not that header. */

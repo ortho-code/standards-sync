@@ -28,11 +28,13 @@ final readonly class RectorBaseSet implements Rule, ExplainsDrift
         $this->entry = DirAnchoredEntry::fromRelativeString($set);
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return RectorConfigFile::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         // A project without a Rector config gets one: enforcing the standard is the point, and withoutRule() is the opt-out.
@@ -45,11 +47,13 @@ final readonly class RectorBaseSet implements Rule, ExplainsDrift
         return FluentChainWriter::ensureArrayEntry($content, self::METHOD, $this->entry->value());
     }
 
+    #[\Override]
     public function description(): string
     {
         return sprintf('Ensures the Rector config registers %s in withSets().', $this->entry->path()->value());
     }
 
+    #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {

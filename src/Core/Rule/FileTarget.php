@@ -14,9 +14,7 @@ use InvalidArgumentException;
 final readonly class FileTarget
 {
     /** @param non-empty-list<Path> $candidates */
-    private function __construct(private array $candidates)
-    {
-    }
+    private function __construct(private array $candidates) {}
 
     public static function fromString(string $path): self
     {
@@ -46,6 +44,6 @@ final readonly class FileTarget
     /** The candidate list as one display string, in precedence order. */
     public function toString(): string
     {
-        return implode(' | ', array_map(static fn (Path $path): string => $path->value(), $this->candidates));
+        return implode(' | ', array_map(static fn(Path $path): string => $path->value(), $this->candidates));
     }
 }

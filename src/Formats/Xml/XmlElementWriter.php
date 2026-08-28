@@ -34,7 +34,7 @@ final readonly class XmlElementWriter
         $tag = self::openTag($content, $element);
 
         $existing = $tag->attribute($attribute);
-        if ($existing !== null) {
+        if ($existing instanceof XmlAttribute) {
             self::assertNeedsNoEncoding($value, $existing->quote());
             if ($existing->value() === $value) {
                 return $content;
@@ -48,7 +48,7 @@ final readonly class XmlElementWriter
 
         // An attribute-less tag gets the token right after the element name.
         $last = $tag->last();
-        if ($last === null) {
+        if (!$last instanceof XmlAttribute) {
             return substr($content, 0, $tag->attributesStart()) . ' ' . $token . substr($content, $tag->attributesStart());
         }
 
@@ -81,7 +81,7 @@ final readonly class XmlElementWriter
             if (!in_array($boundary, [' ', "\t", "\n", "\r", '>', '/'], true)) {
                 continue;
             }
-            if (array_any($comments, static fn (array $range): bool => $candidate >= $range[0] && $candidate < $range[1])) {
+            if (array_any($comments, static fn(array $range): bool => $candidate >= $range[0] && $candidate < $range[1])) {
                 continue;
             }
             if ($tagStart !== null) {
@@ -104,7 +104,7 @@ final readonly class XmlElementWriter
                 }
                 continue;
             }
-            if ($character === '"' || $character === "'") {
+            if ($character === '"' || $character === '\'') {
                 $quote = $character;
                 continue;
             }

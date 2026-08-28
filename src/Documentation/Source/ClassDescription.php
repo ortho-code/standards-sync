@@ -17,10 +17,9 @@ final readonly class ClassDescription
 
     private const string PARAGRAPH_SEPARATOR = Lines::LINE_BREAK . Lines::LINE_BREAK;
 
-    private function __construct(private string $text)
-    {
-    }
+    private function __construct(private string $text) {}
 
+    /** @param class-string $class */
     public static function fromClass(string $class): ?self
     {
         $docblock = (new ReflectionClass($class))->getDocComment();

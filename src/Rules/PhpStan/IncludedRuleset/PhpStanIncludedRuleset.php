@@ -26,22 +26,26 @@ final readonly class PhpStanIncludedRuleset implements Rule, ExplainsDrift
         $this->ruleset = Path::fromRelativeString($ruleset);
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return PhpStanConfigFile::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         // A project without a PHPStan config gets one: enforcing the standard is the point, and withoutRule() is the opt-out.
         return NeonListWriter::ensureEntry($content ?? '', self::SECTION, $this->ruleset->value());
     }
 
+    #[\Override]
     public function description(): string
     {
         return sprintf('Ensures the PHPStan config includes "%s".', $this->ruleset->value());
     }
 
+    #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {

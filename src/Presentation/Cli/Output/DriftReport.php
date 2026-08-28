@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OrthoCode\StandardsSync\Presentation\Cli\Output;
 
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
 use OrthoCode\StandardsSync\Core\Plan\Abstention;
 use OrthoCode\StandardsSync\Core\Plan\Change;
 use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
@@ -68,7 +69,7 @@ final readonly class DriftReport
     private function shadowingNote(Change $change): ?string
     {
         $shadowedBy = $change->shadowedBy();
-        if ($shadowedBy === null) {
+        if (!$shadowedBy instanceof Path) {
             return null;
         }
 
@@ -84,20 +85,20 @@ final readonly class DriftReport
      * The rules named once each, with a count where a rule stood down several times over.
      *
      * @param non-empty-list<Rule> $rules
-     * @return non-empty-list<string>
+     * @return list<string>
      */
     private function ruleNames(array $rules): array
     {
         $counts = $this->countOccurrences(array_map(
-            static fn (Rule $rule): string => new ReflectionClass($rule)->getShortName(),
+            static fn(Rule $rule): string => new ReflectionClass($rule)->getShortName(),
             $rules,
         ));
 
-        return array_values(array_map(
-            static fn (string $name, int $count): string => $count > 1 ? sprintf('%s ×%d', $name, $count) : $name,
+        return array_map(
+            static fn(string $name, int $count): string => $count > 1 ? sprintf('%s ×%d', $name, $count) : $name,
             array_keys($counts),
             $counts,
-        ));
+        );
     }
 
     /**
@@ -129,7 +130,7 @@ final readonly class DriftReport
     private function ruleLines(Change $change): array
     {
         $counts = $this->countOccurrences(array_map(
-            fn (RuleApplication $application): string => $this->ruleText($application->rule(), $application->before()),
+            fn(RuleApplication $application): string => $this->ruleText($application->rule(), $application->before()),
             $change->driftingApplications(),
         ));
 

@@ -33,7 +33,7 @@ final readonly class JsonObjectWriter
     public static function read(string $content, array $path): ?string
     {
         [, $member] = self::walk($content, $path);
-        if ($member === null) {
+        if (!$member instanceof JsonMember) {
             return null;
         }
 
@@ -74,7 +74,7 @@ final readonly class JsonObjectWriter
     public static function ensureListEntry(string $content, array $path, string $entry): string
     {
         [, $member] = self::walk($content, $path);
-        if ($member === null) {
+        if (!$member instanceof JsonMember) {
             return self::set($content, $path, [$entry]);
         }
 
@@ -83,7 +83,7 @@ final readonly class JsonObjectWriter
         }
 
         $entries = self::scanList($content, $member->valueStart());
-        if (array_any($entries, static fn (array $span): bool => $content[$span[0]] === '"' && self::decode(substr($content, $span[0], $span[1] - $span[0])) === $entry)) {
+        if (array_any($entries, static fn(array $span): bool => $content[$span[0]] === '"' && self::decode(substr($content, $span[0], $span[1] - $span[0])) === $entry)) {
             return $content;
         }
 
@@ -111,7 +111,7 @@ final readonly class JsonObjectWriter
     public static function remove(string $content, array $path): string
     {
         [$object, $member] = self::walk($content, $path);
-        if ($member === null) {
+        if (!$member instanceof JsonMember) {
             return $content;
         }
 
@@ -145,7 +145,7 @@ final readonly class JsonObjectWriter
         [$object, $member, $depth] = self::walk($content, $path);
         $unit = self::detectIndent($content);
 
-        if ($member !== null) {
+        if ($member instanceof JsonMember) {
             if ($member->valueIn($content) === $value) {
                 return $content;
             }
@@ -156,10 +156,15 @@ final readonly class JsonObjectWriter
         }
 
         $remaining = array_slice($path, $depth);
+        // walk() stops short of the full path whenever it found no member, so there is always a key left to write; the guard states that rather than leaving it to a docblock.
+        if ($remaining === []) {
+            throw new RuntimeException(sprintf('"%s" resolved to no remaining key; it cannot be written.', implode('.', $path)));
+        }
+
         $last = $object->last();
 
         // An object with nothing to preserve is filled in the canonical shape, one member per line.
-        if ($last === null) {
+        if (!$last instanceof JsonMember) {
             $closingIndent = self::lineIndent($content, $object->start());
             $memberIndent = $closingIndent . $unit;
 
@@ -196,7 +201,7 @@ final readonly class JsonObjectWriter
         $object = self::scanObject($content, self::skipWhitespace($content, 0));
         foreach ($path as $depth => $key) {
             $member = $object->member($key);
-            if ($member === null) {
+            if (!$member instanceof JsonMember) {
                 return [$object, null, $depth];
             }
 
@@ -277,10 +282,10 @@ final readonly class JsonObjectWriter
         }
 
         if ($indent === null) {
-            return '[' . implode(', ', array_map(static fn (string $entry): string => self::encode($entry), $value)) . ']';
+            return '[' . implode(', ', array_map(static fn(string $entry): string => self::encode($entry), $value)) . ']';
         }
 
-        $entries = array_map(static fn (string $entry): string => $indent . $unit . self::encode($entry), $value);
+        $entries = array_map(static fn(string $entry): string => $indent . $unit . self::encode($entry), $value);
 
         return '[' . Lines::LINE_BREAK . implode(',' . Lines::LINE_BREAK, $entries) . Lines::LINE_BREAK . $indent . ']';
     }
@@ -294,11 +299,12 @@ final readonly class JsonObjectWriter
     private static function renderMember(array $path, string|bool|int|array $value, ?string $indent, string $unit): string
     {
         $key = self::encode($path[0]);
-        if (count($path) === 1) {
+        $beneath = array_slice($path, 1);
+        if ($beneath === []) {
             return $key . ': ' . self::renderValue($value, $indent, $unit);
         }
 
-        $inner = self::renderMember(array_slice($path, 1), $value, $indent === null ? null : $indent . $unit, $unit);
+        $inner = self::renderMember($beneath, $value, $indent === null ? null : $indent . $unit, $unit);
         if ($indent === null) {
             return $key . ': {' . $inner . '}';
         }

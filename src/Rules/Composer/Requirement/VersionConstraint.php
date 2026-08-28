@@ -31,8 +31,7 @@ final readonly class VersionConstraint
     private function __construct(
         private string $value,
         private ConstraintInterface $parsed,
-    ) {
-    }
+    ) {}
 
     public static function fromString(string $value): self
     {
@@ -75,7 +74,7 @@ final readonly class VersionConstraint
         }
 
         $alternatives = array_map(
-            fn (string $alternative): string => self::fromString($alternative)->meets($minimum) ? $alternative : $minimum->value,
+            fn(string $alternative): string => self::fromString($alternative)->meets($minimum) ? $alternative : $minimum->value,
             preg_split(self::ALTERNATIVES, $this->value) ?: [$this->value],
         );
 

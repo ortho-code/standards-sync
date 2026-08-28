@@ -19,9 +19,7 @@ final readonly class PhpStanLevel
     /** PHPStan's alias for the highest level, as written in configs. */
     private const string MAX_ALIAS = 'max';
 
-    private function __construct(private int $level)
-    {
-    }
+    private function __construct(private int $level) {}
 
     public static function fromInt(int $level): self
     {

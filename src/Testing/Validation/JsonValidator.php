@@ -13,6 +13,7 @@ final readonly class JsonValidator implements SyncedFileValidator
     /** JSON5 and JSONC are deliberately not covered: they are different grammars this check would wrongly reject. */
     private const string EXTENSION = '.json';
 
+    #[\Override]
     public function assertValid(string $path, string $content): void
     {
         if (!str_ends_with($path, self::EXTENSION)) {

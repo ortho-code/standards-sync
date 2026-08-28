@@ -39,7 +39,7 @@ final class JsonObjectWriterTest extends TestCase
                         "phpstan\/phpstan": "^2.5"
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame('^2.5', JsonObjectWriter::read($content, ['require-dev', 'phpstan/phpstan']));
@@ -67,7 +67,7 @@ final class JsonObjectWriterTest extends TestCase
                         "sort-packages": true
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::write(self::manifest(), ['require-dev', 'phpstan/phpstan'], '^2.6'));
@@ -95,7 +95,7 @@ final class JsonObjectWriterTest extends TestCase
                         "sort-packages": true
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::write(self::manifest(), ['require-dev', 'vimeo/psalm'], '^6'));
@@ -109,7 +109,7 @@ final class JsonObjectWriterTest extends TestCase
                 {
                     "name": "acme/project"
                 }
-                JSON
+                JSON,
         );
         $expected = FileContent::fromString(
             <<<'JSON'
@@ -119,7 +119,7 @@ final class JsonObjectWriterTest extends TestCase
                         "phpstan/phpstan": "^2.5"
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::write($content, ['require-dev', 'phpstan/phpstan'], '^2.5'));
@@ -133,7 +133,7 @@ final class JsonObjectWriterTest extends TestCase
                     "name": "acme/project",
                     "require-dev": {}
                 }
-                JSON
+                JSON,
         );
         $expected = FileContent::fromString(
             <<<'JSON'
@@ -143,7 +143,7 @@ final class JsonObjectWriterTest extends TestCase
                         "phpstan/phpstan": "^2.5"
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::write($content, ['require-dev', 'phpstan/phpstan'], '^2.5'));
@@ -161,13 +161,13 @@ final class JsonObjectWriterTest extends TestCase
     public function testInsertionCopiesTheFilesOwnIndentation(string $indent): void
     {
         $content = FileContent::fromString(
-            '{' . "\n" . $indent . '"name": "acme/project"' . "\n" . '}'
+            '{' . "\n" . $indent . '"name": "acme/project"' . "\n" . '}',
         );
         $expected = FileContent::fromString(
             '{' . "\n" . $indent . '"name": "acme/project",' . "\n"
             . $indent . '"require-dev": {' . "\n"
             . $indent . $indent . '"phpstan/phpstan": "^2.5"' . "\n"
-            . $indent . '}' . "\n" . '}'
+            . $indent . '}' . "\n" . '}',
         );
 
         self::assertSame($expected, JsonObjectWriter::write($content, ['require-dev', 'phpstan/phpstan'], '^2.5'));
@@ -181,14 +181,14 @@ final class JsonObjectWriterTest extends TestCase
                 {
                     "config": {"sort-packages": true}
                 }
-                JSON
+                JSON,
         );
         $expected = FileContent::fromString(
             <<<'JSON'
                 {
                     "config": {"sort-packages": true, "vendor-dir": "vendor"}
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::write($content, ['config', 'vendor-dir'], 'vendor'));
@@ -202,14 +202,14 @@ final class JsonObjectWriterTest extends TestCase
                 {
                     "scripts": {"test": "phpunit"}
                 }
-                JSON
+                JSON,
         );
         $expected = FileContent::fromString(
             <<<'JSON'
                 {
                     "scripts": {"test": "phpunit", "check": ["one", "two"]}
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::writeList($content, ['scripts', 'check'], ['one', 'two']));
@@ -222,7 +222,7 @@ final class JsonObjectWriterTest extends TestCase
                 {
                     "name": "acme/project"
                 }
-                JSON
+                JSON,
         );
         $expected = FileContent::fromString(
             <<<'JSON'
@@ -234,7 +234,7 @@ final class JsonObjectWriterTest extends TestCase
                         ]
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::writeList($content, ['scripts', 'app-check-standards'], ['vendor/bin/standards-sync sync --check']));
@@ -260,7 +260,7 @@ final class JsonObjectWriterTest extends TestCase
                         "optimize-autoloader": true
                     }
                 }
-                JSON
+                JSON,
         );
 
         $result = JsonObjectWriter::write($content, ['config', 'sort-packages'], $value);
@@ -277,7 +277,7 @@ final class JsonObjectWriterTest extends TestCase
                         "sort-packages": true
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($content, JsonObjectWriter::write($content, ['config', 'sort-packages'], true));
@@ -290,7 +290,7 @@ final class JsonObjectWriterTest extends TestCase
                 {
                     "name": "acme/project"
                 }
-                JSON
+                JSON,
         );
         $expected = FileContent::fromString(
             <<<'JSON'
@@ -303,7 +303,7 @@ final class JsonObjectWriterTest extends TestCase
                         ]
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::writeList($content, ['scripts', 'app-check-standards'], ['vendor/bin/standards-sync sync --check', 'vendor/bin/phpstan']));
@@ -318,7 +318,7 @@ final class JsonObjectWriterTest extends TestCase
                         "app-check-standards": "vendor/bin/standards-sync sync"
                     }
                 }
-                JSON
+                JSON,
         );
         $expected = FileContent::fromString(
             <<<'JSON'
@@ -329,7 +329,7 @@ final class JsonObjectWriterTest extends TestCase
                         ]
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::writeList($content, ['scripts', 'app-check-standards'], ['vendor/bin/standards-sync sync --check']));
@@ -345,7 +345,7 @@ final class JsonObjectWriterTest extends TestCase
                         "app-check-standards": ["one", "two"]
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($content, JsonObjectWriter::writeList($content, ['scripts', 'app-check-standards'], ['one', 'two']));
@@ -364,7 +364,7 @@ final class JsonObjectWriterTest extends TestCase
                         "sort-packages": true
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::remove(self::manifest(), ['require-dev', 'phpstan/phpstan']));
@@ -383,7 +383,7 @@ final class JsonObjectWriterTest extends TestCase
                         "sort-packages": true
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::remove(self::manifest(), ['require-dev', 'rector/rector']));
@@ -398,14 +398,14 @@ final class JsonObjectWriterTest extends TestCase
                         "phpstan/phpstan": "^2.5"
                     }
                 }
-                JSON
+                JSON,
         );
         $expected = FileContent::fromString(
             <<<'JSON'
                 {
                     "require-dev": {}
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($expected, JsonObjectWriter::remove($content, ['require-dev', 'phpstan/phpstan']));
@@ -435,7 +435,7 @@ final class JsonObjectWriterTest extends TestCase
                         "phpstan/phpstan": "^2.5"
                     }
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame('^2.5', JsonObjectWriter::read($content, ['require-dev', 'phpstan/phpstan']));
@@ -475,7 +475,7 @@ final class JsonObjectWriterTest extends TestCase
                         "phpstan/phpstan": "^2.6"
                     }
                 }
-                JSON
+                JSON,
         );
 
         $this->expectException(RuntimeException::class);
@@ -493,7 +493,7 @@ final class JsonObjectWriterTest extends TestCase
                         "local>acme\/renovate-config"
                     ]
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($content, JsonObjectWriter::ensureListEntry($content, ['extends'], 'local>acme/renovate-config'));
@@ -508,7 +508,7 @@ final class JsonObjectWriterTest extends TestCase
                     "config:recommended"
                   ]
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame(
@@ -520,7 +520,7 @@ final class JsonObjectWriterTest extends TestCase
                         "local>acme/renovate-config"
                       ]
                     }
-                    JSON
+                    JSON,
             ),
             JsonObjectWriter::ensureListEntry($content, ['extends'], 'local>acme/renovate-config'),
         );
@@ -549,7 +549,7 @@ final class JsonObjectWriterTest extends TestCase
                 {
                   "labels": ["dependencies"]
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame(
@@ -561,7 +561,7 @@ final class JsonObjectWriterTest extends TestCase
                         "local>acme/renovate-config"
                       ]
                     }
-                    JSON
+                    JSON,
             ),
             JsonObjectWriter::ensureListEntry($content, ['extends'], 'local>acme/renovate-config'),
         );
@@ -604,7 +604,7 @@ final class JsonObjectWriterTest extends TestCase
                         "sort-packages": true
                     }
                 }
-                JSON
+                JSON,
         );
     }
 }

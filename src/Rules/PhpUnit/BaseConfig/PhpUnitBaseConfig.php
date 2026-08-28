@@ -23,16 +23,19 @@ final readonly class PhpUnitBaseConfig implements Rule
         }
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return PhpUnitConfigFile::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         return $content ?? $this->config;
     }
 
+    #[\Override]
     public function description(): string
     {
         return 'Seeds a missing PHPUnit config with the org base config.';

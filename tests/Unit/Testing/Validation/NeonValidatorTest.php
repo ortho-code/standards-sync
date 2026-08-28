@@ -21,7 +21,7 @@ final class NeonValidatorTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 6
-                NEON
+                NEON,
         );
 
         new NeonValidator()->assertValid('./phpstan.neon', $content);

@@ -13,9 +13,7 @@ final readonly class ScenarioTestSuite
     private const string TEST_CLASS_SUFFIX = 'Test';
 
     /** @param list<class-string<ScenarioTestCase>> $testClasses */
-    private function __construct(private array $testClasses)
-    {
-    }
+    private function __construct(private array $testClasses) {}
 
     public static function fromDirectory(string $directory, string $namespacePrefix): self
     {

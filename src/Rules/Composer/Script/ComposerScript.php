@@ -17,10 +17,17 @@ use InvalidArgumentException;
  */
 final readonly class ComposerScript implements Rule
 {
-    /** @param non-empty-list<string> $commands */
+    /** @var non-empty-list<string> */
+    private array $commands;
+
+    /**
+     * The commands are validated rather than only typed: an org package is plain PHP, so the docblock is a promise the caller can break.
+     *
+     * @param list<string> $commands
+     */
     public function __construct(
         private string $name,
-        private array $commands,
+        array $commands,
     ) {
         if (trim($name) === '') {
             throw new InvalidArgumentException('A composer script needs a name.');
@@ -28,6 +35,8 @@ final readonly class ComposerScript implements Rule
         if ($commands === []) {
             throw new InvalidArgumentException(sprintf('The composer script "%s" needs at least one command.', $name));
         }
+
+        $this->commands = $commands;
     }
 
     /** Exposed so an org can pin whatever calls this script by name against what it declares. */
@@ -36,11 +45,13 @@ final readonly class ComposerScript implements Rule
         return $this->name;
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return ComposerManifest::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         if ($content === null) {
@@ -50,6 +61,7 @@ final readonly class ComposerScript implements Rule
         return JsonObjectWriter::writeList($content, [ComposerManifest::SCRIPTS_SECTION, $this->name], $this->commands);
     }
 
+    #[\Override]
     public function description(): string
     {
         return sprintf('Runs "%s" as the composer script "%s".', implode('", "', $this->commands), $this->name);

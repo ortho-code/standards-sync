@@ -37,7 +37,7 @@ final class PhpStanPinnedValuesTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	treatPhpDocTypesAsCertain: false
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -47,14 +47,14 @@ final class PhpStanPinnedValuesTest extends TestCase
                     parameters:
                     	level: 6
                     	treatPhpDocTypesAsCertain: true
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	level: 6
                     	treatPhpDocTypesAsCertain: false
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -63,13 +63,13 @@ final class PhpStanPinnedValuesTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	treatPhpDocTypesAsCertain: false
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	treatPhpDocTypesAsCertain: false
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -81,7 +81,7 @@ final class PhpStanPinnedValuesTest extends TestCase
 
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -91,7 +91,7 @@ final class PhpStanPinnedValuesTest extends TestCase
                     parameters:
                     	treatPhpDocTypesAsCertain: false
                     	level: 6
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -100,7 +100,7 @@ final class PhpStanPinnedValuesTest extends TestCase
                 <<<'NEON'
                     includes:
                     	- a.neon
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -109,7 +109,7 @@ final class PhpStanPinnedValuesTest extends TestCase
 
                     parameters:
                     	treatPhpDocTypesAsCertain: false
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -118,13 +118,13 @@ final class PhpStanPinnedValuesTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	treatPhpDocTypesAsCertain: true # why not
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	treatPhpDocTypesAsCertain: false # why not
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -133,14 +133,14 @@ final class PhpStanPinnedValuesTest extends TestCase
                 <<<'NEON'
                     parameters:
                         level: 6
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                         treatPhpDocTypesAsCertain: false
                         level: 6
-                    NEON
+                    NEON,
             ),
         ];
     }
@@ -148,7 +148,11 @@ final class PhpStanPinnedValuesTest extends TestCase
     public function testCreatesNestedSectionsAlongTheWay(): void
     {
         $rule = new PhpStanPinnedValues(values: PinnedValues::fromArray([
-            'parameters' => ['cache' => ['nodesByStringCountMax' => 128]],
+            'parameters' => [
+                'cache' => [
+                    'nodesByStringCountMax' => 128,
+                ],
+            ],
         ]));
 
         $result = $rule->apply(
@@ -156,7 +160,7 @@ final class PhpStanPinnedValuesTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
         );
 
@@ -167,7 +171,7 @@ final class PhpStanPinnedValuesTest extends TestCase
                     	cache:
                     		nodesByStringCountMax: 128
                     	level: 6
-                    NEON
+                    NEON,
             ),
             $result,
         );
@@ -176,7 +180,9 @@ final class PhpStanPinnedValuesTest extends TestCase
     public function testPinsAStringNeedingQuotes(): void
     {
         $rule = new PhpStanPinnedValues(values: PinnedValues::fromArray([
-            'parameters' => ['tmpDir' => 'var/php stan'],
+            'parameters' => [
+                'tmpDir' => 'var/php stan',
+            ],
         ]));
 
         self::assertSame(
@@ -184,7 +190,7 @@ final class PhpStanPinnedValuesTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	tmpDir: 'var/php stan'
-                    NEON
+                    NEON,
             ),
             $rule->apply(null),
         );
@@ -195,7 +201,11 @@ final class PhpStanPinnedValuesTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('holds a section');
 
-        $rule = new PhpStanPinnedValues(values: PinnedValues::fromArray(['parameters' => ['cache' => 'simple']]));
+        $rule = new PhpStanPinnedValues(values: PinnedValues::fromArray([
+            'parameters' => [
+                'cache' => 'simple',
+            ],
+        ]));
 
         $rule->apply(
             FileContent::fromString(
@@ -203,7 +213,7 @@ final class PhpStanPinnedValuesTest extends TestCase
                     parameters:
                     	cache:
                     		nodesByStringCountMax: 128
-                    NEON
+                    NEON,
             ),
         );
     }
@@ -232,7 +242,9 @@ final class PhpStanPinnedValuesTest extends TestCase
     private function rule(): PhpStanPinnedValues
     {
         return new PhpStanPinnedValues(values: PinnedValues::fromArray([
-            'parameters' => ['treatPhpDocTypesAsCertain' => false],
+            'parameters' => [
+                'treatPhpDocTypesAsCertain' => false,
+            ],
         ]));
     }
 

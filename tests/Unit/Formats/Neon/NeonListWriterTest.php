@@ -20,7 +20,7 @@ final class NeonListWriterTest extends TestCase
                 <<<'NEON'
                     includes:
                     	- vendor/acme/standards/phpstan.neon
-                    NEON
+                    NEON,
             ),
             NeonListWriter::ensureEntry('', 'includes', 'vendor/acme/standards/phpstan.neon'),
         );
@@ -32,7 +32,7 @@ final class NeonListWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 6
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -43,7 +43,7 @@ final class NeonListWriterTest extends TestCase
 
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
             NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'),
         );
@@ -55,7 +55,7 @@ final class NeonListWriterTest extends TestCase
             <<<'NEON'
                 includes:
                 	- vendor/acme/standards/phpstan.neon
-                NEON
+                NEON,
         );
 
         self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
@@ -67,7 +67,7 @@ final class NeonListWriterTest extends TestCase
             <<<'NEON'
                 includes:
                 	- vendor/acme/standards/phpstan.neon # the org baseline
-                NEON
+                NEON,
         );
 
         self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
@@ -79,7 +79,7 @@ final class NeonListWriterTest extends TestCase
             <<<'NEON'
                 includes:
                 	- 'vendor/acme/standards/phpstan.neon'
-                NEON
+                NEON,
         );
 
         self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
@@ -92,7 +92,7 @@ final class NeonListWriterTest extends TestCase
                 includes:
                 	# the org baseline
                 	- vendor/acme/standards/phpstan.neon
-                NEON
+                NEON,
         );
 
         self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
@@ -104,7 +104,7 @@ final class NeonListWriterTest extends TestCase
             <<<'NEON'
                 includes: # org standards
                 	- vendor/acme/standards/phpstan.neon
-                NEON
+                NEON,
         );
 
         self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
@@ -119,7 +119,7 @@ final class NeonListWriterTest extends TestCase
 
                 parameters:
                 	level: 6
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -131,7 +131,7 @@ final class NeonListWriterTest extends TestCase
 
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
             NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'),
         );
@@ -145,7 +145,7 @@ final class NeonListWriterTest extends TestCase
 
                 parameters:
                 	level: 6
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -156,7 +156,7 @@ final class NeonListWriterTest extends TestCase
 
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
             NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'),
         );
@@ -167,7 +167,7 @@ final class NeonListWriterTest extends TestCase
         $content = FileContent::fromString(
             <<<'NEON'
                 includes: [vendor/acme/standards/phpstan.neon]
-                NEON
+                NEON,
         );
 
         $this->expectException(RuntimeException::class);
@@ -185,7 +185,7 @@ final class NeonListWriterTest extends TestCase
 
                 includes:
                 	- vendor/acme/standards/phpstan.neon
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -197,7 +197,7 @@ final class NeonListWriterTest extends TestCase
                     includes:
                     	- vendor/acme/standards/phpstan.neon
                     	- vendor/acme/standards/strict.neon
-                    NEON
+                    NEON,
             ),
             NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/strict.neon'),
         );

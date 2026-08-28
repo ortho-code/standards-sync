@@ -17,8 +17,7 @@ final readonly class Change
         private string $desired,
         private array $applications,
         private ?Path $shadowedBy = null,
-    ) {
-    }
+    ) {}
 
     public function path(): Path
     {
@@ -61,7 +60,7 @@ final readonly class Change
     {
         return array_values(array_filter(
             $this->applications,
-            static fn (RuleApplication $application): bool => $application->changed(),
+            static fn(RuleApplication $application): bool => $application->changed(),
         ));
     }
 

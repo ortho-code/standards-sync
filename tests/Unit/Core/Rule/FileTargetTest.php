@@ -27,7 +27,7 @@ final class FileTargetTest extends TestCase
 
         self::assertSame(
             ['phpstan.neon', 'phpstan.dist.neon', 'phpstan.neon.dist'],
-            array_map(static fn (Path $path): string => $path->value(), $candidates),
+            array_map(static fn(Path $path): string => $path->value(), $candidates),
         );
     }
 

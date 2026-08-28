@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\OrthoCode\StandardsSync\Unit\Rules\PhpStan\PinnedValues;
 
-use OrthoCode\StandardsSync\Rules\PhpStan\PinnedValues\PinnedValue;
 use OrthoCode\StandardsSync\Rules\PhpStan\PinnedValues\PinnedValues;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -19,7 +18,9 @@ final class PinnedValuesTest extends TestCase
         $values = PinnedValues::fromArray([
             'parameters' => [
                 'treatPhpDocTypesAsCertain' => false,
-                'cache' => ['nodesByStringCountMax' => 128],
+                'cache' => [
+                    'nodesByStringCountMax' => 128,
+                ],
             ],
         ]);
 
@@ -44,9 +45,23 @@ final class PinnedValuesTest extends TestCase
     public static function invalidStructures(): iterable
     {
         yield 'nothing pinned' => [[]];
-        yield 'an empty pinned section' => [['parameters' => []]];
-        yield 'a non-string key' => [['parameters' => [0 => 'x']]];
-        yield 'a float leaf' => [['parameters' => ['memoryLimitFactor' => 1.5]]];
-        yield 'a null leaf' => [['parameters' => ['editorUrl' => null]]];
+        yield 'an empty pinned section' => [[
+            'parameters' => [],
+        ]];
+        yield 'a non-string key' => [[
+            'parameters' => [
+                0 => 'x',
+            ],
+        ]];
+        yield 'a float leaf' => [[
+            'parameters' => [
+                'memoryLimitFactor' => 1.5,
+            ],
+        ]];
+        yield 'a null leaf' => [[
+            'parameters' => [
+                'editorUrl' => null,
+            ],
+        ]];
     }
 }

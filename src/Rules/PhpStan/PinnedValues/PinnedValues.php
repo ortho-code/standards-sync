@@ -13,9 +13,7 @@ use InvalidArgumentException;
 final readonly class PinnedValues
 {
     /** @param non-empty-list<PinnedValue> $leaves */
-    private function __construct(private array $leaves)
-    {
-    }
+    private function __construct(private array $leaves) {}
 
     /** @param array<string, mixed> $values */
     public static function fromArray(array $values): self
@@ -57,6 +55,11 @@ final readonly class PinnedValues
                 throw new InvalidArgumentException(sprintf('Pinned values must be bool, int or string; "%s" is %s.', implode('.', $keyPath), get_debug_type($value)));
             }
             $leaves[] = new PinnedValue($keyPath, $value);
+        }
+
+        // A non-empty section either yields a leaf or throws above; the guard states that so the type is provable rather than asserted in a docblock.
+        if ($leaves === []) {
+            throw new InvalidArgumentException(sprintf('The pinned section "%s" produced no values.', implode('.', $path)));
         }
 
         return $leaves;

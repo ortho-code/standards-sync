@@ -17,7 +17,7 @@ final class ConfigLoaderTest extends IntegrationTestCase
 {
     public function testLoadsAFileThatReturnsSyncConfig(): void
     {
-        $path = $this->writeConfig('<?php return \OrthoCode\StandardsSync\Core\Config\SyncConfig::create();');
+        $path = $this->writeConfig('<?php return ' . SyncConfig::class . '::create();');
 
         self::assertInstanceOf(SyncConfig::class, (new ConfigLoader())->loadFrom($path));
     }

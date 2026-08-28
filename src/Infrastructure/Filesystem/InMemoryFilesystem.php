@@ -10,23 +10,19 @@ use OrthoCode\StandardsSync\Core\Filesystem\Path;
 /** Filesystem adapter that keeps files in an array and records every write; backs disk-free syncs (tests, previews). */
 final class InMemoryFilesystem implements Filesystem
 {
-    /** @var array<string, string> */
-    private array $files;
-
     /** @var list<string> */
     private array $written = [];
 
     /** @param array<string, string> $files */
-    public function __construct(array $files = [])
-    {
-        $this->files = $files;
-    }
+    public function __construct(private array $files = []) {}
 
+    #[\Override]
     public function read(Path $path): ?string
     {
         return $this->files[$path->value()] ?? null;
     }
 
+    #[\Override]
     public function write(Path $path, string $contents): void
     {
         $this->files[$path->value()] = $contents;

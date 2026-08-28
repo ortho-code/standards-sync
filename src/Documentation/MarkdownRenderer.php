@@ -81,7 +81,7 @@ final readonly class MarkdownRenderer
         foreach ($rulePages as $page) {
             $ruleNamesByFamily[$page->family()][] = $page->name();
         }
-        $pagedFamilies = array_map(static fn (FamilyPage $page): string => $page->family(), $familyPages);
+        $pagedFamilies = array_map(static fn(FamilyPage $page): string => $page->family(), $familyPages);
 
         $families = array_unique([...array_keys($ruleNamesByFamily), ...$pagedFamilies]);
         sort($families);
@@ -99,12 +99,12 @@ final readonly class MarkdownRenderer
         $blocks = [
             self::GENERATED_NOTICE,
             '# ' . self::INDEX_TITLE,
-            "Every example is generated from the scenario suite (`tests/Scenario`): the fixtures are the engine's behaviour catalog, so these pages cannot drift from what the tests pin. Each rule has its own page; a linked family page holds its cross-rule compositions, and engine-level behaviours live on their own page.",
+            'Every example is generated from the scenario suite (`tests/Scenario`): the fixtures are the engine\'s behaviour catalog, so these pages cannot drift from what the tests pin. Each rule has its own page; a linked family page holds its cross-rule compositions, and engine-level behaviours live on their own page.',
             Lines::join($lines),
         ];
         if ($engineSections !== []) {
             $blocks[] = 'Engine behaviours, not any rule\'s own: ' . implode(', ', array_map(
-                fn (CompositionSection $section): string => sprintf('[%s](%s)', $section->name(), $this->enginePageFilename()),
+                fn(CompositionSection $section): string => sprintf('[%s](%s)', $section->name(), $this->enginePageFilename()),
                 $engineSections,
             ));
         }
@@ -126,7 +126,7 @@ final readonly class MarkdownRenderer
         if ($page->ruleNames() !== []) {
             // The rule pages share the family page's folder, so the links are plain basenames.
             $blocks[] = 'Rules: ' . implode(' · ', array_map(
-                static fn (string $rule): string => sprintf('[%s](%s)', $rule, $rule . self::PAGE_EXTENSION),
+                static fn(string $rule): string => sprintf('[%s](%s)', $rule, $rule . self::PAGE_EXTENSION),
                 $page->ruleNames(),
             ));
         }
@@ -170,7 +170,7 @@ final readonly class MarkdownRenderer
         foreach ($subsections as $subsection) {
             $titled = $subsection->title() !== null;
             if ($titled) {
-                $blocks[] = $this->heading($level, (string) $subsection->title());
+                $blocks[] = $this->heading($level, $subsection->title());
             }
             foreach ($subsection->groups() as $group) {
                 $blocks[] = 'Declared as:';
@@ -229,7 +229,7 @@ final readonly class MarkdownRenderer
         }
 
         return '…which report as:' . self::BLOCK_SEPARATOR . Lines::join(array_map(
-            static fn (string $line): string => sprintf('- *%s*', $line),
+            static fn(string $line): string => sprintf('- *%s*', $line),
             $lines,
         ));
     }
@@ -239,13 +239,13 @@ final readonly class MarkdownRenderer
     {
         $kept = array_filter(
             Lines::split($source),
-            static fn (string $line): bool => !array_any(
+            static fn(string $line): bool => !array_any(
                 self::PREAMBLE_PATTERNS,
-                static fn (string $pattern): bool => preg_match($pattern, $line) === 1,
+                static fn(string $pattern): bool => preg_match($pattern, $line) === 1,
             ),
         );
 
-        $listing = (string) preg_replace('/\n{3,}/', self::BLOCK_SEPARATOR, Lines::join($kept));
+        $listing = (string) preg_replace('/\n{3,}/', self::BLOCK_SEPARATOR, Lines::join(array_values($kept)));
 
         return ltrim($listing, Lines::LINE_BREAK);
     }

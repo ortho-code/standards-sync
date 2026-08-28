@@ -12,8 +12,7 @@ final readonly class XmlOpenTag
         private int $start,
         private int $attributesStart,
         private array $attributes,
-    ) {
-    }
+    ) {}
 
     /** The offset of the opening "<". */
     public function start(): int
@@ -34,6 +33,6 @@ final readonly class XmlOpenTag
 
     public function last(): ?XmlAttribute
     {
-        return $this->attributes === [] ? null : $this->attributes[array_key_last($this->attributes)];
+        return $this->attributes === [] ? null : array_last($this->attributes);
     }
 }

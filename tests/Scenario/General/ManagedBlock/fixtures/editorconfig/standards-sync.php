@@ -12,7 +12,7 @@ use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 // The fixture is its own package: distributed content in templates/, sitting at the (virtual) consumer root.
 $package = new Package(__DIR__, '');
 
-return SyncConfig::create()->withRuleSet(new class($package) extends ComposableRuleSet {
+return SyncConfig::create()->withRuleSet(new class ($package) extends ComposableRuleSet {
     public function __construct(Package $package)
     {
         $this->addRule(new ManagedBlock(

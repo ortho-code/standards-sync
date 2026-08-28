@@ -28,18 +28,20 @@ final readonly class ComposerConfigSetting implements Rule
         private string|bool|int $value,
     ) {
         $segments = explode(self::SEPARATOR, $setting);
-        if (array_any($segments, static fn (string $segment): bool => trim($segment) === '')) {
+        if (array_any($segments, static fn(string $segment): bool => trim($segment) === '')) {
             throw new InvalidArgumentException(sprintf('"%s" is not a composer config setting: every segment of a dotted name needs a key.', $setting));
         }
 
         $this->segments = $segments;
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return ComposerManifest::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         if ($content === null) {
@@ -49,6 +51,7 @@ final readonly class ComposerConfigSetting implements Rule
         return JsonObjectWriter::write($content, [ComposerManifest::CONFIG_SECTION, ...$this->segments], $this->value);
     }
 
+    #[\Override]
     public function description(): string
     {
         return sprintf('Pins the composer config setting "%s" to %s.', $this->setting, json_encode($this->value, JSON_THROW_ON_ERROR));

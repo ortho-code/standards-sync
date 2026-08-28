@@ -13,8 +13,7 @@ final readonly class Mismatch
         private Path $path,
         private ?string $expected,
         private ?string $actual,
-    ) {
-    }
+    ) {}
 
     public function path(): Path
     {

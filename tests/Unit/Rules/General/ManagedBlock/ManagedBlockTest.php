@@ -40,7 +40,7 @@ final class ManagedBlockTest extends TestCase
                     # >>> test - managed >>>
                     root = true
                     # <<< test <<<
-                    FILE
+                    FILE,
             ),
         ];
 
@@ -54,7 +54,7 @@ final class ManagedBlockTest extends TestCase
                     # >>> test - managed >>>
                     ignored/
                     # <<< test <<<
-                    FILE
+                    FILE,
             ),
         ];
 
@@ -67,7 +67,7 @@ final class ManagedBlockTest extends TestCase
                     old
                     # <<< test <<<
                     bottom
-                    FILE
+                    FILE,
             ),
             FileContent::fromString(
                 <<<'FILE'
@@ -76,7 +76,7 @@ final class ManagedBlockTest extends TestCase
                     new
                     # <<< test <<<
                     bottom
-                    FILE
+                    FILE,
             ),
         ];
 
@@ -87,14 +87,14 @@ final class ManagedBlockTest extends TestCase
                     # >>> test - managed >>>
                     root = true
                     # <<< test <<<
-                    FILE
+                    FILE,
             ),
             FileContent::fromString(
                 <<<'FILE'
                     # >>> test - managed >>>
                     root = true
                     # <<< test <<<
-                    FILE
+                    FILE,
             ),
         ];
     }

@@ -22,7 +22,7 @@ final class XmlElementWriterTest extends TestCase
                 <?xml version="1.0"?>
                 <psalm errorLevel="3">
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame('3', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -42,7 +42,7 @@ final class XmlElementWriterTest extends TestCase
                         <directory name="src" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame('1', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -54,7 +54,7 @@ final class XmlElementWriterTest extends TestCase
             <<<'XML'
                 <psalm errorLevel='3'>
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame('3', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -66,7 +66,7 @@ final class XmlElementWriterTest extends TestCase
             <<<'XML'
                 <psalm resolveFromConfigFile="true">
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertNull(XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -78,7 +78,7 @@ final class XmlElementWriterTest extends TestCase
             <<<'XML'
                 <psalm autoloader="a&amp;b.php">
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame('a&amp;b.php', XmlElementWriter::readAttribute($content, 'psalm', 'autoloader'));
@@ -91,7 +91,7 @@ final class XmlElementWriterTest extends TestCase
                 <!-- the old config: <psalm errorLevel="8"> -->
                 <psalm errorLevel="3">
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame('3', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -105,7 +105,7 @@ final class XmlElementWriterTest extends TestCase
                 <psalm errorLevel="3">
                 </psalm>
                 </psalmodie>
-                XML
+                XML,
         );
 
         self::assertSame('3', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -117,7 +117,7 @@ final class XmlElementWriterTest extends TestCase
             <<<'XML'
                 <psalm title="a>b" errorLevel="3">
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame('3', XmlElementWriter::readAttribute($content, 'psalm', 'errorLevel'));
@@ -199,7 +199,7 @@ final class XmlElementWriterTest extends TestCase
                         <directory name="src" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
 
         $expected = FileContent::fromString(
@@ -213,7 +213,7 @@ final class XmlElementWriterTest extends TestCase
                         <directory name="src" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '4'));
@@ -225,14 +225,14 @@ final class XmlElementWriterTest extends TestCase
             <<<'XML'
                 <psalm errorLevel='8'>
                 </psalm>
-                XML
+                XML,
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
                 <psalm errorLevel='4'>
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '4'));
@@ -244,7 +244,7 @@ final class XmlElementWriterTest extends TestCase
             <<<'XML'
                 <psalm errorLevel="4">
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame($content, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '4'));
@@ -255,13 +255,13 @@ final class XmlElementWriterTest extends TestCase
         $content = FileContent::fromString(
             <<<'XML'
                 <psalm errorLevel="8" />
-                XML
+                XML,
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
                 <psalm errorLevel="4" />
-                XML
+                XML,
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '4'));
@@ -273,14 +273,14 @@ final class XmlElementWriterTest extends TestCase
             <<<'XML'
                 <psalm resolveFromConfigFile="true">
                 </psalm>
-                XML
+                XML,
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
                 <psalm resolveFromConfigFile="true" errorLevel="2">
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -299,7 +299,7 @@ final class XmlElementWriterTest extends TestCase
                         <directory name="src" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
 
         $expected = FileContent::fromString(
@@ -314,7 +314,7 @@ final class XmlElementWriterTest extends TestCase
                         <directory name="src" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -328,7 +328,7 @@ final class XmlElementWriterTest extends TestCase
                 	resolveFromConfigFile="true"
                 >
                 </psalm>
-                XML
+                XML,
         );
 
         $expected = FileContent::fromString(
@@ -338,7 +338,7 @@ final class XmlElementWriterTest extends TestCase
                 	errorLevel="2"
                 >
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -350,14 +350,14 @@ final class XmlElementWriterTest extends TestCase
             <<<'XML'
                 <psalm>
                 </psalm>
-                XML
+                XML,
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
                 <psalm errorLevel="2">
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -368,13 +368,13 @@ final class XmlElementWriterTest extends TestCase
         $content = FileContent::fromString(
             <<<'XML'
                 <psalm resolveFromConfigFile="true" />
-                XML
+                XML,
         );
 
         $expected = FileContent::fromString(
             <<<'XML'
                 <psalm resolveFromConfigFile="true" errorLevel="2" />
-                XML
+                XML,
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -387,7 +387,7 @@ final class XmlElementWriterTest extends TestCase
                 <psalm resolveFromConfigFile="true"
                 >
                 </psalm>
-                XML
+                XML,
         );
 
         $expected = FileContent::fromString(
@@ -395,7 +395,7 @@ final class XmlElementWriterTest extends TestCase
                 <psalm resolveFromConfigFile="true" errorLevel="2"
                 >
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame($expected, XmlElementWriter::writeAttribute($content, 'psalm', 'errorLevel', '2'));
@@ -416,7 +416,7 @@ final class XmlElementWriterTest extends TestCase
             <<<'XML'
                 <psalm>
                 </psalm>
-                XML
+                XML,
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -431,12 +431,12 @@ final class XmlElementWriterTest extends TestCase
             <<<'XML'
                 <psalm autoloader='old.php'>
                 </psalm>
-                XML
+                XML,
         );
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"\'" would need entity encoding');
 
-        XmlElementWriter::writeAttribute($content, 'psalm', 'autoloader', "it's.php");
+        XmlElementWriter::writeAttribute($content, 'psalm', 'autoloader', 'it\'s.php');
     }
 }

@@ -25,12 +25,16 @@ final class EngineTest extends TestCase
 {
     public function testPlanDoesNotTouchTheFilesystem(): void
     {
-        $filesystem = new InMemoryFilesystem(['/a/.editorconfig' => 'stale']);
+        $filesystem = new InMemoryFilesystem([
+            '/a/.editorconfig' => 'stale',
+        ]);
 
         new Engine($filesystem)->plan($this->config());
 
         self::assertSame([], $filesystem->written());
-        self::assertSame(['/a/.editorconfig' => 'stale'], $filesystem->contents());
+        self::assertSame([
+            '/a/.editorconfig' => 'stale',
+        ], $filesystem->contents());
     }
 
     public function testApplyWritesOnlyDriftedFiles(): void
@@ -50,7 +54,9 @@ final class EngineTest extends TestCase
 
     public function testApplyThenReplanReportsNoDrift(): void
     {
-        $filesystem = new InMemoryFilesystem(['/a/.editorconfig' => 'stale']);
+        $filesystem = new InMemoryFilesystem([
+            '/a/.editorconfig' => 'stale',
+        ]);
         $engine = new Engine($filesystem);
 
         $engine->apply($engine->plan($this->config()));
@@ -64,14 +70,14 @@ final class EngineTest extends TestCase
 
         self::assertSame(
             ['/a/.editorconfig', '/b/.editorconfig'],
-            array_map(static fn (Change $change): string => $change->path()->value(), $plan->changes()),
+            array_map(static fn(Change $change): string => $change->path()->value(), $plan->changes()),
         );
     }
 
     public function testComposedRuleSetsFoldASharedLabelToTheChildContent(): void
     {
         $parent = $this->ruleSetWith($this->blockRule('.editorconfig', 'shared', 'parent'));
-        $child = new class($parent, $this->blockRule('.editorconfig', 'shared', 'child')) extends ComposableRuleSet {
+        $child = new class ($parent, $this->blockRule('.editorconfig', 'shared', 'child')) extends ComposableRuleSet {
             public function __construct(ComposableRuleSet $parent, Rule $own)
             {
                 $this->include($parent);
@@ -108,7 +114,9 @@ final class EngineTest extends TestCase
 
     public function testResolvesTheOnlyExistingCandidateWhateverItsName(): void
     {
-        $filesystem = new InMemoryFilesystem(['/a/phpstan.dist.neon' => FileContent::fromString('old')]);
+        $filesystem = new InMemoryFilesystem([
+            '/a/phpstan.dist.neon' => FileContent::fromString('old'),
+        ]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(new ManagedBlock(
             FileTarget::fromStrings('phpstan.neon', 'phpstan.dist.neon'),
             Label::fromString('test'),
@@ -131,7 +139,7 @@ final class EngineTest extends TestCase
         ]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith($this->stubRule(
             FileTarget::fromStrings('phpstan.neon', 'phpstan.neon.dist', 'phpstan.dist.neon'),
-            static fn (?string $content): ?string => $content . FileContent::fromString('managed'),
+            static fn(?string $content): ?string => $content . FileContent::fromString('managed'),
         )));
 
         $changes = new Engine($filesystem)->plan($config)->changes();
@@ -150,7 +158,7 @@ final class EngineTest extends TestCase
         ]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith($this->stubRule(
             FileTarget::fromStrings('phpstan.neon', 'phpstan.neon.dist', 'phpstan.dist.neon'),
-            static fn (?string $content): ?string => $content,
+            static fn(?string $content): ?string => $content,
         )));
 
         $this->expectException(RuntimeException::class);
@@ -167,7 +175,7 @@ final class EngineTest extends TestCase
         ]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith($this->stubRule(
             FileTarget::fromStrings('a.conf', 'b.conf'),
-            static fn (?string $content): ?string => $content,
+            static fn(?string $content): ?string => $content,
         )));
 
         $this->expectException(RuntimeException::class);
@@ -193,7 +201,9 @@ final class EngineTest extends TestCase
 
     public function testRulesWithDifferentCandidatesResolvingToTheSameFileFoldTogether(): void
     {
-        $filesystem = new InMemoryFilesystem(['/a/phpstan.dist.neon' => FileContent::fromString('old')]);
+        $filesystem = new InMemoryFilesystem([
+            '/a/phpstan.dist.neon' => FileContent::fromString('old'),
+        ]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(
             new ManagedBlock(
                 FileTarget::fromStrings('phpstan.neon', 'phpstan.dist.neon'),
@@ -217,7 +227,7 @@ final class EngineTest extends TestCase
     public function testAbstainingRulesLeaveAnAbsentFileWithoutAChange(): void
     {
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(
-            $this->stubRule('phpstan.neon', static fn (?string $content): ?string => $content),
+            $this->stubRule('phpstan.neon', static fn(?string $content): ?string => $content),
         ));
 
         self::assertSame([], new Engine(new InMemoryFilesystem())->plan($config)->changes());
@@ -225,9 +235,11 @@ final class EngineTest extends TestCase
 
     public function testRefusesARuleThatWantsTheFileDeleted(): void
     {
-        $filesystem = new InMemoryFilesystem(['/a/phpstan.neon' => FileContent::fromString('level')]);
+        $filesystem = new InMemoryFilesystem([
+            '/a/phpstan.neon' => FileContent::fromString('level'),
+        ]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith(
-            $this->stubRule('phpstan.neon', static fn (?string $content): ?string => null),
+            $this->stubRule('phpstan.neon', static fn(?string $content): ?string => null),
         ));
 
         $this->expectException(RuntimeException::class);
@@ -240,7 +252,9 @@ final class EngineTest extends TestCase
     {
         $satisfied = $this->blockRule('.gitignore', 'one', 'a');
         $missing = $this->blockRule('.gitignore', 'two', 'b');
-        $filesystem = new InMemoryFilesystem(['/a/.gitignore' => (string) $satisfied->apply(null)]);
+        $filesystem = new InMemoryFilesystem([
+            '/a/.gitignore' => (string) $satisfied->apply(null),
+        ]);
         $config = SyncConfig::create()->withRoots(['/a'])->withRuleSet($this->ruleSetWith($satisfied, $missing));
 
         $drifting = new Engine($filesystem)->plan($config)->changes()[0]->driftingApplications();
@@ -266,13 +280,12 @@ final class EngineTest extends TestCase
     {
         $target = is_string($target) ? FileTarget::fromString($target) : $target;
 
-        return new class($target, $apply) implements Rule {
+        return new class ($target, $apply) implements Rule {
             /** @param Closure(?string): ?string $apply */
             public function __construct(
                 private readonly FileTarget $target,
                 private readonly Closure $apply,
-            ) {
-            }
+            ) {}
 
             public function target(): FileTarget
             {
@@ -293,7 +306,7 @@ final class EngineTest extends TestCase
 
     private function ruleSetWith(Rule ...$rules): ComposableRuleSet
     {
-        return new class(...$rules) extends ComposableRuleSet {
+        return new class (...$rules) extends ComposableRuleSet {
             public function __construct(Rule ...$rules)
             {
                 foreach ($rules as $rule) {

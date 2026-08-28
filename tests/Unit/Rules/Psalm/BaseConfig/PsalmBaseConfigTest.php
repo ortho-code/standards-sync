@@ -28,7 +28,7 @@ final class PsalmBaseConfigTest extends TestCase
                         <directory name="app" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame($existing, $this->rule()->apply($existing));
@@ -59,7 +59,7 @@ final class PsalmBaseConfigTest extends TestCase
                         <directory name="src" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
     }
 }

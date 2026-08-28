@@ -23,16 +23,19 @@ final readonly class PsalmBaseConfig implements Rule
         }
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return PsalmConfigFile::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         return $content ?? $this->config;
     }
 
+    #[\Override]
     public function description(): string
     {
         return 'Seeds a missing Psalm config with the org base config.';

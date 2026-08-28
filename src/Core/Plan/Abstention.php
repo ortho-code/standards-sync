@@ -17,8 +17,7 @@ final readonly class Abstention
     public function __construct(
         private Path $path,
         private array $rules,
-    ) {
-    }
+    ) {}
 
     public function path(): Path
     {

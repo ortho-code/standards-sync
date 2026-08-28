@@ -12,8 +12,7 @@ final readonly class JsonObject
         private int $start,
         private int $end,
         private array $members,
-    ) {
-    }
+    ) {}
 
     /** The offset of the opening brace. */
     public function start(): int
@@ -40,6 +39,6 @@ final readonly class JsonObject
 
     public function last(): ?JsonMember
     {
-        return $this->members === [] ? null : $this->members[array_key_last($this->members)];
+        return $this->members === [] ? null : array_last($this->members);
     }
 }

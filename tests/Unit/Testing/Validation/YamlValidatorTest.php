@@ -21,7 +21,7 @@ final class YamlValidatorTest extends TestCase
             <<<'YAML'
                 imports:
                   - vendor/acme/standards/deptrac.yaml
-                YAML
+                YAML,
         );
 
         new YamlValidator()->assertValid('./deptrac.yaml', $content);

@@ -44,7 +44,7 @@ final readonly class YamlValue
                 }
                 continue;
             }
-            if ($character === "'" || $character === '"') {
+            if ($character === '\'' || $character === '"') {
                 $quote = $character;
                 continue;
             }

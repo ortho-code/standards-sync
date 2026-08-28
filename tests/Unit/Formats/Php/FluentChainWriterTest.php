@@ -23,7 +23,7 @@ final class FluentChainWriterTest extends TestCase
                             'a.php',
                             'b.php',
                         ]);
-                    PHP
+                    PHP,
             ),
             FluentChainWriter::ensureArrayEntry(
                 FileContent::fromString(
@@ -32,10 +32,10 @@ final class FluentChainWriterTest extends TestCase
                             ->withSets([
                                 'a.php',
                             ]);
-                        PHP
+                        PHP,
                 ),
                 'withSets',
-                "'b.php'",
+                '\'b.php\'',
             ),
         );
     }
@@ -48,7 +48,7 @@ final class FluentChainWriterTest extends TestCase
                     ->withSets([
                         __DIR__ . '/x.php', // the org set
                     ]);
-                PHP
+                PHP,
         );
         $withHashComment = FileContent::fromString(
             <<<'PHP'
@@ -56,11 +56,11 @@ final class FluentChainWriterTest extends TestCase
                     ->withSets([
                         __DIR__ . '/x.php', # the org set
                     ]);
-                PHP
+                PHP,
         );
 
-        self::assertSame($withLineComment, FluentChainWriter::ensureArrayEntry($withLineComment, 'withSets', "__DIR__ . '/x.php'"));
-        self::assertSame($withHashComment, FluentChainWriter::ensureArrayEntry($withHashComment, 'withSets', "__DIR__ . '/x.php'"));
+        self::assertSame($withLineComment, FluentChainWriter::ensureArrayEntry($withLineComment, 'withSets', '__DIR__ . \'/x.php\''));
+        self::assertSame($withHashComment, FluentChainWriter::ensureArrayEntry($withHashComment, 'withSets', '__DIR__ . \'/x.php\''));
     }
 
     public function testSlashesInsideAQuotedEntryAreNotACommentBoundary(): void
@@ -71,10 +71,10 @@ final class FluentChainWriterTest extends TestCase
                     ->withSets([
                         'https://example.com/sets/a.php',
                     ]);
-                PHP
+                PHP,
         );
 
-        self::assertSame($content, FluentChainWriter::ensureArrayEntry($content, 'withSets', "'https://example.com/sets/a.php'"));
+        self::assertSame($content, FluentChainWriter::ensureArrayEntry($content, 'withSets', '\'https://example.com/sets/a.php\''));
     }
 
     public function testMatchesAnEntryWithAndWithoutTrailingComma(): void
@@ -85,7 +85,7 @@ final class FluentChainWriterTest extends TestCase
                     ->withSets([
                         'a.php',
                     ]);
-                PHP
+                PHP,
         );
         $withoutComma = FileContent::fromString(
             <<<'PHP'
@@ -93,11 +93,11 @@ final class FluentChainWriterTest extends TestCase
                     ->withSets([
                         'a.php'
                     ]);
-                PHP
+                PHP,
         );
 
-        self::assertSame($withComma, FluentChainWriter::ensureArrayEntry($withComma, 'withSets', "'a.php'"));
-        self::assertSame($withoutComma, FluentChainWriter::ensureArrayEntry($withoutComma, 'withSets', "'a.php'"));
+        self::assertSame($withComma, FluentChainWriter::ensureArrayEntry($withComma, 'withSets', '\'a.php\''));
+        self::assertSame($withoutComma, FluentChainWriter::ensureArrayEntry($withoutComma, 'withSets', '\'a.php\''));
     }
 
     public function testInsertsIntoAnEmptyBlockArray(): void
@@ -109,7 +109,7 @@ final class FluentChainWriterTest extends TestCase
                         ->withSets([
                             'a.php',
                         ]);
-                    PHP
+                    PHP,
             ),
             FluentChainWriter::ensureArrayEntry(
                 FileContent::fromString(
@@ -117,10 +117,10 @@ final class FluentChainWriterTest extends TestCase
                         return RectorConfig::configure()
                             ->withSets([
                             ]);
-                        PHP
+                        PHP,
                 ),
                 'withSets',
-                "'a.php'",
+                '\'a.php\'',
             ),
         );
     }
@@ -133,10 +133,10 @@ final class FluentChainWriterTest extends TestCase
                     ->withSets([
                         'a)]b.php',
                     ]);
-                PHP
+                PHP,
         );
 
-        self::assertSame($content, FluentChainWriter::ensureArrayEntry($content, 'withSets', "'a)]b.php'"));
+        self::assertSame($content, FluentChainWriter::ensureArrayEntry($content, 'withSets', '\'a)]b.php\''));
     }
 
     public function testCreatesTheCallAtTheEndOfAMultilineChain(): void
@@ -149,17 +149,17 @@ final class FluentChainWriterTest extends TestCase
                         ->withSets([
                             'a.php',
                         ]);
-                    PHP
+                    PHP,
             ),
             FluentChainWriter::ensureArrayEntry(
                 FileContent::fromString(
                     <<<'PHP'
                         return RectorConfig::configure()
                             ->withDeadCodeLevel(10);
-                        PHP
+                        PHP,
                 ),
                 'withSets',
-                "'a.php'",
+                '\'a.php\'',
             ),
         );
     }
@@ -173,9 +173,9 @@ final class FluentChainWriterTest extends TestCase
                         ->withSets([
                             'a.php',
                         ]);
-                    PHP
+                    PHP,
             ),
-            FluentChainWriter::ensureArrayEntry(FileContent::fromString('return RectorConfig::configure();'), 'withSets', "'a.php'"),
+            FluentChainWriter::ensureArrayEntry(FileContent::fromString('return RectorConfig::configure();'), 'withSets', '\'a.php\''),
         );
     }
 
@@ -184,7 +184,7 @@ final class FluentChainWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('terminated statement');
 
-        FluentChainWriter::ensureArrayEntry(FileContent::fromString('return RectorConfig::configure()'), 'withSets', "'a.php'");
+        FluentChainWriter::ensureArrayEntry(FileContent::fromString('return RectorConfig::configure()'), 'withSets', '\'a.php\'');
     }
 
     public function testRefusesASingleLineArray(): void
@@ -192,7 +192,7 @@ final class FluentChainWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('one entry per line');
 
-        FluentChainWriter::ensureArrayEntry("return RectorConfig::configure()->withSets(['a.php']);", 'withSets', "'b.php'");
+        FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets([\'a.php\']);', 'withSets', '\'b.php\'');
     }
 
     public function testRefusesANonArrayArgument(): void
@@ -200,7 +200,7 @@ final class FluentChainWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('not an array');
 
-        FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets($sets);', 'withSets', "'a.php'");
+        FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets($sets);', 'withSets', '\'a.php\'');
     }
 
     public function testRefusesACallThatNeverCloses(): void
@@ -208,7 +208,7 @@ final class FluentChainWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('never closes');
 
-        FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets([;', 'withSets', "'a.php'");
+        FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets([;', 'withSets', '\'a.php\'');
     }
 
     public function testRendersTheBlockFormArrayCall(): void
@@ -219,7 +219,7 @@ final class FluentChainWriterTest extends TestCase
                         __DIR__ . '/vendor/acme/standards/config/rector.php',
                     ])
                 PHP,
-            FluentChainWriter::createArrayCall('withSets', "__DIR__ . '/vendor/acme/standards/config/rector.php'"),
+            FluentChainWriter::createArrayCall('withSets', '__DIR__ . \'/vendor/acme/standards/config/rector.php\''),
         );
     }
 }

@@ -11,8 +11,7 @@ final readonly class Subsection
     public function __construct(
         private ?string $title,
         private array $groups,
-    ) {
-    }
+    ) {}
 
     public function title(): ?string
     {

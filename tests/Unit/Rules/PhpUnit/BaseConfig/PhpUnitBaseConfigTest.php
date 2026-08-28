@@ -30,7 +30,7 @@ final class PhpUnitBaseConfigTest extends TestCase
                         </testsuite>
                     </testsuites>
                 </phpunit>
-                XML
+                XML,
         );
 
         self::assertSame($existing, $this->rule()->apply($existing));
@@ -61,7 +61,7 @@ final class PhpUnitBaseConfigTest extends TestCase
                         </testsuite>
                     </testsuites>
                 </phpunit>
-                XML
+                XML,
         );
     }
 }

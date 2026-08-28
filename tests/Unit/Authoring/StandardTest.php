@@ -15,7 +15,7 @@ final class StandardTest extends TestCase
 {
     public function testEnforceReceivesTheInjectedPackage(): void
     {
-        $standard = new class(new Package('/anywhere', 'vendor/acme/standards')) extends Standard {
+        $standard = new class (new Package('/anywhere', 'vendor/acme/standards')) extends Standard {
             protected function enforce(Package $package): void
             {
                 $this->addRule(new PhpStanIncludedRuleset(ruleset: $package->path('phpstan.neon')));

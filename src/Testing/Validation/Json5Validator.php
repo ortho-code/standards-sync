@@ -20,6 +20,7 @@ final readonly class Json5Validator implements SyncedFileValidator
         $this->parserInstalled = $parserInstalled ?? function_exists('json5_decode');
     }
 
+    #[\Override]
     public function assertValid(string $path, string $content): void
     {
         if (!str_ends_with($path, self::EXTENSION)) {

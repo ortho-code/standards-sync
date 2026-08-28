@@ -16,20 +16,20 @@ use OrthoCode\StandardsSync\Rules\Psalm\PsalmConfigFile;
  */
 final readonly class PsalmLoosestErrorLevel implements Rule, ExplainsDrift
 {
-    public function __construct(private PsalmErrorLevel $loosest)
-    {
-    }
+    public function __construct(private PsalmErrorLevel $loosest) {}
 
     public function loosest(): PsalmErrorLevel
     {
         return $this->loosest;
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return PsalmConfigFile::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         if ($content === null) {
@@ -40,11 +40,13 @@ final readonly class PsalmLoosestErrorLevel implements Rule, ExplainsDrift
         return XmlElementWriter::writeAttribute($content, PsalmConfigFile::ROOT_ELEMENT, PsalmConfigFile::ERROR_LEVEL, (string) $this->enforcedLevel($content)->value());
     }
 
+    #[\Override]
     public function description(): string
     {
         return sprintf('Keeps the Psalm error level at or below %d (lower is stricter).', $this->loosest->value());
     }
 
+    #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {

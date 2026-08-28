@@ -14,9 +14,7 @@ final readonly class Label
 {
     private const string VALID_LABEL = '/^[A-Za-z0-9._-]+$/';
 
-    private function __construct(private string $value)
-    {
-    }
+    private function __construct(private string $value) {}
 
     public static function fromString(string $value): self
     {

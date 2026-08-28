@@ -48,6 +48,7 @@ final readonly class Package
      * Locates the package declaring the given class: the nearest composer.json above the class file names it, and composer's install record places it.
      * The record is authoritative where the file location cannot be: under a symlinked install the class file resolves outside the consumer project, while the record keeps the portable vendor path.
      */
+    /** @param class-string $class */
     public static function fromClass(string $class): self
     {
         $file = new ReflectionClass($class)->getFileName();
@@ -78,7 +79,7 @@ final readonly class Package
     {
         $distributed = $this->distributed($file);
 
-        return $this->installedAt === null ? $distributed->value() : $this->installedAt->join($distributed)->value();
+        return $this->installedAt instanceof Path ? $this->installedAt->join($distributed)->value() : $distributed->value();
     }
 
     // A distributed file is named relative to the templates directory.

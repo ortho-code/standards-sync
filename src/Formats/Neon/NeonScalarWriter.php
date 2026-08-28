@@ -145,7 +145,7 @@ final readonly class NeonScalarWriter
     {
         return array_find_key(
             array_slice($lines, $rangeStart, $rangeEnd - $rangeStart, true),
-            static fn (string $line): bool => str_starts_with($line, $prefix),
+            static fn(string $line): bool => str_starts_with($line, $prefix),
         );
     }
 
@@ -159,7 +159,8 @@ final readonly class NeonScalarWriter
     {
         $childIndent = null;
         $end = count($lines);
-        for ($index = $keyIndex + 1; $index < count($lines); $index++) {
+        $counter = count($lines);
+        for ($index = $keyIndex + 1; $index < $counter; $index++) {
             if (trim($lines[$index]) === '') {
                 continue;
             }
@@ -176,7 +177,7 @@ final readonly class NeonScalarWriter
 
     /**
      * @param list<string> $lines
-     * @param non-empty-list<string> $remainingPath
+     * @param list<string> $remainingPath
      */
     private static function insertMissing(string $content, array $lines, array $remainingPath, bool|int|string $value, ?string $comment, string $indent, string $unit, int $insertAt, bool $topLevel): string
     {

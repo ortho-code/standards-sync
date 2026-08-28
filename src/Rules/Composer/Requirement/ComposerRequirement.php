@@ -29,11 +29,13 @@ final readonly class ComposerRequirement implements Rule, ExplainsDrift
         }
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return ComposerManifest::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         if ($content === null) {
@@ -55,16 +57,18 @@ final readonly class ComposerRequirement implements Rule, ExplainsDrift
         return JsonObjectWriter::write($content, [($section ?? $this->type)->value, $this->package], $constraint->value());
     }
 
+    #[\Override]
     public function description(): string
     {
         return sprintf('Requires %s in the composer manifest (%s), no lower than "%s".', $this->package, $this->type->value, $this->constraint->value());
     }
 
+    #[\Override]
     public function explain(?string $content): string
     {
         $sections = $content === null ? [] : $this->sectionsRequiring($content);
         $section = $sections[0] ?? null;
-        if ($section === null) {
+        if ($content === null || $section === null) {
             return sprintf('%s is not required; it is added to %s. Run "composer update %s" afterwards, or composer install will refuse the stale lock.', $this->package, $this->type->value, $this->package);
         }
 
@@ -99,7 +103,7 @@ final readonly class ComposerRequirement implements Rule, ExplainsDrift
     {
         return array_values(array_filter(
             RequirementType::cases(),
-            fn (RequirementType $section): bool => $this->requirementIn($content, $section) !== null,
+            fn(RequirementType $section): bool => $this->requirementIn($content, $section) instanceof VersionConstraint,
         ));
     }
 

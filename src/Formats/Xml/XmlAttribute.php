@@ -14,8 +14,7 @@ final readonly class XmlAttribute
         private string $value,
         private int $valueStart,
         private int $valueEnd,
-    ) {
-    }
+    ) {}
 
     /** The offset of the attribute name; its text runs to the closing quote of its value. */
     public function start(): int

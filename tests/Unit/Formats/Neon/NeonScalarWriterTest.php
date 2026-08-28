@@ -21,7 +21,7 @@ final class NeonScalarWriterTest extends TestCase
                 	level: 6
                 	paths:
                 		- src
-                NEON
+                NEON,
         );
 
         self::assertSame('6', NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -33,7 +33,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 6 # keep in step with CI
-                NEON
+                NEON,
         );
 
         self::assertSame('6', NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -45,10 +45,10 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: '6'
-                NEON
+                NEON,
         );
 
-        self::assertSame("'6'", NeonScalarWriter::read($content, ['parameters', 'level']));
+        self::assertSame('\'6\'', NeonScalarWriter::read($content, ['parameters', 'level']));
     }
 
     public function testReadsNullWhenTheKeyIsNotWritten(): void
@@ -58,7 +58,7 @@ final class NeonScalarWriterTest extends TestCase
                 parameters:
                 	paths:
                 		- src
-                NEON
+                NEON,
         );
 
         self::assertNull(NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -70,7 +70,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 includes:
                 	- vendor/acme/standards/phpstan.neon
-                NEON
+                NEON,
         );
 
         self::assertNull(NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -83,7 +83,7 @@ final class NeonScalarWriterTest extends TestCase
                 parameters:
                 	level:
                 		nested: 1
-                NEON
+                NEON,
         );
 
         self::assertNull(NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -96,7 +96,7 @@ final class NeonScalarWriterTest extends TestCase
                 parameters:
                 	type_coverage:
                 		level: 9
-                NEON
+                NEON,
         );
 
         self::assertNull(NeonScalarWriter::read($content, ['parameters', 'level']));
@@ -113,7 +113,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 4
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -121,7 +121,7 @@ final class NeonScalarWriterTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 7
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::write($content, ['parameters', 'level'], 7),
         );
@@ -133,7 +133,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 7
-                NEON
+                NEON,
         );
 
         self::assertSame($content, NeonScalarWriter::write($content, ['parameters', 'level'], 7));
@@ -145,7 +145,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 4 # keep in step with CI
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -153,7 +153,7 @@ final class NeonScalarWriterTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 7 # keep in step with CI
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::write($content, ['parameters', 'level'], 7),
         );
@@ -166,7 +166,7 @@ final class NeonScalarWriterTest extends TestCase
                 parameters:
                 	paths:
                 		- src
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -176,7 +176,7 @@ final class NeonScalarWriterTest extends TestCase
                     	level: 7
                     	paths:
                     		- src
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::write($content, ['parameters', 'level'], 7),
         );
@@ -188,7 +188,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 includes:
                 	- vendor/acme/standards/phpstan.neon
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -199,7 +199,7 @@ final class NeonScalarWriterTest extends TestCase
 
                     parameters:
                     	level: 7
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::write($content, ['parameters', 'level'], 7),
         );
@@ -212,7 +212,7 @@ final class NeonScalarWriterTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 7
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::write('', ['parameters', 'level'], 7),
         );
@@ -225,7 +225,7 @@ final class NeonScalarWriterTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	treatPhpDocTypesAsCertain: false
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::write('', ['parameters', 'treatPhpDocTypesAsCertain'], false),
         );
@@ -238,7 +238,7 @@ final class NeonScalarWriterTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	message: 'hello world'
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::write('', ['parameters', 'message'], 'hello world'),
         );
@@ -250,10 +250,10 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	pattern: '~foo#bar~'
-                NEON
+                NEON,
         );
 
-        self::assertSame("'~foo#bar~'", NeonScalarWriter::read($content, ['parameters', 'pattern']));
+        self::assertSame('\'~foo#bar~\'', NeonScalarWriter::read($content, ['parameters', 'pattern']));
         self::assertSame($content, NeonScalarWriter::write($content, ['parameters', 'pattern'], '~foo#bar~'));
     }
 
@@ -263,7 +263,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	pattern: '~foo#bar~' # the org pattern
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -271,7 +271,7 @@ final class NeonScalarWriterTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	pattern: '~other#thing~' # the org pattern
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::write($content, ['parameters', 'pattern'], '~other#thing~'),
         );
@@ -283,7 +283,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 4 # we lowered this deliberately
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -291,7 +291,7 @@ final class NeonScalarWriterTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 7 # org minimum: raise freely
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::write($content, ['parameters', 'level'], 7, 'org minimum: raise freely'),
         );
@@ -304,7 +304,7 @@ final class NeonScalarWriterTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 7 # org minimum: raise freely
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::write('', ['parameters', 'level'], 7, 'org minimum: raise freely'),
         );
@@ -316,7 +316,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 7 # org minimum: raise freely
-                NEON
+                NEON,
         );
 
         self::assertSame($content, NeonScalarWriter::write($content, ['parameters', 'level'], 7, 'org minimum: raise freely'));
@@ -328,7 +328,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: max
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -336,7 +336,7 @@ final class NeonScalarWriterTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: max # org minimum: raise freely
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'),
         );
@@ -348,7 +348,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 8 # our own note
-                NEON
+                NEON,
         );
 
         self::assertSame(
@@ -356,7 +356,7 @@ final class NeonScalarWriterTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 8 # org minimum: raise freely
-                    NEON
+                    NEON,
             ),
             NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'),
         );
@@ -368,7 +368,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 8 # org minimum: raise freely
-                NEON
+                NEON,
         );
 
         self::assertSame($content, NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'));
@@ -381,7 +381,7 @@ final class NeonScalarWriterTest extends TestCase
                 parameters:
                 	paths:
                 		- src
-                NEON
+                NEON,
         );
 
         self::assertSame($content, NeonScalarWriter::ensureTrailingComment($content, ['parameters', 'level'], 'org minimum: raise freely'));
@@ -394,7 +394,7 @@ final class NeonScalarWriterTest extends TestCase
                 parameters:
                 	level:
                 		nested: 1
-                NEON
+                NEON,
         );
 
         $this->expectException(RuntimeException::class);
@@ -409,7 +409,7 @@ final class NeonScalarWriterTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 6
-                NEON
+                NEON,
         );
 
         $this->expectException(RuntimeException::class);

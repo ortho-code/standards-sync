@@ -51,7 +51,7 @@ final readonly class Json5ListWriter
 
         $object = self::scanObject($content, $objectStart);
         $member = $object->member($key);
-        if ($member === null) {
+        if (!$member instanceof JsonMember) {
             return self::appendMember($content, $object, $key, $entry, $comment);
         }
 
@@ -60,7 +60,7 @@ final readonly class Json5ListWriter
         }
 
         $spans = self::scanList($content, $member->valueStart());
-        $present = array_find($spans, static fn (array $span): bool => self::isEntry($content, $span, $entry));
+        $present = array_find($spans, static fn(array $span): bool => self::isEntry($content, $span, $entry));
         if ($present !== null) {
             return $comment === null ? $content : self::ensureTrailingComment($content, $present, $comment);
         }
@@ -113,7 +113,7 @@ final readonly class Json5ListWriter
         $last = $object->last();
 
         // An object with nothing to preserve is filled in the canonical shape, one member per line.
-        if ($last === null) {
+        if (!$last instanceof JsonMember) {
             $closingIndent = self::lineIndent($content, $object->start());
             $memberIndent = $closingIndent . $unit;
 
@@ -235,7 +235,7 @@ final readonly class Json5ListWriter
     private static function isEntry(string $content, array $span, string $entry): bool
     {
         $character = $content[$span[0]];
-        if ($character !== '"' && $character !== "'") {
+        if ($character !== '"' && $character !== '\'') {
             return false;
         }
 
@@ -265,8 +265,8 @@ final readonly class Json5ListWriter
 
     private static function renderLike(string $content, int $offset, string $text): string
     {
-        if ($content[$offset] === "'") {
-            return "'" . addcslashes($text, "\\'") . "'";
+        if ($content[$offset] === '\'') {
+            return '\'' . addcslashes($text, '\\\'') . '\'';
         }
 
         return self::renderDouble($text);
@@ -275,8 +275,8 @@ final readonly class Json5ListWriter
     /** Renders the key in the sibling member's spelling — bare where the file uses bare identifiers and the key allows it. */
     private static function renderKeyLike(string $content, int $offset, string $key): string
     {
-        if ($content[$offset] === "'") {
-            return "'" . addcslashes($key, "\\'") . "'";
+        if ($content[$offset] === '\'') {
+            return '\'' . addcslashes($key, '\\\'') . '\'';
         }
 
         if ($content[$offset] !== '"' && strspn($key, self::IDENTIFIER_CHARACTERS) === strlen($key)) {
@@ -299,7 +299,7 @@ final readonly class Json5ListWriter
     private static function skipKey(string $content, int $index): int
     {
         $character = self::characterAt($content, $index);
-        if ($character === '"' || $character === "'") {
+        if ($character === '"' || $character === '\'') {
             return self::skipString($content, $index);
         }
 
@@ -313,13 +313,13 @@ final readonly class Json5ListWriter
 
     private static function memberKey(string $text): string
     {
-        return $text[0] === '"' || $text[0] === "'" ? self::unquote($text) : $text;
+        return $text[0] === '"' || $text[0] === '\'' ? self::unquote($text) : $text;
     }
 
     private static function skipValue(string $content, int $index): int
     {
         return match (self::characterAt($content, $index)) {
-            '"', "'" => self::skipString($content, $index),
+            '"', '\'' => self::skipString($content, $index),
             '{', '[' => self::skipBracketed($content, $index),
             '' => throw new RuntimeException('The JSON5 document ends where a value should start; the file cannot be managed.'),
             default => self::skipLiteral($content, $index),
@@ -349,7 +349,7 @@ final readonly class Json5ListWriter
         $depth = 0;
         for ($cursor = $index; $cursor < strlen($content); $cursor++) {
             $character = $content[$cursor];
-            if ($character === '"' || $character === "'") {
+            if ($character === '"' || $character === '\'') {
                 $cursor = self::skipString($content, $cursor) - 1;
                 continue;
             }

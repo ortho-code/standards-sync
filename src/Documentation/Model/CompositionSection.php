@@ -11,8 +11,7 @@ final readonly class CompositionSection
     public function __construct(
         private string $name,
         private array $subsections,
-    ) {
-    }
+    ) {}
 
     public function name(): string
     {

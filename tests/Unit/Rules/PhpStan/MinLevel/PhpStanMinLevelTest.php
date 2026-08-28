@@ -37,7 +37,7 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 7
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -48,7 +48,7 @@ final class PhpStanMinLevelTest extends TestCase
                     	level: 4
                     	paths:
                     		- src
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -56,7 +56,7 @@ final class PhpStanMinLevelTest extends TestCase
                     	level: 7
                     	paths:
                     		- src
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -65,13 +65,13 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 8
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	level: 8
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -80,13 +80,13 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 7
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	level: 7
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -95,13 +95,13 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: max
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	level: max
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -110,13 +110,13 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: '4'
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	level: 7
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -129,7 +129,7 @@ final class PhpStanMinLevelTest extends TestCase
                     parameters:
                     	paths:
                     		- src
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -140,7 +140,7 @@ final class PhpStanMinLevelTest extends TestCase
                     	level: 7
                     	paths:
                     		- src
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -149,7 +149,7 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     includes:
                     	- vendor/acme/standards/phpstan.neon
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -158,7 +158,7 @@ final class PhpStanMinLevelTest extends TestCase
 
                     parameters:
                     	level: 7
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -169,7 +169,7 @@ final class PhpStanMinLevelTest extends TestCase
                     	level: 4
                     	type_coverage:
                     		level: 9
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -177,7 +177,7 @@ final class PhpStanMinLevelTest extends TestCase
                     	level: 7
                     	type_coverage:
                     		level: 9
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -187,7 +187,7 @@ final class PhpStanMinLevelTest extends TestCase
                     parameters:
                     	type_coverage:
                     		level: 2
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -195,7 +195,7 @@ final class PhpStanMinLevelTest extends TestCase
                     	level: 7
                     	type_coverage:
                     		level: 2
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -204,13 +204,13 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 4 # keep in step with CI
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	level: 7 # keep in step with CI
-                    NEON
+                    NEON,
             ),
         ];
     }
@@ -236,13 +236,13 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 4
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	level: 7 # org minimum: raise freely
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -251,13 +251,13 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 4 # we lowered this deliberately
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	level: 7 # org minimum: raise freely
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -266,13 +266,13 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: max
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     parameters:
                     	level: max # org minimum: raise freely
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -282,7 +282,7 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 7 # org minimum: raise freely
-                    NEON
+                    NEON,
             ),
         ];
     }
@@ -307,7 +307,7 @@ final class PhpStanMinLevelTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 8
-                NEON
+                NEON,
         );
 
         self::assertSame('The org comment on the level line is missing or altered.', $this->commentedRule()->explain($compliant));
@@ -319,7 +319,7 @@ final class PhpStanMinLevelTest extends TestCase
             <<<'NEON'
                 includes:
                 	- vendor/acme/standards/phpstan.neon
-                NEON
+                NEON,
         );
 
         self::assertSame('No PHPStan level is written; 7 is added as the minimum.', $this->rule()->explain($config));
@@ -334,7 +334,7 @@ final class PhpStanMinLevelTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: %level%
-                    NEON
+                    NEON,
             ),
         );
     }
@@ -351,7 +351,7 @@ final class PhpStanMinLevelTest extends TestCase
             <<<'NEON'
                 parameters:
                 	level: 4
-                NEON
+                NEON,
         );
 
         self::assertSame('Keeps the PHPStan level at or above 7.', $rule->description());

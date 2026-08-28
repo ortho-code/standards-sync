@@ -36,9 +36,7 @@ final class ClassDescriptionTest extends TestCase
 }
 
 /** One line. */
-final class OneLineDocblock
-{
-}
+final class OneLineDocblock {}
 
 /**
  * First sentence.
@@ -48,15 +46,9 @@ final class OneLineDocblock
  *
  * @internal a tag line the description drops
  */
-final class MultiParagraphDocblock
-{
-}
+final class MultiParagraphDocblock {}
 
-final class NoDocblock
-{
-}
+final class NoDocblock {}
 
 /** @internal */
-final class TagOnlyDocblock
-{
-}
+final class TagOnlyDocblock {}

@@ -12,9 +12,7 @@ use RecursiveIteratorIterator;
 final readonly class DirectoryListing
 {
     /** @param list<string> $relativePaths */
-    private function __construct(private array $relativePaths)
-    {
-    }
+    private function __construct(private array $relativePaths) {}
 
     public static function fromDirectory(string $directory): self
     {

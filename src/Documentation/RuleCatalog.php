@@ -61,9 +61,7 @@ final readonly class RuleCatalog
      * @param list<FamilyPage> $familyPages
      * @param list<CompositionSection> $engineSections
      */
-    private function __construct(private array $rulePages, private array $familyPages, private array $engineSections)
-    {
-    }
+    private function __construct(private array $rulePages, private array $familyPages, private array $engineSections) {}
 
     public static function fromProject(string $projectRoot, Filesystem $filesystem = new SymfonyFilesystem()): self
     {
@@ -118,7 +116,7 @@ final readonly class RuleCatalog
                 self::subsections($testClasses, $projectRoot, $filesystem, $ruleClass),
             );
         }
-        usort($rulePages, static fn (RulePage $a, RulePage $b): int => strcmp($a->name(), $b->name()));
+        usort($rulePages, static fn(RulePage $a, RulePage $b): int => strcmp($a->name(), $b->name()));
 
         $familyPages = [];
         $engineSections = [];
@@ -150,8 +148,8 @@ final readonly class RuleCatalog
                 continue;
             }
             $ruleNames = array_map(
-                static fn (RulePage $page): string => $page->name(),
-                array_values(array_filter($rulePages, static fn (RulePage $page): bool => $page->family() === $family)),
+                static fn(RulePage $page): string => $page->name(),
+                array_values(array_filter($rulePages, static fn(RulePage $page): bool => $page->family() === $family)),
             );
             $familyPages[] = new FamilyPage($family, $ruleNames, $sections);
         }
@@ -164,7 +162,9 @@ final readonly class RuleCatalog
     {
         $renderer = new MarkdownRenderer();
 
-        $pages = [self::INDEX_PAGE => $renderer->renderIndex($this->rulePages, $this->familyPages, $this->engineSections)];
+        $pages = [
+            self::INDEX_PAGE => $renderer->renderIndex($this->rulePages, $this->familyPages, $this->engineSections),
+        ];
         foreach ($this->rulePages as $page) {
             $pages[$renderer->rulePageFilename($page->family(), $page->name())] = $renderer->renderRulePage($page);
         }
@@ -206,7 +206,7 @@ final readonly class RuleCatalog
                 self::assertDeclaresOnly($ruleClass, $rules, $configPath);
                 $groups[] = new DeclarationGroup(
                     self::read($filesystem, $configPath),
-                    array_map(static fn (Rule $rule): string => $rule->description(), $rules),
+                    array_map(static fn(Rule $rule): string => $rule->description(), $rules),
                     $entries,
                 );
             }
@@ -232,7 +232,7 @@ final readonly class RuleCatalog
             return;
         }
 
-        $foreign = array_find($rules, static fn (Rule $rule): bool => $rule::class !== $ruleClass);
+        $foreign = array_find($rules, static fn(Rule $rule): bool => $rule::class !== $ruleClass);
         if ($foreign !== null) {
             throw new RuntimeException(sprintf(
                 '"%s" declares %s inside the scenarios of %s — a rule\'s fixtures declare only that rule.',
@@ -248,7 +248,7 @@ final readonly class RuleCatalog
     {
         $config = (new ConfigLoader())->loadFrom(Path::fromString($configPath));
 
-        return array_merge(...array_map(static fn (RuleSet $ruleSet): array => $ruleSet->rules(), $config->ruleSets()));
+        return array_merge(...array_map(static fn(RuleSet $ruleSet): array => $ruleSet->rules(), $config->ruleSets()));
     }
 
     /** @return list<FileExample> */
@@ -260,7 +260,7 @@ final readonly class RuleCatalog
         $paths = array_unique([...array_keys($before), ...array_keys($after)]);
         sort($paths);
 
-        return array_map(static fn (string $path): FileExample => new FileExample(
+        return array_map(static fn(string $path): FileExample => new FileExample(
             $path,
             match (true) {
                 !isset($before[$path]) => ExampleKind::Created,
@@ -334,7 +334,8 @@ final readonly class RuleCatalog
 
     private static function shortName(string $class, string $trimSuffix = ''): string
     {
-        $name = substr($class, (strrpos($class, '\\') ?: -1) + 1);
+        $separatorAt = strrpos($class, '\\');
+        $name = substr($class, $separatorAt === false ? 0 : $separatorAt + 1);
 
         return $trimSuffix !== '' && str_ends_with($name, $trimSuffix)
             ? substr($name, 0, -strlen($trimSuffix))

@@ -34,7 +34,7 @@ final class PhpUnitConfigValidatorTest extends TestCase
                         </testsuite>
                     </testsuites>
                 </phpunit>
-                XML
+                XML,
         );
 
         new PhpUnitConfigValidator()->assertValid('./phpunit.xml', $content);

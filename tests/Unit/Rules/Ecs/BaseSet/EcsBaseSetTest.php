@@ -47,7 +47,7 @@ final class EcsBaseSetTest extends TestCase
                         ->withSets([
                             __DIR__ . '/vendor/acme/standards/config/ecs.php',
                         ]);
-                    PHP
+                    PHP,
             ),
         ];
 
@@ -68,7 +68,7 @@ final class EcsBaseSetTest extends TestCase
                         ->withSets([
                             SetList::PSR_12,
                         ]);
-                    PHP
+                    PHP,
             ),
             FileContent::fromString(
                 <<<'PHP'
@@ -87,7 +87,7 @@ final class EcsBaseSetTest extends TestCase
                             SetList::PSR_12,
                             __DIR__ . '/vendor/acme/standards/config/ecs.php',
                         ]);
-                    PHP
+                    PHP,
             ),
         ];
 
@@ -105,7 +105,7 @@ final class EcsBaseSetTest extends TestCase
                             __DIR__ . '/src',
                         ])
                         ->withPreparedSets(psr12: true);
-                    PHP
+                    PHP,
             ),
             FileContent::fromString(
                 <<<'PHP'
@@ -123,7 +123,7 @@ final class EcsBaseSetTest extends TestCase
                         ->withSets([
                             __DIR__ . '/vendor/acme/standards/config/ecs.php',
                         ]);
-                    PHP
+                    PHP,
             ),
         ];
 
@@ -140,7 +140,7 @@ final class EcsBaseSetTest extends TestCase
                         ->withSets([
                             __DIR__ . '/vendor/acme/standards/config/ecs.php',
                         ]);
-                    PHP
+                    PHP,
             ),
             FileContent::fromString(
                 <<<'PHP'
@@ -154,7 +154,7 @@ final class EcsBaseSetTest extends TestCase
                         ->withSets([
                             __DIR__ . '/vendor/acme/standards/config/ecs.php',
                         ]);
-                    PHP
+                    PHP,
             ),
         ];
 
@@ -172,7 +172,7 @@ final class EcsBaseSetTest extends TestCase
                       ->withSets([
                         SetList::PSR_12,
                       ]);
-                    PHP
+                    PHP,
             ),
             FileContent::fromString(
                 <<<'PHP'
@@ -188,7 +188,7 @@ final class EcsBaseSetTest extends TestCase
                         SetList::PSR_12,
                         __DIR__ . '/vendor/acme/standards/config/ecs.php',
                       ]);
-                    PHP
+                    PHP,
             ),
         ];
     }
@@ -209,7 +209,7 @@ final class EcsBaseSetTest extends TestCase
                 return static function (ECSConfig $ecsConfig): void {
                     $ecsConfig->sets([__DIR__ . '/config/sets.php']);
                 };
-                PHP
+                PHP,
         ));
     }
 
@@ -229,7 +229,7 @@ final class EcsBaseSetTest extends TestCase
 
                 return $config
                     ->withPaths(['src', 'tests']);
-                PHP
+                PHP,
         ));
     }
 
@@ -238,7 +238,7 @@ final class EcsBaseSetTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('one entry per line');
 
-        $this->rule()->apply(FileContent::fromString("return ECSConfig::configure()->withSets([SetList::PSR_12]);"));
+        $this->rule()->apply(FileContent::fromString('return ECSConfig::configure()->withSets([SetList::PSR_12]);'));
     }
 
     public function testRejectsAnEmptySetPath(): void
@@ -254,7 +254,7 @@ final class EcsBaseSetTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('relative path');
 
-        new EcsBaseSet(set: "__DIR__ . '/vendor/acme/standards/config/ecs.php'");
+        new EcsBaseSet(set: '__DIR__ . \'/vendor/acme/standards/config/ecs.php\'');
     }
 
     public function testRejectsAnAbsoluteSetPath(): void

@@ -26,22 +26,26 @@ final readonly class DeptracImportedDepfile implements Rule, ExplainsDrift
         $this->depfile = Path::fromRelativeString($depfile);
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return DeptracConfigFile::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         // A project without a deptrac config gets one: enforcing the standard is the point, and withoutRule() is the opt-out.
         return YamlListWriter::ensureEntry($content ?? '', self::SECTION, $this->depfile->value());
     }
 
+    #[\Override]
     public function description(): string
     {
         return sprintf('Ensures the deptrac config imports "%s".', $this->depfile->value());
     }
 
+    #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {

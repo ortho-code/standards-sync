@@ -15,8 +15,7 @@ final readonly class FamilyPage
         private string $family,
         private array $ruleNames,
         private array $sections,
-    ) {
-    }
+    ) {}
 
     public function family(): string
     {

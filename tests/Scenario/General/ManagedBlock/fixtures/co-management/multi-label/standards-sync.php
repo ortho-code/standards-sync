@@ -12,7 +12,7 @@ use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 $package = new Package(__DIR__, '');
 
 // Two packages co-own one .gitignore under distinct labels; each label is its own block, and adopting the second block keeps the first.
-return SyncConfig::create()->withRuleSet(new class($package) extends ComposableRuleSet {
+return SyncConfig::create()->withRuleSet(new class ($package) extends ComposableRuleSet {
     public function __construct(Package $package)
     {
         $this->addRule(new ManagedBlock(

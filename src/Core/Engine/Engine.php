@@ -39,8 +39,8 @@ final readonly class Engine
         }
 
         return new Plan(
-            array_values(array_filter($outcomes, static fn (Change|Abstention $outcome): bool => $outcome instanceof Change)),
-            array_values(array_filter($outcomes, static fn (Change|Abstention $outcome): bool => $outcome instanceof Abstention)),
+            array_values(array_filter($outcomes, static fn(Change|Abstention $outcome): bool => $outcome instanceof Change)),
+            array_values(array_filter($outcomes, static fn(Change|Abstention $outcome): bool => $outcome instanceof Abstention)),
         );
     }
 

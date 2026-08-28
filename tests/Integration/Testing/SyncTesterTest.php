@@ -27,7 +27,9 @@ final class SyncTesterTest extends TestCase
 
     public function testPlanReportsDriftForAStaleFile(): void
     {
-        $plan = (new SyncTester())->plan($this->config(), ['./.editorconfig' => 'stale']);
+        $plan = (new SyncTester())->plan($this->config(), [
+            './.editorconfig' => 'stale',
+        ]);
 
         self::assertTrue($plan->hasDrift());
     }

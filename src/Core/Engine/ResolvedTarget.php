@@ -13,8 +13,7 @@ final readonly class ResolvedTarget
         private Path $path,
         private ?string $current,
         private ?Path $shadowedBy = null,
-    ) {
-    }
+    ) {}
 
     public function path(): Path
     {

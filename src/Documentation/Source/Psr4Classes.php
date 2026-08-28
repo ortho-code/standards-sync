@@ -12,9 +12,7 @@ final readonly class Psr4Classes
     private const string PHP_EXTENSION = '.php';
 
     /** @param array<string, string> $classFiles class name => file path */
-    private function __construct(private array $classFiles)
-    {
-    }
+    private function __construct(private array $classFiles) {}
 
     public static function fromDirectory(string $directory, string $namespacePrefix): self
     {
@@ -27,7 +25,10 @@ final readonly class Psr4Classes
                 continue;
             }
             $withoutExtension = substr($relativePath, 0, -strlen(self::PHP_EXTENSION));
-            $class = $prefix . '\\' . strtr($withoutExtension, ['/' => '\\', DIRECTORY_SEPARATOR => '\\']);
+            $class = $prefix . '\\' . strtr($withoutExtension, [
+                '/' => '\\',
+                DIRECTORY_SEPARATOR => '\\',
+            ]);
             $classFiles[$class] = $root . '/' . $relativePath;
         }
 

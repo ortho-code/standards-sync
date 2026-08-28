@@ -39,7 +39,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
                 <<<'NEON'
                     includes:
                     	- vendor/acme/standards/phpstan.neon
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -51,7 +51,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
 
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -61,7 +61,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
 
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -70,7 +70,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
                 <<<'NEON'
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -79,7 +79,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
 
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -89,7 +89,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
                     includes:
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -97,7 +97,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
                     	- vendor/acme/standards/phpstan.neon
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -109,7 +109,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
 
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -118,7 +118,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
 
                     parameters:
                     	level: 6
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -127,13 +127,13 @@ final class PhpStanIncludedRulesetTest extends TestCase
                 <<<'NEON'
                     includes:
                     	- 'vendor/acme/standards/phpstan.neon'
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
                     includes:
                     	- 'vendor/acme/standards/phpstan.neon'
-                    NEON
+                    NEON,
             ),
         ];
 
@@ -144,7 +144,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
                         - phpstan-baseline.neon
                     parameters:
                         level: 6
-                    NEON
+                    NEON,
             ),
             FileContent::fromString(
                 <<<'NEON'
@@ -153,7 +153,7 @@ final class PhpStanIncludedRulesetTest extends TestCase
                         - vendor/acme/standards/phpstan.neon
                     parameters:
                         level: 6
-                    NEON
+                    NEON,
             ),
         ];
     }

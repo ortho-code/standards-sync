@@ -13,8 +13,7 @@ final readonly class RuleApplication
         private Rule $rule,
         private ?string $before,
         private ?string $after,
-    ) {
-    }
+    ) {}
 
     public function rule(): Rule
     {

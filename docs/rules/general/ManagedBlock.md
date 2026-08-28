@@ -12,7 +12,7 @@ Declared as:
 // The fixture is its own package: distributed content in templates/, sitting at the (virtual) consumer root.
 $package = new Package(__DIR__, '');
 
-return SyncConfig::create()->withRuleSet(new class($package) extends ComposableRuleSet {
+return SyncConfig::create()->withRuleSet(new class ($package) extends ComposableRuleSet {
     public function __construct(Package $package)
     {
         $this->addRule(new ManagedBlock(
@@ -91,7 +91,7 @@ Declared as:
 $package = new Package(__DIR__, '');
 
 // Two packages co-own one .gitignore under distinct labels; each label is its own block, and adopting the second block keeps the first.
-return SyncConfig::create()->withRuleSet(new class($package) extends ComposableRuleSet {
+return SyncConfig::create()->withRuleSet(new class ($package) extends ComposableRuleSet {
     public function __construct(Package $package)
     {
         $this->addRule(new ManagedBlock(
@@ -137,7 +137,7 @@ Declared as:
 // The fixture is its own package: distributed content in templates/, sitting at the (virtual) consumer root.
 $package = new Package(__DIR__, '');
 
-return SyncConfig::create()->withRuleSet(new class($package) extends ComposableRuleSet {
+return SyncConfig::create()->withRuleSet(new class ($package) extends ComposableRuleSet {
     public function __construct(Package $package)
     {
         $this->addRule(new ManagedBlock(
@@ -168,7 +168,7 @@ Declared as:
 ```php
 $package = new Package(__DIR__, '');
 
-return SyncConfig::create()->withRuleSet(new class($package) extends ComposableRuleSet {
+return SyncConfig::create()->withRuleSet(new class ($package) extends ComposableRuleSet {
     public function __construct(Package $package)
     {
         $this->addRule(new ManagedBlock(

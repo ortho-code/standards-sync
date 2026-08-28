@@ -19,9 +19,7 @@ final readonly class TargetResolver
     /** The dotted file-name segment marking a committed dist variant (phpstan.neon.dist, psalm.dist.xml). */
     private const string DIST_SEGMENT = 'dist';
 
-    public function __construct(private Filesystem $filesystem)
-    {
-    }
+    public function __construct(private Filesystem $filesystem) {}
 
     public function resolve(Path $root, FileTarget $target): ResolvedTarget
     {
@@ -73,6 +71,6 @@ final readonly class TargetResolver
     /** @param non-empty-list<ResolvedTarget> $targets */
     private function pathList(array $targets): string
     {
-        return implode(' and ', array_map(static fn (ResolvedTarget $target): string => sprintf('"%s"', $target->path()->value()), $targets));
+        return implode(' and ', array_map(static fn(ResolvedTarget $target): string => sprintf('"%s"', $target->path()->value()), $targets));
     }
 }

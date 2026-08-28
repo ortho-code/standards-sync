@@ -12,8 +12,7 @@ final readonly class FileExample
         private ExampleKind $kind,
         private ?string $before,
         private ?string $after,
-    ) {
-    }
+    ) {}
 
     public function path(): string
     {

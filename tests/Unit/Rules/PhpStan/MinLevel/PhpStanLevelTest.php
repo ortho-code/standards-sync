@@ -48,11 +48,11 @@ final class PhpStanLevelTest extends TestCase
     public static function configValues(): iterable
     {
         yield 'bare number' => ['6', 6];
-        yield 'single-quoted number' => ["'6'", 6];
+        yield 'single-quoted number' => ['\'6\'', 6];
         yield 'double-quoted number' => ['"6"', 6];
         yield 'the max alias' => ['max', 10];
         yield 'the max alias in any case' => ['MAX', 10];
-        yield 'the quoted max alias' => ["'max'", 10];
+        yield 'the quoted max alias' => ['\'max\'', 10];
     }
 
     public function testRejectsAValueThatIsNotALevel(): void

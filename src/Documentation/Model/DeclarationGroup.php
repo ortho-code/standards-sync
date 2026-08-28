@@ -15,8 +15,7 @@ final readonly class DeclarationGroup
         private string $configSource,
         private array $reportLines,
         private array $entries,
-    ) {
-    }
+    ) {}
 
     public function configSource(): string
     {

@@ -12,6 +12,7 @@ final readonly class XmlValidator implements SyncedFileValidator
 {
     private const string EXTENSION = '.xml';
 
+    #[\Override]
     public function assertValid(string $path, string $content): void
     {
         if (!str_ends_with($path, self::EXTENSION)) {
@@ -33,6 +34,6 @@ final readonly class XmlValidator implements SyncedFileValidator
     {
         $error = libxml_get_errors()[0] ?? null;
 
-        return $error === null ? 'unknown error' : trim($error->message);
+        return $error instanceof \LibXMLError ? trim($error->message) : 'unknown error';
     }
 }

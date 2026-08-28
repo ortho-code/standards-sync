@@ -44,17 +44,20 @@ final readonly class RenovateExtendedPreset implements Rule, ExplainsDrift, Appl
         }
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return RenovateConfigFile::target($this->createAs);
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         // Without a resolved path the creation candidate's grammar applies; the engine calls applyAt() with the real one.
         return $this->applyAt($this->target()->candidates()[0], $content);
     }
 
+    #[\Override]
     public function applyAt(Path $path, ?string $content): ?string
     {
         if (RenovateConfigFile::isJsonc($path)) {
@@ -75,11 +78,13 @@ final readonly class RenovateExtendedPreset implements Rule, ExplainsDrift, Appl
         return JsonObjectWriter::ensureListEntry($content, [self::SECTION], $this->preset);
     }
 
+    #[\Override]
     public function description(): string
     {
         return sprintf('Ensures the renovate config extends "%s".', $this->preset);
     }
 
+    #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {

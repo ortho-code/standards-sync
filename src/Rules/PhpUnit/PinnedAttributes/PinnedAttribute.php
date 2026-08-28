@@ -18,8 +18,7 @@ final readonly class PinnedAttribute
     private function __construct(
         private string $name,
         private string $value,
-    ) {
-    }
+    ) {}
 
     /** Booleans render as phpunit's canonical "true"/"false" spelling, integers as decimal text. */
     public static function fromNameAndValue(string $name, bool|int|string $value): self

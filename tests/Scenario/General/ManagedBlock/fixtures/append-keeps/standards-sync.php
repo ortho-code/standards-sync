@@ -11,7 +11,7 @@ use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 
 $package = new Package(__DIR__, '');
 
-return SyncConfig::create()->withRuleSet(new class($package) extends ComposableRuleSet {
+return SyncConfig::create()->withRuleSet(new class ($package) extends ComposableRuleSet {
     public function __construct(Package $package)
     {
         $this->addRule(new ManagedBlock(

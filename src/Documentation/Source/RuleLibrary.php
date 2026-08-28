@@ -12,9 +12,7 @@ use RuntimeException;
 final readonly class RuleLibrary
 {
     /** @param list<class-string<Rule>> $ruleClasses */
-    private function __construct(private array $ruleClasses)
-    {
-    }
+    private function __construct(private array $ruleClasses) {}
 
     public static function fromDirectory(string $directory, string $namespacePrefix): self
     {
@@ -27,7 +25,7 @@ final readonly class RuleLibrary
                 continue;
             }
             $reflection = new ReflectionClass($class);
-            if ($reflection->implementsInterface(Rule::class) && $reflection->isInstantiable()) {
+            if (is_a($class, Rule::class, allow_string: true) && $reflection->isInstantiable()) {
                 $classes[] = $class;
             }
         }

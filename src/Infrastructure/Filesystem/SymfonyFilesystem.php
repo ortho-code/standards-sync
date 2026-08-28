@@ -18,6 +18,7 @@ final readonly class SymfonyFilesystem implements Filesystem
         $this->filesystem = new SymfonyFilesystemComponent();
     }
 
+    #[\Override]
     public function read(Path $path): ?string
     {
         $location = $path->value();
@@ -33,6 +34,7 @@ final readonly class SymfonyFilesystem implements Filesystem
         return $this->filesystem->readFile($location);
     }
 
+    #[\Override]
     public function write(Path $path, string $contents): void
     {
         $this->filesystem->dumpFile($path->value(), $contents);

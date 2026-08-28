@@ -25,7 +25,7 @@ final class XmlValidatorTest extends TestCase
                         <directory name="src" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
 
         new XmlValidator()->assertValid('./psalm.xml', $content);

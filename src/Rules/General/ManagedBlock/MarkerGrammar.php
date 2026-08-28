@@ -13,8 +13,7 @@ final readonly class MarkerGrammar
     public function __construct(
         private MarkerSyntax $syntax,
         private Label $label,
-    ) {
-    }
+    ) {}
 
     public function open(): string
     {
@@ -27,6 +26,7 @@ final readonly class MarkerGrammar
     }
 
     /** Matches this label's whole block, markers included, across the lines between them — built from the rendered marker lines, so drawing and finding can never drift apart. */
+    /** @return non-empty-string */
     public function blockPattern(): string
     {
         return sprintf('#^%s\R.*?\R%s[ \t]*$#ms', preg_quote($this->open(), '#'), preg_quote($this->close(), '#'));

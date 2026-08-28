@@ -19,7 +19,7 @@ final readonly class Indent
      */
     public static function detect(array $lines): ?string
     {
-        $indented = array_find($lines, static fn (string $line): bool => preg_match(self::INDENTED_LINE, $line) === 1);
+        $indented = array_find($lines, static fn(string $line): bool => preg_match(self::INDENTED_LINE, $line) === 1);
         if ($indented === null) {
             return null;
         }

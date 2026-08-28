@@ -42,7 +42,7 @@ final class PhpUnitPinnedAttributesTest extends TestCase
                             </testsuite>
                         </testsuites>
                     </phpunit>
-                    XML
+                    XML,
             ),
         ];
 
@@ -51,13 +51,13 @@ final class PhpUnitPinnedAttributesTest extends TestCase
                 <<<'XML'
                     <?xml version="1.0" encoding="UTF-8"?>
                     <phpunit failOnWarning="false" failOnRisky="true" colors="true" />
-                    XML
+                    XML,
             ),
             FileContent::fromString(
                 <<<'XML'
                     <?xml version="1.0" encoding="UTF-8"?>
                     <phpunit failOnWarning="true" failOnRisky="true" colors="true" />
-                    XML
+                    XML,
             ),
         ];
 
@@ -66,13 +66,13 @@ final class PhpUnitPinnedAttributesTest extends TestCase
                 <<<'XML'
                     <?xml version="1.0" encoding="UTF-8"?>
                     <phpunit failOnWarning="1" failOnRisky="true" />
-                    XML
+                    XML,
             ),
             FileContent::fromString(
                 <<<'XML'
                     <?xml version="1.0" encoding="UTF-8"?>
                     <phpunit failOnWarning="true" failOnRisky="true" />
-                    XML
+                    XML,
             ),
         ];
 
@@ -81,13 +81,13 @@ final class PhpUnitPinnedAttributesTest extends TestCase
                 <<<'XML'
                     <?xml version="1.0" encoding="UTF-8"?>
                     <phpunit failOnWarning="TRUE" failOnRisky="true" />
-                    XML
+                    XML,
             ),
             FileContent::fromString(
                 <<<'XML'
                     <?xml version="1.0" encoding="UTF-8"?>
                     <phpunit failOnWarning="true" failOnRisky="true" />
-                    XML
+                    XML,
             ),
         ];
 
@@ -96,13 +96,13 @@ final class PhpUnitPinnedAttributesTest extends TestCase
                 <<<'XML'
                     <?xml version="1.0" encoding="UTF-8"?>
                     <phpunit bootstrap="vendor/autoload.php" />
-                    XML
+                    XML,
             ),
             FileContent::fromString(
                 <<<'XML'
                     <?xml version="1.0" encoding="UTF-8"?>
                     <phpunit bootstrap="vendor/autoload.php" failOnWarning="true" failOnRisky="true" />
-                    XML
+                    XML,
             ),
         ];
 
@@ -113,7 +113,7 @@ final class PhpUnitPinnedAttributesTest extends TestCase
                     <phpunit bootstrap="vendor/autoload.php"
                              cacheDirectory=".phpunit.cache">
                     </phpunit>
-                    XML
+                    XML,
             ),
             FileContent::fromString(
                 <<<'XML'
@@ -123,7 +123,7 @@ final class PhpUnitPinnedAttributesTest extends TestCase
                              failOnWarning="true"
                              failOnRisky="true">
                     </phpunit>
-                    XML
+                    XML,
             ),
         ];
 
@@ -132,13 +132,13 @@ final class PhpUnitPinnedAttributesTest extends TestCase
                 <<<'XML'
                     <?xml version="1.0" encoding="UTF-8"?>
                     <phpunit failOnWarning="true" failOnRisky="true" />
-                    XML
+                    XML,
             ),
             FileContent::fromString(
                 <<<'XML'
                     <?xml version="1.0" encoding="UTF-8"?>
                     <phpunit failOnWarning="true" failOnRisky="true" />
-                    XML
+                    XML,
             ),
         ];
     }

@@ -45,7 +45,7 @@ final class RenovateExtendedPresetTest extends TestCase
     public function testTheCreationCandidateLeadsTheTarget(): void
     {
         $candidates = array_map(
-            static fn (Path $path): string => $path->value(),
+            static fn(Path $path): string => $path->value(),
             new RenovateExtendedPreset(preset: self::PRESET)->target()->candidates(),
         );
 
@@ -59,7 +59,7 @@ final class RenovateExtendedPresetTest extends TestCase
     public function testCreatingAsJson5MovesThatNameToTheFront(): void
     {
         $candidates = array_map(
-            static fn (Path $path): string => $path->value(),
+            static fn(Path $path): string => $path->value(),
             new RenovateExtendedPreset(preset: self::PRESET, createAs: RenovateConfigFormat::Json5)->target()->candidates(),
         );
 
@@ -78,7 +78,7 @@ final class RenovateExtendedPresetTest extends TestCase
                             "local>acme/renovate-config"
                         ]
                     }
-                    JSON
+                    JSON,
             ),
             new RenovateExtendedPreset(preset: self::PRESET)->apply(null),
         );
@@ -94,7 +94,7 @@ final class RenovateExtendedPresetTest extends TestCase
                             "local>acme/renovate-config" // org standard
                         ]
                     }
-                    JSON5
+                    JSON5,
             ),
             new RenovateExtendedPreset(preset: self::PRESET, createAs: RenovateConfigFormat::Json5, comment: 'org standard')->apply(null),
         );
@@ -110,7 +110,7 @@ final class RenovateExtendedPresetTest extends TestCase
                     'config:recommended',
                   ],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -123,7 +123,7 @@ final class RenovateExtendedPresetTest extends TestCase
                         'local>acme/renovate-config',
                       ],
                     }
-                    JSON5
+                    JSON5,
             ),
             new RenovateExtendedPreset(preset: self::PRESET)->applyAt(Path::fromString('renovate.json5'), $content),
         );
@@ -145,7 +145,7 @@ final class RenovateExtendedPresetTest extends TestCase
                     // a comment renovate tolerates but strict JSON forbids
                     "extends": []
                 }
-                JSON
+                JSON,
         );
 
         $this->expectException(RuntimeException::class);
@@ -172,7 +172,7 @@ final class RenovateExtendedPresetTest extends TestCase
                             "local>acme/renovate-config"
                         ]
                     }
-                    JSON5
+                    JSON5,
             ),
             new RenovateExtendedPreset(preset: self::PRESET)->applyAt(Path::fromString('.github/renovate.json5'), null),
         );
@@ -187,7 +187,7 @@ final class RenovateExtendedPresetTest extends TestCase
                         "local>acme/renovate-config"
                     ]
                 }
-                JSON
+                JSON,
         );
 
         self::assertSame($content, new RenovateExtendedPreset(preset: self::PRESET)->applyAt(Path::fromString('renovate.json'), $content));

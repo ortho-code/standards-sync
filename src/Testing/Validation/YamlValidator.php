@@ -21,9 +21,10 @@ final readonly class YamlValidator implements SyncedFileValidator
         $this->parserInstalled = $parserInstalled ?? class_exists(Yaml::class);
     }
 
+    #[\Override]
     public function assertValid(string $path, string $content): void
     {
-        if (!array_any(self::EXTENSIONS, static fn (string $extension): bool => str_ends_with($path, $extension))) {
+        if (!array_any(self::EXTENSIONS, static fn(string $extension): bool => str_ends_with($path, $extension))) {
             return;
         }
 

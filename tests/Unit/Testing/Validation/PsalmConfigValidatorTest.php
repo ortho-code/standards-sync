@@ -32,7 +32,7 @@ final class PsalmConfigValidatorTest extends TestCase
                         <directory name="src" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
 
         new PsalmConfigValidator()->assertValid('./psalm.xml', $content);

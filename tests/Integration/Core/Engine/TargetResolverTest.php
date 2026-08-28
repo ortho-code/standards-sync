@@ -85,7 +85,9 @@ final class TargetResolverTest extends TestCase
 
     public function testALoneRenovateFileWinsWhateverTheCreationPreference(): void
     {
-        $resolved = $this->resolver(['/a/renovate.json5' => "{}\n"])
+        $resolved = $this->resolver([
+            '/a/renovate.json5' => "{}\n",
+        ])
             ->resolve(Path::fromString('/a'), RenovateConfigFile::target());
 
         self::assertSame('/a/renovate.json5', $resolved->path()->value());

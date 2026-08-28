@@ -13,8 +13,7 @@ final readonly class Plan
     public function __construct(
         private array $changes,
         private array $abstentions = [],
-    ) {
-    }
+    ) {}
 
     /** @return list<Change> */
     public function changes(): array
@@ -35,7 +34,7 @@ final readonly class Plan
     /** @return list<Change> */
     public function drift(): array
     {
-        return array_values(array_filter($this->changes, static fn (Change $change): bool => $change->isDrift()));
+        return array_values(array_filter($this->changes, static fn(Change $change): bool => $change->isDrift()));
     }
 
     public function hasDrift(): bool

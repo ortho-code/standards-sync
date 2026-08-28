@@ -25,7 +25,7 @@ final class Json5ValidatorTest extends TestCase
                     'local>acme/renovate-config',
                   ],
                 }
-                JSON5
+                JSON5,
         );
 
         new Json5Validator()->assertValid('./renovate.json5', $content);

@@ -20,8 +20,7 @@ final readonly class SyncConfig
     private function __construct(
         private array $roots,
         private array $ruleSets,
-    ) {
-    }
+    ) {}
 
     public static function create(): self
     {
@@ -32,7 +31,7 @@ final readonly class SyncConfig
     public function withRoots(array $roots): self
     {
         return new self(
-            array_map(static fn (string $root): Path => Path::fromString($root), $roots),
+            array_map(static fn(string $root): Path => Path::fromString($root), $roots),
             $this->ruleSets,
         );
     }

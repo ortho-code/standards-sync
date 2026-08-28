@@ -47,7 +47,7 @@ final class RectorBaseSetTest extends TestCase
                         ->withSets([
                             __DIR__ . '/vendor/acme/standards/config/rector.php',
                         ]);
-                    PHP
+                    PHP,
             ),
         ];
 
@@ -68,7 +68,7 @@ final class RectorBaseSetTest extends TestCase
                         ->withSets([
                             SetList::DEAD_CODE,
                         ]);
-                    PHP
+                    PHP,
             ),
             FileContent::fromString(
                 <<<'PHP'
@@ -87,7 +87,7 @@ final class RectorBaseSetTest extends TestCase
                             SetList::DEAD_CODE,
                             __DIR__ . '/vendor/acme/standards/config/rector.php',
                         ]);
-                    PHP
+                    PHP,
             ),
         ];
 
@@ -104,7 +104,7 @@ final class RectorBaseSetTest extends TestCase
                         ->withPaths([
                             __DIR__ . '/src',
                         ]);
-                    PHP
+                    PHP,
             ),
             FileContent::fromString(
                 <<<'PHP'
@@ -121,7 +121,7 @@ final class RectorBaseSetTest extends TestCase
                         ->withSets([
                             __DIR__ . '/vendor/acme/standards/config/rector.php',
                         ]);
-                    PHP
+                    PHP,
             ),
         ];
 
@@ -138,7 +138,7 @@ final class RectorBaseSetTest extends TestCase
                         ->withSets([
                             __DIR__ . '/vendor/acme/standards/config/rector.php',
                         ]);
-                    PHP
+                    PHP,
             ),
             FileContent::fromString(
                 <<<'PHP'
@@ -152,7 +152,7 @@ final class RectorBaseSetTest extends TestCase
                         ->withSets([
                             __DIR__ . '/vendor/acme/standards/config/rector.php',
                         ]);
-                    PHP
+                    PHP,
             ),
         ];
 
@@ -170,7 +170,7 @@ final class RectorBaseSetTest extends TestCase
                       ->withSets([
                         SetList::DEAD_CODE,
                       ]);
-                    PHP
+                    PHP,
             ),
             FileContent::fromString(
                 <<<'PHP'
@@ -186,7 +186,7 @@ final class RectorBaseSetTest extends TestCase
                         SetList::DEAD_CODE,
                         __DIR__ . '/vendor/acme/standards/config/rector.php',
                       ]);
-                    PHP
+                    PHP,
             ),
         ];
     }
@@ -207,7 +207,7 @@ final class RectorBaseSetTest extends TestCase
                 return static function (RectorConfig $rectorConfig): void {
                     $rectorConfig->sets([__DIR__ . '/config/sets.php']);
                 };
-                PHP
+                PHP,
         ));
     }
 
@@ -216,7 +216,7 @@ final class RectorBaseSetTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('one entry per line');
 
-        $this->rule()->apply(FileContent::fromString("return RectorConfig::configure()->withSets([SetList::DEAD_CODE]);"));
+        $this->rule()->apply(FileContent::fromString('return RectorConfig::configure()->withSets([SetList::DEAD_CODE]);'));
     }
 
     public function testRejectsAnEmptySetPath(): void
@@ -232,7 +232,7 @@ final class RectorBaseSetTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('relative path');
 
-        new RectorBaseSet(set: "__DIR__ . '/vendor/acme/standards/config/rector.php'");
+        new RectorBaseSet(set: '__DIR__ . \'/vendor/acme/standards/config/rector.php\'');
     }
 
     public function testRejectsAnAbsoluteSetPath(): void

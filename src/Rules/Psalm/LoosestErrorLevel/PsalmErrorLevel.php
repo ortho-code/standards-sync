@@ -18,9 +18,7 @@ final readonly class PsalmErrorLevel
     /** The level psalm applies when the errorLevel attribute is absent. */
     private const int DEFAULT_LEVEL = 2;
 
-    private function __construct(private int $level)
-    {
-    }
+    private function __construct(private int $level) {}
 
     public static function fromInt(int $level): self
     {

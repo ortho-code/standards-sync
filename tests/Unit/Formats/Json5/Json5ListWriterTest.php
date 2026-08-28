@@ -25,7 +25,7 @@ final class Json5ListWriterTest extends TestCase
                             "local>acme/renovate-config"
                         ]
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry('', 'extends', self::ENTRY),
         );
@@ -41,7 +41,7 @@ final class Json5ListWriterTest extends TestCase
                             "local>acme/renovate-config" // org standard
                         ]
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry('', 'extends', self::ENTRY, 'org standard'),
         );
@@ -57,7 +57,7 @@ final class Json5ListWriterTest extends TestCase
                     'config:recommended',
                   ],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -70,7 +70,7 @@ final class Json5ListWriterTest extends TestCase
                         'local>acme/renovate-config',
                       ],
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY),
         );
@@ -85,7 +85,7 @@ final class Json5ListWriterTest extends TestCase
                     "config:recommended"
                   ]
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -97,7 +97,7 @@ final class Json5ListWriterTest extends TestCase
                         "local>acme/renovate-config"
                       ]
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY),
         );
@@ -112,7 +112,7 @@ final class Json5ListWriterTest extends TestCase
                     'config:recommended' // keep
                   ]
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -124,7 +124,7 @@ final class Json5ListWriterTest extends TestCase
                         'local>acme/renovate-config'
                       ]
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY),
         );
@@ -145,7 +145,7 @@ final class Json5ListWriterTest extends TestCase
                 {
                   extends: [],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -154,7 +154,7 @@ final class Json5ListWriterTest extends TestCase
                     {
                       extends: ["local>acme/renovate-config"],
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY),
         );
@@ -169,7 +169,7 @@ final class Json5ListWriterTest extends TestCase
                     'config:recommended',
                   ],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -181,7 +181,7 @@ final class Json5ListWriterTest extends TestCase
                         'local>acme/renovate-config', // org standard
                       ],
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY, 'org standard'),
         );
@@ -196,7 +196,7 @@ final class Json5ListWriterTest extends TestCase
                     'local>acme/renovate-config',
                   ],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame($content, Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY));
@@ -211,7 +211,7 @@ final class Json5ListWriterTest extends TestCase
                     'local>acme/renovate-config',
                   ],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -222,7 +222,7 @@ final class Json5ListWriterTest extends TestCase
                         'local>acme/renovate-config', // org standard
                       ],
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY, 'org standard'),
         );
@@ -237,7 +237,7 @@ final class Json5ListWriterTest extends TestCase
                     'local>acme/renovate-config', // my own note
                   ],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -248,7 +248,7 @@ final class Json5ListWriterTest extends TestCase
                         'local>acme/renovate-config', // org standard
                       ],
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY, 'org standard'),
         );
@@ -263,7 +263,7 @@ final class Json5ListWriterTest extends TestCase
                     'local>acme/renovate-config', // org standard
                   ],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame($content, Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY, 'org standard'));
@@ -278,7 +278,7 @@ final class Json5ListWriterTest extends TestCase
                     'local>acme/renovate-config', // my own note
                   ],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame($content, Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY));
@@ -298,7 +298,7 @@ final class Json5ListWriterTest extends TestCase
                 {
                   labels: ['dependencies'],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -310,7 +310,7 @@ final class Json5ListWriterTest extends TestCase
                         "local>acme/renovate-config"
                       ],
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY),
         );
@@ -334,7 +334,7 @@ final class Json5ListWriterTest extends TestCase
                             "local>acme/renovate-config"
                         ]
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry("{}\n", 'extends', self::ENTRY),
         );
@@ -348,7 +348,7 @@ final class Json5ListWriterTest extends TestCase
                   extends: [
                     'config:recommended' ]
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -358,7 +358,7 @@ final class Json5ListWriterTest extends TestCase
                       extends: [
                         'config:recommended', 'local>acme/renovate-config' ]
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY),
         );
@@ -374,7 +374,7 @@ final class Json5ListWriterTest extends TestCase
                     ,
                   ],
                 }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -387,7 +387,7 @@ final class Json5ListWriterTest extends TestCase
                         ,
                       ],
                     }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY),
         );
@@ -399,7 +399,7 @@ final class Json5ListWriterTest extends TestCase
             <<<'JSON5'
                 {
                   labels: ['x'] }
-                JSON5
+                JSON5,
         );
 
         self::assertSame(
@@ -407,7 +407,7 @@ final class Json5ListWriterTest extends TestCase
                 <<<'JSON5'
                     {
                       labels: ['x'], extends: ["local>acme/renovate-config"] }
-                    JSON5
+                    JSON5,
             ),
             Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY),
         );

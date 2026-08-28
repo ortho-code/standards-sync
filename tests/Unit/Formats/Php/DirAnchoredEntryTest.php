@@ -17,7 +17,7 @@ final class DirAnchoredEntryTest extends TestCase
     {
         $entry = DirAnchoredEntry::fromRelativeString('vendor/acme/standards/config/rector.php');
 
-        self::assertSame("__DIR__ . '/vendor/acme/standards/config/rector.php'", $entry->value());
+        self::assertSame('__DIR__ . \'/vendor/acme/standards/config/rector.php\'', $entry->value());
         self::assertSame('vendor/acme/standards/config/rector.php', $entry->path()->value());
     }
 
@@ -34,8 +34,8 @@ final class DirAnchoredEntryTest extends TestCase
     /** @return iterable<string, array{string}> */
     public static function expressionTextPaths(): iterable
     {
-        yield '__DIR__' => ["__DIR__ . /vendor/acme/rector.php"];
-        yield 'single quote' => ["vendor/a'cme/rector.php"];
+        yield '__DIR__' => ['__DIR__ . /vendor/acme/rector.php'];
+        yield 'single quote' => ['vendor/a\'cme/rector.php'];
         yield 'double quote' => ['vendor/a"cme/rector.php'];
     }
 

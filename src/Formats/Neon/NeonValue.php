@@ -27,8 +27,8 @@ final readonly class NeonValue
         if (preg_match(self::SAFE_STRING, $value) === 1) {
             return $value;
         }
-        if (!str_contains($value, "'")) {
-            return "'" . $value . "'";
+        if (!str_contains($value, '\'')) {
+            return '\'' . $value . '\'';
         }
         if (!str_contains($value, '"')) {
             return '"' . $value . '"';
@@ -70,7 +70,7 @@ final readonly class NeonValue
                 }
                 continue;
             }
-            if ($character === "'" || $character === '"') {
+            if ($character === '\'' || $character === '"') {
                 $quote = $character;
                 continue;
             }

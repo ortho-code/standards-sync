@@ -35,17 +35,19 @@ final readonly class PhpStanMinLevel implements Rule, ExplainsDrift
         return $this->minLevel;
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return PhpStanConfigFile::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         $written = $content === null ? null : NeonScalarWriter::read($content, self::LEVEL_PATH);
 
         // A compliant level keeps its own spelling ('max' stays 'max'); only the org comment is enforced on it.
-        if ($written !== null && PhpStanLevel::fromConfigValue($written)->isAtLeast($this->minLevel)) {
+        if ($content !== null && $written !== null && PhpStanLevel::fromConfigValue($written)->isAtLeast($this->minLevel)) {
             return $this->comment === null ? $content : NeonScalarWriter::ensureTrailingComment($content, self::LEVEL_PATH, $this->comment);
         }
 
@@ -53,11 +55,13 @@ final readonly class PhpStanMinLevel implements Rule, ExplainsDrift
         return NeonScalarWriter::write($content ?? '', self::LEVEL_PATH, $this->minLevel->value(), $this->comment);
     }
 
+    #[\Override]
     public function description(): string
     {
         return sprintf('Keeps the PHPStan level at or above %d.', $this->minLevel->value());
     }
 
+    #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {

@@ -74,7 +74,7 @@ final readonly class FluentChainWriter
         $lines = self::arrayCallLines($method, $entry, self::INDENT);
         $first = array_shift($lines);
 
-        return Lines::join([$first, ...array_map(static fn (string $line): string => self::INDENT . $line, $lines)]);
+        return Lines::join([$first, ...array_map(static fn(string $line): string => self::INDENT . $line, $lines)]);
     }
 
     /** Appends ->method([entry,]) as the chain's last call, before the terminating semicolon, following the file's own indentation. */
@@ -84,12 +84,12 @@ final readonly class FluentChainWriter
         $lastIndex = self::terminatingLineIndex($lines, $method);
 
         $indent = self::chainIndent($lines, $lastIndex);
-        $call = array_map(static fn (string $line): string => $indent . $line, self::arrayCallLines($method, $entry, self::unit($lines)));
+        $call = array_map(static fn(string $line): string => $indent . $line, self::arrayCallLines($method, $entry, self::unit($lines)));
         $call[array_key_last($call)] .= ';';
         $lines[$lastIndex] = substr(rtrim($lines[$lastIndex]), 0, -1);
         array_splice($lines, $lastIndex + 1, 0, $call);
 
-        return Lines::join($lines);
+        return Lines::join(array_values($lines));
     }
 
     /**
@@ -113,7 +113,7 @@ final readonly class FluentChainWriter
      */
     private static function terminatingLineIndex(array $lines, string $method): int
     {
-        $lastIndex = array_find_key(array_reverse($lines, true), static fn (string $line): bool => trim($line) !== '');
+        $lastIndex = array_find_key(array_reverse($lines, true), static fn(string $line): bool => trim($line) !== '');
         if ($lastIndex === null || !str_ends_with(rtrim($lines[$lastIndex]), ';')) {
             throw new RuntimeException(sprintf('The config does not end in a terminated statement; ->%s() cannot be appended.', $method));
         }
@@ -166,6 +166,7 @@ final readonly class FluentChainWriter
         $close = match ($open) {
             '(' => ')',
             '[' => ']',
+            default => throw new RuntimeException(sprintf('The %s() call opens with "%s"; only a parenthesis or a square bracket can be matched.', $method, $open)),
         };
 
         $depth = 0;
@@ -182,7 +183,7 @@ final readonly class FluentChainWriter
                 }
                 continue;
             }
-            if ($character === "'" || $character === '"') {
+            if ($character === '\'' || $character === '"') {
                 $quote = $character;
                 continue;
             }
@@ -223,7 +224,7 @@ final readonly class FluentChainWriter
                 }
                 continue;
             }
-            if ($character === "'" || $character === '"') {
+            if ($character === '\'' || $character === '"') {
                 $quote = $character;
                 continue;
             }

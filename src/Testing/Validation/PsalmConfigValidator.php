@@ -26,6 +26,7 @@ final readonly class PsalmConfigValidator implements SyncedFileValidator
         $this->schema = $psalmInstalled === false ? null : self::installedSchema();
     }
 
+    #[\Override]
     public function assertValid(string $path, string $content): void
     {
         if (!in_array(basename($path), self::CANDIDATES, true)) {
@@ -78,6 +79,6 @@ final readonly class PsalmConfigValidator implements SyncedFileValidator
     {
         $error = libxml_get_errors()[0] ?? null;
 
-        return $error === null ? 'unknown error' : trim($error->message);
+        return $error instanceof \LibXMLError ? trim($error->message) : 'unknown error';
     }
 }

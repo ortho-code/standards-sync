@@ -16,6 +16,7 @@ abstract class ComposableRuleSet implements RuleSet
     private array $rules = [];
 
     /** @return list<Rule> */
+    #[\Override]
     public function rules(): array
     {
         return $this->rules;

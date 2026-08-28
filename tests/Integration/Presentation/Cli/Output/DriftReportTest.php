@@ -123,7 +123,7 @@ final class DriftReportTest extends TestCase
 
     private function planFor(InMemoryFilesystem $filesystem, Rule ...$rules): Plan
     {
-        $ruleSet = new class(...$rules) extends ComposableRuleSet {
+        $ruleSet = new class (...$rules) extends ComposableRuleSet {
             public function __construct(Rule ...$rules)
             {
                 foreach ($rules as $rule) {

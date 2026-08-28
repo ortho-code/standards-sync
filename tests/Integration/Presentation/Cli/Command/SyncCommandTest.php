@@ -72,7 +72,9 @@ final class SyncCommandTest extends IntegrationTestCase
 
     public function testCheckReportsDriftAndExitsNonZeroWhenAManagedFileIsMissing(): void
     {
-        [$exitCode, $output] = $this->runSync(['--check' => true]);
+        [$exitCode, $output] = $this->runSync([
+            '--check' => true,
+        ]);
 
         self::assertSame(1, $exitCode);
         self::assertStringContainsString('CREATE', $output);
@@ -82,7 +84,9 @@ final class SyncCommandTest extends IntegrationTestCase
 
     public function testCheckNeverWrites(): void
     {
-        $this->runSync(['--check' => true]);
+        $this->runSync([
+            '--check' => true,
+        ]);
 
         self::assertFileDoesNotExist($this->workspace() . '/.editorconfig');
     }
@@ -99,7 +103,9 @@ final class SyncCommandTest extends IntegrationTestCase
     {
         $this->runSync([]);
 
-        [$exitCode] = $this->runSync(['--check' => true]);
+        [$exitCode] = $this->runSync([
+            '--check' => true,
+        ]);
 
         self::assertSame(0, $exitCode);
     }
@@ -109,7 +115,9 @@ final class SyncCommandTest extends IntegrationTestCase
     {
         $this->writeToWorkspace('standards-sync.php', self::ABSTAINING_CONFIG);
 
-        [$exitCode, $output] = $this->runSync(['--check' => true]);
+        [$exitCode, $output] = $this->runSync([
+            '--check' => true,
+        ]);
 
         self::assertSame(0, $exitCode);
         self::assertStringContainsString('NOTE ./composer.json does not exist; nothing was enforced there (ComposerRequirement).', $output);
@@ -129,7 +137,10 @@ final class SyncCommandTest extends IntegrationTestCase
 
     public function testHelpDescribesTheSyncCommand(): void
     {
-        [$exitCode, $output] = $this->runApplication(['command' => 'sync', '--help' => true]);
+        [$exitCode, $output] = $this->runApplication([
+            'command' => 'sync',
+            '--help' => true,
+        ]);
 
         self::assertSame(0, $exitCode);
         self::assertStringContainsString('--check', $output);
@@ -141,7 +152,11 @@ final class SyncCommandTest extends IntegrationTestCase
      */
     private function runSync(array $options): array
     {
-        return $this->runApplication(['command' => 'sync', '--root' => $this->workspace(), ...$options]);
+        return $this->runApplication([
+            'command' => 'sync',
+            '--root' => $this->workspace(),
+            ...$options,
+        ]);
     }
 
     /**

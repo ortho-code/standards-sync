@@ -16,20 +16,20 @@ use OrthoCode\StandardsSync\Rules\PhpStan\PhpStanConfigFile;
  */
 final readonly class PhpStanPinnedValues implements Rule
 {
-    public function __construct(private PinnedValues $values)
-    {
-    }
+    public function __construct(private PinnedValues $values) {}
 
     public function pinnedValues(): PinnedValues
     {
         return $this->values;
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return PhpStanConfigFile::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         $result = $content ?? '';
@@ -40,9 +40,10 @@ final readonly class PhpStanPinnedValues implements Rule
         return $result;
     }
 
+    #[\Override]
     public function description(): string
     {
-        $paths = array_map(static fn (PinnedValue $pin): string => $pin->dottedPath(), $this->values->leaves());
+        $paths = array_map(static fn(PinnedValue $pin): string => $pin->dottedPath(), $this->values->leaves());
 
         return sprintf('Pins the PHPStan config values: %s.', implode(', ', $paths));
     }

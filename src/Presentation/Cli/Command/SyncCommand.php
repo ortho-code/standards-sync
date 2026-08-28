@@ -25,6 +25,7 @@ final class SyncCommand extends Command
     private const string OPTION_CONFIG = 'config';
     private const string DEFAULT_CONFIG = 'standards-sync.php';
 
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -33,6 +34,7 @@ final class SyncCommand extends Command
             ->addOption(self::OPTION_CONFIG, null, InputOption::VALUE_REQUIRED, 'Path to the standards-sync.php config file.', self::DEFAULT_CONFIG);
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);

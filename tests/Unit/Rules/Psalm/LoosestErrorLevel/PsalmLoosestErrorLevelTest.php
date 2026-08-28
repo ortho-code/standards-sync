@@ -43,7 +43,7 @@ final class PsalmLoosestErrorLevelTest extends TestCase
                             </ignoreFiles>
                         </projectFiles>
                     </psalm>
-                    XML
+                    XML,
             ),
         ];
 
@@ -56,7 +56,7 @@ final class PsalmLoosestErrorLevelTest extends TestCase
                             <directory name="src" />
                         </projectFiles>
                     </psalm>
-                    XML
+                    XML,
             ),
             FileContent::fromString(
                 <<<'XML'
@@ -66,7 +66,7 @@ final class PsalmLoosestErrorLevelTest extends TestCase
                             <directory name="src" />
                         </projectFiles>
                     </psalm>
-                    XML
+                    XML,
             ),
         ];
 
@@ -78,7 +78,7 @@ final class PsalmLoosestErrorLevelTest extends TestCase
                         <directory name="src" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
         yield 'a stricter level is never touched' => [$stricter, $stricter];
 
@@ -90,7 +90,7 @@ final class PsalmLoosestErrorLevelTest extends TestCase
                         <directory name="src" />
                     </projectFiles>
                 </psalm>
-                XML
+                XML,
         );
         yield 'an equal level is never touched' => [$equal, $equal];
 
@@ -103,7 +103,7 @@ final class PsalmLoosestErrorLevelTest extends TestCase
                             <directory name="src" />
                         </projectFiles>
                     </psalm>
-                    XML
+                    XML,
             ),
             FileContent::fromString(
                 <<<'XML'
@@ -113,7 +113,7 @@ final class PsalmLoosestErrorLevelTest extends TestCase
                             <directory name="src" />
                         </projectFiles>
                     </psalm>
-                    XML
+                    XML,
             ),
         ];
     }
@@ -125,7 +125,7 @@ final class PsalmLoosestErrorLevelTest extends TestCase
                 <?xml version="1.0"?>
                 <psalm resolveFromConfigFile="true">
                 </psalm>
-                XML
+                XML,
         );
 
         $rule = new PsalmLoosestErrorLevel(loosest: PsalmErrorLevel::fromInt(1));
@@ -149,7 +149,7 @@ final class PsalmLoosestErrorLevelTest extends TestCase
             <<<'XML'
                 <psalm>
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame('No errorLevel is written; the implicit default is made explicit as 2.', $this->rule()->explain($content));
@@ -161,7 +161,7 @@ final class PsalmLoosestErrorLevelTest extends TestCase
             <<<'XML'
                 <psalm errorLevel="7">
                 </psalm>
-                XML
+                XML,
         );
 
         self::assertSame('Level 7 is looser than the loosest allowed 4.', $this->rule()->explain($content));

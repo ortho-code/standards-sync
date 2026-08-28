@@ -20,7 +20,7 @@ final class YamlListWriterTest extends TestCase
                 <<<'YAML'
                     imports:
                       - vendor/acme/standards/deptrac.yaml
-                    YAML
+                    YAML,
             ),
             YamlListWriter::ensureEntry('', 'imports', 'vendor/acme/standards/deptrac.yaml'),
         );
@@ -33,7 +33,7 @@ final class YamlListWriterTest extends TestCase
                 deptrac:
                   paths:
                     - ./src
-                YAML
+                YAML,
         );
 
         self::assertSame(
@@ -45,7 +45,7 @@ final class YamlListWriterTest extends TestCase
                     deptrac:
                       paths:
                         - ./src
-                    YAML
+                    YAML,
             ),
             YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml'),
         );
@@ -57,7 +57,7 @@ final class YamlListWriterTest extends TestCase
             <<<'YAML'
                 imports:
                   - vendor/acme/standards/deptrac.yaml
-                YAML
+                YAML,
         );
 
         self::assertSame($content, YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml'));
@@ -69,7 +69,7 @@ final class YamlListWriterTest extends TestCase
             <<<'YAML'
                 imports:
                   - vendor/acme/standards/deptrac.yaml # the org architecture
-                YAML
+                YAML,
         );
 
         self::assertSame($content, YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml'));
@@ -81,7 +81,7 @@ final class YamlListWriterTest extends TestCase
             <<<'YAML'
                 imports:
                   - 'vendor/acme/standards/deptrac.yaml'
-                YAML
+                YAML,
         );
 
         self::assertSame($content, YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml'));
@@ -94,7 +94,7 @@ final class YamlListWriterTest extends TestCase
                 imports:
                   # the org architecture
                   - vendor/acme/standards/deptrac.yaml
-                YAML
+                YAML,
         );
 
         self::assertSame($content, YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml'));
@@ -106,7 +106,7 @@ final class YamlListWriterTest extends TestCase
             <<<'YAML'
                 imports: # architecture standards
                   - vendor/acme/standards/deptrac.yaml
-                YAML
+                YAML,
         );
 
         self::assertSame($content, YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml'));
@@ -118,7 +118,7 @@ final class YamlListWriterTest extends TestCase
             <<<'YAML'
                 imports:
                 - vendor/acme/standards/deptrac.yaml
-                YAML
+                YAML,
         );
 
         self::assertSame($content, YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml'));
@@ -134,7 +134,7 @@ final class YamlListWriterTest extends TestCase
                 deptrac:
                   paths:
                     - ./src
-                YAML
+                YAML,
         );
 
         self::assertSame(
@@ -147,7 +147,7 @@ final class YamlListWriterTest extends TestCase
                     deptrac:
                       paths:
                         - ./src
-                    YAML
+                    YAML,
             ),
             YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml'),
         );
@@ -159,7 +159,7 @@ final class YamlListWriterTest extends TestCase
             <<<'YAML'
                 imports:
                 - local/architecture.yaml
-                YAML
+                YAML,
         );
 
         self::assertSame(
@@ -168,7 +168,7 @@ final class YamlListWriterTest extends TestCase
                     imports:
                     - local/architecture.yaml
                     - vendor/acme/standards/deptrac.yaml
-                    YAML
+                    YAML,
             ),
             YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml'),
         );
@@ -183,7 +183,7 @@ final class YamlListWriterTest extends TestCase
                 deptrac:
                   paths:
                     - ./src
-                YAML
+                YAML,
         );
 
         self::assertSame(
@@ -195,7 +195,7 @@ final class YamlListWriterTest extends TestCase
                     deptrac:
                       paths:
                         - ./src
-                    YAML
+                    YAML,
             ),
             YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml'),
         );
@@ -206,7 +206,7 @@ final class YamlListWriterTest extends TestCase
         $content = FileContent::fromString(
             <<<'YAML'
                 imports: [vendor/acme/standards/deptrac.yaml]
-                YAML
+                YAML,
         );
 
         $this->expectException(RuntimeException::class);
@@ -224,7 +224,7 @@ final class YamlListWriterTest extends TestCase
 
                 imports:
                   - vendor/acme/standards/deptrac.yaml
-                YAML
+                YAML,
         );
 
         self::assertSame(
@@ -236,7 +236,7 @@ final class YamlListWriterTest extends TestCase
                     imports:
                       - vendor/acme/standards/deptrac.yaml
                       - vendor/acme/standards/strict.yaml
-                    YAML
+                    YAML,
             ),
             YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/strict.yaml'),
         );

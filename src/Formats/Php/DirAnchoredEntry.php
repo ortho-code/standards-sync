@@ -13,14 +13,12 @@ use InvalidArgumentException;
  */
 final readonly class DirAnchoredEntry
 {
-    private function __construct(private Path $path)
-    {
-    }
+    private function __construct(private Path $path) {}
 
     public static function fromRelativeString(string $path): self
     {
         $relative = Path::fromRelativeString($path);
-        if (str_contains($relative->value(), '__DIR__') || str_contains($relative->value(), "'") || str_contains($relative->value(), '"')) {
+        if (str_contains($relative->value(), '__DIR__') || str_contains($relative->value(), '\'') || str_contains($relative->value(), '"')) {
             throw new InvalidArgumentException('Pass a plain relative path; the entry renders the PHP expression.');
         }
 
@@ -34,6 +32,6 @@ final readonly class DirAnchoredEntry
 
     public function value(): string
     {
-        return "__DIR__ . '/" . $this->path->value() . "'";
+        return '__DIR__ . \'/' . $this->path->value() . '\'';
     }
 }

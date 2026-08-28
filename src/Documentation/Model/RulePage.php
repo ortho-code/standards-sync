@@ -13,8 +13,7 @@ final readonly class RulePage
         private string $name,
         private string $description,
         private array $subsections,
-    ) {
-    }
+    ) {}
 
     public function family(): string
     {

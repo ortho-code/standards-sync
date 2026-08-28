@@ -44,7 +44,7 @@ final readonly class RenovateConfigFile
             RenovateConfigFormat::Json5 => self::NAME_JSON5,
         };
 
-        return FileTarget::fromStrings($created, ...array_values(array_filter(self::NAMES, static fn (string $name): bool => $name !== $created)));
+        return FileTarget::fromStrings($created, ...array_values(array_filter(self::NAMES, static fn(string $name): bool => $name !== $created)));
     }
 
     public static function isJson5(Path $path): bool

@@ -11,8 +11,7 @@ final readonly class JsonMember
         private int $start,
         private int $valueStart,
         private int $valueEnd,
-    ) {
-    }
+    ) {}
 
     /** The offset of the member's opening key quote; its text runs to the end of its value. */
     public function start(): int

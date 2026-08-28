@@ -26,8 +26,8 @@ final class NeonValueTest extends TestCase
         yield 'false stays bare' => [false, 'false'];
         yield 'an integer stays bare' => [7, '7'];
         yield 'a safe string stays bare' => ['vendor/acme/standards.neon', 'vendor/acme/standards.neon'];
-        yield 'a string with spaces is single-quoted' => ['hello world', "'hello world'"];
-        yield 'a string holding a single quote is double-quoted' => ["it's", '"it\'s"'];
+        yield 'a string with spaces is single-quoted' => ['hello world', '\'hello world\''];
+        yield 'a string holding a single quote is double-quoted' => ['it\'s', '"it\'s"'];
     }
 
     public function testRefusesAValueMixingBothQuoteStyles(): void
@@ -49,10 +49,10 @@ final class NeonValueTest extends TestCase
     {
         yield 'a bare value stays as is' => ['6', '6'];
         yield 'surrounding whitespace is trimmed' => [' 6 ', '6'];
-        yield 'single quotes are stripped' => ["'6'", '6'];
+        yield 'single quotes are stripped' => ['\'6\'', '6'];
         yield 'double quotes are stripped' => ['"6"', '6'];
-        yield 'inner quotes are kept' => ["'it''s'", "it''s"];
-        yield 'an unmatched quote is kept' => ["'6", "'6"];
+        yield 'inner quotes are kept' => ['\'it\'\'s\'', 'it\'\'s'];
+        yield 'an unmatched quote is kept' => ['\'6', '\'6'];
     }
 
     #[DataProvider('splitLines')]
@@ -66,10 +66,10 @@ final class NeonValueTest extends TestCase
     {
         yield 'no comment' => [' 6', ' 6', ''];
         yield 'a plain comment' => [' 6 # keep in step with CI', ' 6', ' # keep in step with CI'];
-        yield 'a hash inside single quotes is content' => [" '~foo#bar~'", " '~foo#bar~'", ''];
+        yield 'a hash inside single quotes is content' => [' \'~foo#bar~\'', ' \'~foo#bar~\'', ''];
         yield 'a hash inside double quotes is content' => [' "~foo#bar~"', ' "~foo#bar~"', ''];
-        yield 'a comment after a quoted hash value' => [" '~foo#bar~' # pattern", " '~foo#bar~'", ' # pattern'];
+        yield 'a comment after a quoted hash value' => [' \'~foo#bar~\' # pattern', ' \'~foo#bar~\'', ' # pattern'];
         yield 'an escaped quote does not end a double-quoted value' => [' "a\\"#b" # c', ' "a\\"#b"', ' # c'];
-        yield 'a quote inside the comment stays in the comment' => [" 4 # don't touch", ' 4', " # don't touch"];
+        yield 'a quote inside the comment stays in the comment' => [' 4 # don\'t touch', ' 4', ' # don\'t touch'];
     }
 }

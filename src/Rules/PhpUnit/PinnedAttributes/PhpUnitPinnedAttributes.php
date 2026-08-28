@@ -40,11 +40,13 @@ final readonly class PhpUnitPinnedAttributes implements Rule, ExplainsDrift
         return $this->attributes;
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return PhpUnitConfigFile::target();
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         // The writer leaves an attribute already carrying its pinned value byte-identical, so the compliant path needs no branch of its own.
@@ -56,13 +58,15 @@ final readonly class PhpUnitPinnedAttributes implements Rule, ExplainsDrift
         return $result;
     }
 
+    #[\Override]
     public function description(): string
     {
-        $names = array_map(static fn (PinnedAttribute $attribute): string => $attribute->name(), $this->attributes);
+        $names = array_map(static fn(PinnedAttribute $attribute): string => $attribute->name(), $this->attributes);
 
         return sprintf('Pins the PHPUnit root attributes: %s.', implode(', ', $names));
     }
 
+    #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {

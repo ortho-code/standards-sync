@@ -25,11 +25,13 @@ final readonly class ManagedBlock implements Rule
         $this->syntax = $this->agreedSyntax($target);
     }
 
+    #[\Override]
     public function target(): FileTarget
     {
         return $this->target;
     }
 
+    #[\Override]
     public function apply(?string $content): ?string
     {
         $grammar = new MarkerGrammar($this->syntax, $this->label);
@@ -42,13 +44,14 @@ final readonly class ManagedBlock implements Rule
 
         // An existing block is replaced in place, leaving everything around it untouched.
         if (preg_match($grammar->blockPattern(), $content) === 1) {
-            return (string) preg_replace_callback($grammar->blockPattern(), static fn (): string => $rendered, $content);
+            return (string) preg_replace_callback($grammar->blockPattern(), static fn(): string => $rendered, $content);
         }
 
         // An existing file without the block keeps its content and gains the block at the end.
         return rtrim($content, Lines::LINE_BREAK) . Lines::LINE_BREAK . Lines::LINE_BREAK . $rendered . Lines::LINE_BREAK;
     }
 
+    #[\Override]
     public function description(): string
     {
         return sprintf('Places the managed "%s" block in %s.', $this->label->value(), $this->target->toString());

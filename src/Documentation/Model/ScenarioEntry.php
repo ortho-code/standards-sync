@@ -12,8 +12,7 @@ final readonly class ScenarioEntry
         private string $heading,
         private string $fixtureDirectory,
         private array $examples,
-    ) {
-    }
+    ) {}
 
     public function heading(): string
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OrthoCode\StandardsSync\Testing\Validation;
 
+use Nette\Neon\Exception;
 use Nette\Neon\Neon;
 use RuntimeException;
 
@@ -20,6 +21,7 @@ final readonly class NeonValidator implements SyncedFileValidator
         $this->parserInstalled = $parserInstalled ?? class_exists(Neon::class);
     }
 
+    #[\Override]
     public function assertValid(string $path, string $content): void
     {
         if (!str_ends_with($path, self::EXTENSION)) {
@@ -32,7 +34,7 @@ final readonly class NeonValidator implements SyncedFileValidator
 
         try {
             Neon::decode($content);
-        } catch (\Nette\Neon\Exception $exception) {
+        } catch (Exception $exception) {
             throw new RuntimeException(sprintf('The synced %s is not valid neon: %s', $path, $exception->getMessage()), 0, $exception);
         }
     }

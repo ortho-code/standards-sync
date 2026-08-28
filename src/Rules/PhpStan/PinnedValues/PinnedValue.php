@@ -11,8 +11,7 @@ final readonly class PinnedValue
     public function __construct(
         private array $path,
         private bool|int|string $value,
-    ) {
-    }
+    ) {}
 
     /** @return non-empty-list<string> */
     public function path(): array
