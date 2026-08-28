@@ -4,6 +4,8 @@
 
 Ensures the renovate config extends a given preset, as a targeted edit that leaves the rest of the file untouched. An existing extends list gains the entry; a config without the list gains it; a project without a renovate config gets one created in the org-chosen format. The optional comment is written and enforced on the entry's line where the grammar has comments (json5); a strict-JSON config carries the standard unexplained.
 
+The preset itself is not distributed by this engine: renovate fetches it from its repository over the forge API, never from a composer install. It therefore lives where renovate's preset resolution looks — a bare "local><owner>/<repo>" reference resolves that repository's default.json — and not under the package's templates/ directory.
+
 Declared as:
 
 ```php
