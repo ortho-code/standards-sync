@@ -1,7 +1,7 @@
 # Code and test conventions
 
 - PHP 8.5+, `declare(strict_types=1)` in every file. Use modern features freely (`readonly class`, enums, `new` in initializers) — including the newest stdlib: `array_find` / `array_any` / `array_find_key` over a stateless `foreach` scan; a scan that tracks running state stays a `foreach`.
-- Single quotes unless interpolation or escapes need double.
+- **Single quotes unless interpolation or an escape sequence needs double (revised 2026-08-29).** A string containing an apostrophe escapes it (`'it\'s here'`) rather than switching to double quotes, because the standard this repository consumes configures the fixer that way and reverts the switch on every run; where escaping hurts readability, `sprintf()`. Reasoning and the probe in [the revision](history/rule-model.md#changed-2026-08-29--the-quoting-convention-follows-the-standard-this-repository-consumes).
 - Comments in English, one sentence per line; comment the non-obvious *why*, not the *what*.
 - **Comments own only their holder's knowledge (recorded 2026-08-06).** A declaration's docblock states what the value or type *means* — its contract, which stays even when a collaborator computes the value. The moment it narrates a producer's action, a collaborator's policy or justification, or one caller's situation, knowledge has crossed a boundary: move the sentence to the class that decides it, or delete it when the surrounding type already implies it. Specific vocabulary on general code is the visible symptom; policy narration in neutral words is the same violation and harder to spot.
 - CLI (`Presentation/Cli`, `symfony/console`): `bin/standards-sync` keeps only the autoload probe, then builds and runs the console application.
