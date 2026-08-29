@@ -73,11 +73,12 @@ Order is only meaningful among rules sharing a target: declarations aimed at dif
 
 Synced configs enforce nothing on their own: a repo that never installs the tools, or never runs them, passes every day. Three shipped rules close that — `ComposerRequirement` puts the tool in the manifest, `ComposerScript` owns a named entry point that runs the tools plus `standards-sync sync --check`, and `ManagedBlock` carries that call into a CI config, which needs no engine support of its own since `ManagedBlock` works in any comment-bearing format and CI configs are YAML.
 
-Three facts govern how they behave in a consumer:
+These facts govern how they behave in a consumer:
 
 - Writing a requirement leaves `composer.lock` stale: `composer install` warns, and refuses outright when the package is not in the lock at all, so the gap surfaces rather than passing silently.
 - Composer puts its bin-dir on PATH when running scripts, so a script entry names the bare binary with no `vendor/bin/` prefix.
 - That bin-dir holds the binaries of a project's *dependencies*, never the root package's own. A package that ships a tool and also adopts a standard that runs it therefore cannot invoke it by bare name — the script fails with `<tool>: not found` while every other script works. Linking the package's own binary into the bin-dir from a `post-install-cmd` resolves it, and is the only case where a consumer needs anything beyond the three rules above.
+- A consumer wraps an owned script rather than editing it: composer passes arguments through an `@name` reference, so `"app-phpstan-local": ["@app-phpstan --memory-limit=1G"]` runs the owned command with the argument added, and keeps working when the standard changes what that command is. The standard's own aggregate still calls the owned name, so a wrapper serves a person at a terminal, not CI.
 - Nothing in the engine ties a CI config's call to the name `ComposerScript` declares. The two are matched only by the text of the call, so a renamed script leaves the CI file calling a script that no longer exists.
 
 ## What the mechanism does not do
