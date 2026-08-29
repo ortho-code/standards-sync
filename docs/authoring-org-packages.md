@@ -57,6 +57,22 @@ final class AcmeProject extends Standard
 
 The tiers share the one `templates/` directory, so dividing it between them is a matter of relative paths — but divide it before the first release: a path a rule renders into a consumer's config is matched verbatim afterwards, so moving a template later leaves a stale entry beside the new one (see [What the mechanism does not do](#what-the-mechanism-does-not-do)).
 
+## Several standards in one consumer
+
+`withRuleSet()` is additive, and the engine flattens every declared set's rules in declaration order before folding them per file, so a consumer can declare more than one standard:
+
+```php
+return SyncConfig::create()
+    ->withRuleSet(new Acme())
+    ->withRuleSet(new AcmeGitHub());
+```
+
+This is the same composition `include()` performs, moved to the consumer's own config, and it is how an org separates a concern the *consumer* chooses between rather than the standard — CI for one forge or another being the case that forces it. Nothing here removes a file, so a standard that ships one forge's CI cannot be adopted on another at all; splitting that concern into a rule set declared beside the tier is the fix, and it needs no engine feature.
+
+Each standard declared this way locates its own package, so the pass-down trap above does not apply — that one belongs to `include()`, where a standard constructs another.
+
+**Two separately declared rule sets that target the same thing do not merge.** Folding is by resolved path in declaration order, and the same-target semantics are exactly the ones below: a same-label block is replaced by the later one, and `ComposerScript` rewrites the named script's command list wholesale. The later declaration wins and the earlier one's content is gone, with nothing reported. Within one standard that is the documented override mechanism and one author sees both declarations; across two, neither author can see the other. Keep separately declared standards on disjoint concerns, and pin anywhere one names something another declares — a CI block calling a script name, say — in the package's own suite, because the engine will not.
+
 ## Declaration order
 
 Rules that target the same file fold in declaration order — each rule receives the previous rule's output. Order never breaks correctness (every rule is idempotent and the fold is deterministic), but it *is* semantics in three places:
