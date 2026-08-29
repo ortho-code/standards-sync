@@ -12,7 +12,7 @@ The next family is picked from this list rather than from memory; nothing here i
 
 - **`Dockerfile`** — needs no engine work: it is comment-bearing, so `ManagedBlock` handles it today and the whole family is org authoring. Recorded because "already possible" is easy to miss.
 - **`compose.yaml`** — waits on nothing technically (the YAML writer exists), but `compose.override.yaml` is the record's one named example of genuine multi-file merging, parked as out of scope — picking this family forces that decision open. Not a casual pick.
-- **Release workflow + changelog** — needs no engine work, like `Dockerfile`: a tag-driven release workflow synced as a managed block, a `CHANGELOG.md` seeded one-shot, and release notes extracted from the tag's changelog section — this repository's own release mechanism is the worked example.
+- **Release workflow + changelog** — the workflow half needs no engine work, like `Dockerfile`, and a standard already ships it: a tag-driven release workflow synced as a managed block, with the release notes extracted from the tag's changelog section (this repository's own release mechanism is the worked example). The **changelog half does** need engine work, and the earlier form of this entry was wrong to bundle them: nothing here can seed a `CHANGELOG.md`, because the one-shot seeds are all tool-specific rules and a managed block is wrong for a file of human prose that must not carry markers. What is missing is a generic seed-if-absent rule; its trigger is the first consumer for which starting a changelog by hand is friction rather than a one-line chore.
 
 ## Deferred, with recorded triggers
 
