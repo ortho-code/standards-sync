@@ -8,7 +8,6 @@ use OrthoCode\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
 use OrthoCode\StandardsSync\Rules\Composer\Requirement\RequirementType;
 use OrthoCode\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
 use OrthoCode\StandardsSync\Testing\FileContent;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -16,13 +15,27 @@ use RuntimeException;
 #[CoversClass(ComposerRequirement::class)]
 final class ComposerRequirementTest extends TestCase
 {
-    /** An org declaring a branch as its standard states no minimum, so it is refused where it is written rather than at sync time. */
-    public function testRefusesAConstraintThatStatesNoMinimum(): void
+    /** A declared branch states no minimum and branches have no ordering, so the requirement pins rather than floors. */
+    public function testTheDescriptionOfABranchConstraintSaysItIsPinned(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('names a branch, so it states no minimum version to enforce');
+        self::assertSame(
+            'Requires acme/security-advisories in the composer manifest (require-dev), pinned to "dev-latest".',
+            self::pinnedRule()->description(),
+        );
+    }
 
-        new ComposerRequirement(package: 'phpstan/phpstan', constraint: VersionConstraint::fromString('dev-main'));
+    public function testLeavesThePinnedBranchByteIdentical(): void
+    {
+        $manifest = self::manifest('{"require-dev": {"acme/security-advisories": "dev-latest"}}');
+
+        self::assertSame($manifest, self::pinnedRule()->apply($manifest));
+    }
+
+    public function testExplainsWhyAnotherBranchIsRewrittenToThePinnedOne(): void
+    {
+        $explanation = self::pinnedRule()->explain(self::manifest('{"require-dev": {"acme/security-advisories": "dev-master"}}'));
+
+        self::assertSame('The required "dev-master" is not the pinned "dev-latest", and branches name no versions to compare, so the pinned one is written.', $explanation);
     }
 
     public function testAbstainsWithoutAManifest(): void
@@ -89,6 +102,11 @@ final class ComposerRequirementTest extends TestCase
     private static function rule(): ComposerRequirement
     {
         return new ComposerRequirement(package: 'phpstan/phpstan', constraint: VersionConstraint::fromString('^2.5'));
+    }
+
+    private static function pinnedRule(): ComposerRequirement
+    {
+        return new ComposerRequirement(package: 'acme/security-advisories', constraint: VersionConstraint::fromString('dev-latest'));
     }
 
     private static function manifest(string $json): string

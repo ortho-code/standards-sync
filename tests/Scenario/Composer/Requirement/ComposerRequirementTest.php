@@ -15,6 +15,8 @@ final class ComposerRequirementTest extends ScenarioTestCase
     {
         $config = 'standards-sync.php';
         $runtime = 'standards-sync-runtime.php';
+        $pinned = 'standards-sync-pinned-branch.php';
+        $pinnedRuntime = 'standards-sync-pinned-branch-runtime.php';
 
         yield 'the requirement is added to an existing require-dev' => ['adds-to-require-dev', $config];
         yield 'a manifest without require-dev gains the section' => ['creates-the-require-dev-section', $config];
@@ -28,5 +30,9 @@ final class ComposerRequirementTest extends ScenarioTestCase
         yield 'a package key written with an escaped slash is the same member' => ['matches-an-escaped-package-key', $config];
         yield 'a root that is not a composer project gets no manifest' => ['no-manifest-creates-nothing', $config];
         yield 'a runtime requirement moves out of require-dev' => ['moves-a-requirement-into-require', $runtime];
+        yield 'a declared branch constraint adds the package it pins' => ['adds-an-absent-pinned-package', $pinned];
+        yield 'a project on another branch is rewritten to the pinned one' => ['rewrites-a-different-branch', $pinned];
+        yield 'a pinned requirement moves into the section that covers the need' => ['moves-a-pinned-requirement-into-require', $pinnedRuntime];
+        yield 'a pinned requirement drops the redundant duplicate too' => ['drops-a-duplicate-branch-requirement', $pinned];
     }
 }

@@ -15,6 +15,7 @@ use RuntimeException;
 /**
  * Requires a package in the composer manifest exactly once, in a section that covers the declared need, at or above a minimum version.
  * A constraint reaching below the minimum is raised to it alternative-wise, so a project allowing a newer major keeps it; a package required where the declared need is not covered moves, carrying a constraint that already meets the minimum.
+ * A declared constraint naming only a branch is pinned instead: branches have no ordering to floor, so the declared one is written outright, which is how a package publishing nothing but branches can be part of a standard at all.
  * A root without a manifest is not a composer project, so the rule abstains rather than creating one.
  */
 final readonly class ComposerRequirement implements Rule, ExplainsDrift
@@ -23,11 +24,7 @@ final readonly class ComposerRequirement implements Rule, ExplainsDrift
         private string $package,
         private VersionConstraint $constraint,
         private RequirementType $type = RequirementType::Development,
-    ) {
-        if ($constraint->lowestVersion() === null) {
-            throw new InvalidArgumentException(sprintf('The constraint "%s" required for %s names a branch, so it states no minimum version to enforce.', $constraint->value(), $package));
-        }
-    }
+    ) {}
 
     #[\Override]
     public function target(): FileTarget
@@ -51,8 +48,10 @@ final readonly class ComposerRequirement implements Rule, ExplainsDrift
             $section = null;
         }
 
-        // Raising a constraint that already meets the minimum returns it unchanged, and writing an equal value leaves the file byte-identical, so one path serves adding, raising, moving and leaving alike.
-        $constraint = $required?->raisedTo($this->constraint) ?? $this->constraint;
+        // Raising a constraint that already meets the minimum returns it unchanged, and writing an equal value leaves the file byte-identical, so one path serves adding, raising, pinning, moving and leaving alike.
+        $constraint = $this->pinsItsBranch()
+            ? $this->constraint
+            : $required?->raisedTo($this->constraint) ?? $this->constraint;
 
         return JsonObjectWriter::write($content, [($section ?? $this->type)->value, $this->package], $constraint->value());
     }
@@ -60,6 +59,10 @@ final readonly class ComposerRequirement implements Rule, ExplainsDrift
     #[\Override]
     public function description(): string
     {
+        if ($this->pinsItsBranch()) {
+            return sprintf('Requires %s in the composer manifest (%s), pinned to "%s".', $this->package, $this->type->value, $this->constraint->value());
+        }
+
         return sprintf('Requires %s in the composer manifest (%s), no lower than "%s".', $this->package, $this->type->value, $this->constraint->value());
     }
 
@@ -81,11 +84,21 @@ final readonly class ComposerRequirement implements Rule, ExplainsDrift
         }
 
         $required = $this->requirementIn($content, $section) ?? $this->constraint;
+        if ($this->pinsItsBranch()) {
+            return sprintf('The required "%s" is not the pinned "%s", and branches name no versions to compare, so the pinned one is written.', $required->value(), $this->constraint->value());
+        }
+
         if ($required->lowestVersion() === null) {
             return sprintf('The required "%s" names a branch, which can resolve to any version and so meets no minimum; it is raised to "%s".', $required->value(), $this->constraint->value());
         }
 
         return sprintf('The required "%s" reaches below the "%s" minimum.', $required->value(), $this->constraint->value());
+    }
+
+    /** A constraint naming only a branch states no minimum, and branches have no ordering, so there is nothing to measure a project's own constraint against — the declared one is written outright. */
+    private function pinsItsBranch(): bool
+    {
+        return $this->constraint->lowestVersion() === null;
     }
 
     /** Both entries' constraints apply at once, so a package required in both sections carries a hidden extra minimum; the runtime entry is the one composer locks. */

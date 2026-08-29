@@ -75,6 +75,7 @@ Synced configs enforce nothing on their own: a repo that never installs the tool
 
 These facts govern how they behave in a consumer:
 
+- A requirement whose declared constraint names only a branch is *pinned* rather than floored: branches have no ordering, so the declared one is written outright and a project on another branch is rewritten to it. That is how a package publishing nothing but branches (a security-advisories package, for instance) becomes part of a standard at all.
 - Writing a requirement leaves `composer.lock` stale: `composer install` warns, and refuses outright when the package is not in the lock at all, so the gap surfaces rather than passing silently.
 - Composer puts its bin-dir on PATH when running scripts, so a script entry names the bare binary with no `vendor/bin/` prefix.
 - That bin-dir holds the binaries of a project's *dependencies*, never the root package's own. A package that ships a tool and also adopts a standard that runs it therefore cannot invoke it by bare name — the script fails with `<tool>: not found` while every other script works. Linking the package's own binary into the bin-dir from a `post-install-cmd` resolves it, and is the only case where a consumer needs anything beyond the three rules above.

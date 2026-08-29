@@ -2,7 +2,7 @@
 
 # ComposerRequirement
 
-Requires a package in the composer manifest exactly once, in a section that covers the declared need, at or above a minimum version. A constraint reaching below the minimum is raised to it alternative-wise, so a project allowing a newer major keeps it; a package required where the declared need is not covered moves, carrying a constraint that already meets the minimum. A root without a manifest is not a composer project, so the rule abstains rather than creating one.
+Requires a package in the composer manifest exactly once, in a section that covers the declared need, at or above a minimum version. A constraint reaching below the minimum is raised to it alternative-wise, so a project allowing a newer major keeps it; a package required where the declared need is not covered moves, carrying a constraint that already meets the minimum. A declared constraint naming only a branch is pinned instead: branches have no ordering to floor, so the declared one is written outright, which is how a package publishing nothing but branches can be part of a standard at all. A root without a manifest is not a composer project, so the rule abstains rather than creating one.
 
 Declared as:
 
@@ -301,6 +301,153 @@ Fixture: [`tests/Scenario/Composer/Requirement/fixtures/moves-a-requirement-into
     },
     "require": {
         "acme/runtime-support": "^1.4"
+    }
+}
+```
+
+Declared as:
+
+```php
+// A package publishing nothing but branches: branches have no ordering, so the declared one is pinned rather than floored.
+return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
+    public function __construct()
+    {
+        $this->addRule(new ComposerRequirement(package: 'acme/security-advisories', constraint: VersionConstraint::fromString('dev-latest')));
+    }
+});
+```
+
+…which reports as: *Requires acme/security-advisories in the composer manifest (require-dev), pinned to "dev-latest".*
+
+## A declared branch constraint adds the package it pins
+
+Fixture: [`tests/Scenario/Composer/Requirement/fixtures/adds-an-absent-pinned-package`](../../../tests/Scenario/Composer/Requirement/fixtures/adds-an-absent-pinned-package)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "name": "acme/project",
+    "require-dev": {
+        "phpstan/phpstan": "^2.5"
+    }
+}
+```
+
+**After:**
+
+```json
+{
+    "name": "acme/project",
+    "require-dev": {
+        "phpstan/phpstan": "^2.5",
+        "acme/security-advisories": "dev-latest"
+    }
+}
+```
+
+## A project on another branch is rewritten to the pinned one
+
+Fixture: [`tests/Scenario/Composer/Requirement/fixtures/rewrites-a-different-branch`](../../../tests/Scenario/Composer/Requirement/fixtures/rewrites-a-different-branch)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "name": "acme/project",
+    "require-dev": {
+        "acme/security-advisories": "dev-master"
+    }
+}
+```
+
+**After:**
+
+```json
+{
+    "name": "acme/project",
+    "require-dev": {
+        "acme/security-advisories": "dev-latest"
+    }
+}
+```
+
+## A pinned requirement drops the redundant duplicate too
+
+Fixture: [`tests/Scenario/Composer/Requirement/fixtures/drops-a-duplicate-branch-requirement`](../../../tests/Scenario/Composer/Requirement/fixtures/drops-a-duplicate-branch-requirement)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "name": "acme/project",
+    "require": {
+        "acme/security-advisories": "dev-latest"
+    },
+    "require-dev": {
+        "acme/security-advisories": "dev-master",
+        "rector/rector": "^2.5"
+    }
+}
+```
+
+**After:**
+
+```json
+{
+    "name": "acme/project",
+    "require": {
+        "acme/security-advisories": "dev-latest"
+    },
+    "require-dev": {
+        "rector/rector": "^2.5"
+    }
+}
+```
+
+Declared as:
+
+```php
+return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
+    public function __construct()
+    {
+        $this->addRule(new ComposerRequirement(
+            package: 'acme/security-advisories',
+            constraint: VersionConstraint::fromString('dev-latest'),
+            type: RequirementType::Runtime,
+        ));
+    }
+});
+```
+
+…which reports as: *Requires acme/security-advisories in the composer manifest (require), pinned to "dev-latest".*
+
+## A pinned requirement moves into the section that covers the need
+
+Fixture: [`tests/Scenario/Composer/Requirement/fixtures/moves-a-pinned-requirement-into-require`](../../../tests/Scenario/Composer/Requirement/fixtures/moves-a-pinned-requirement-into-require)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "name": "acme/project",
+    "require-dev": {
+        "acme/security-advisories": "dev-master",
+        "rector/rector": "^2.5"
+    }
+}
+```
+
+**After:**
+
+```json
+{
+    "name": "acme/project",
+    "require-dev": {
+        "rector/rector": "^2.5"
+    },
+    "require": {
+        "acme/security-advisories": "dev-latest"
     }
 }
 ```

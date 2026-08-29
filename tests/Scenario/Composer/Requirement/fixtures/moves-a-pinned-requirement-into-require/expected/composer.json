@@ -1,0 +1,9 @@
+{
+    "name": "acme/project",
+    "require-dev": {
+        "rector/rector": "^2.5"
+    },
+    "require": {
+        "acme/security-advisories": "dev-latest"
+    }
+}
