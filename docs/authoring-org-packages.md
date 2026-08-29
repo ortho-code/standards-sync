@@ -27,7 +27,7 @@ final class Acme extends Standard
 
 **Everything the package distributes lives in its `templates/` directory** — both copied fragments (often partial files) and the complete rulesets consumers' tools load from `vendor/<name>/templates/…`. `read()` and `path()` resolve inside it, so a rule can never point at the package's own config: what the package lints *itself* with stays at its root, outside the distributed directory by construction. Both accept a relative path, so a package distributing several variants of a file separates them by subdirectory.
 
-A hierarchy composes inside `enforce()`: a second-tier standard starts with `$this->include(new AcmeBase());` and adds or overrides after it — the included standard locates its own package, unless it is handed one.
+A hierarchy composes inside `enforce()`: a second-tier standard starts with `$this->include(new AcmeBase());` and adds or overrides after it. The tiers live in separate packages or side by side in one — see [Several standards in one package](#several-standards-in-one-package).
 
 A consumer whose layout composer does not know (an in-repo psr-4 package) injects the location in its own `standards-sync.php`:
 
@@ -36,6 +36,26 @@ return SyncConfig::create()->withRuleSet(new Acme(
     package: new Package(__DIR__ . '/standards/acme', 'standards/acme'),
 ));
 ```
+
+## Several standards in one package
+
+Tiers do not need a package each. Two standards side by side in one package compose exactly as two packages do, which is how an organisation ships a library tier and an application tier — and later a base extracted from them — on one release line and one version constraint:
+
+```php
+final class AcmeProject extends Standard
+{
+    protected function enforce(Package $package): void
+    {
+        $this->include(new AcmeBase($package));
+
+        $this->addRule(new PhpStanIncludedRuleset(ruleset: $package->path('project/phpstan.neon')));
+    }
+}
+```
+
+**Hand the package down.** An included standard constructed without one locates its own, which resolves to the same package in a consumer install and makes the omission look harmless — until a test injects a `Package`: there the including tier renders `vendor/acme/standards/templates/…` while the included tier renders bare `templates/…` paths for the very same directory. Passing `$package` makes both tiers speak for the package they are in, in every layout.
+
+The tiers share the one `templates/` directory, so dividing it between them is a matter of relative paths — but divide it before the first release: a path a rule renders into a consumer's config is matched verbatim afterwards, so moving a template later leaves a stale entry beside the new one (see [What the mechanism does not do](#what-the-mechanism-does-not-do)).
 
 ## Declaration order
 
