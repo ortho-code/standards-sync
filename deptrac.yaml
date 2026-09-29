@@ -90,6 +90,7 @@ deptrac:
     ComposerRules:
       - Core
       - Formats
+      - Rules
       - Vendor
     Infrastructure:
       - Core
