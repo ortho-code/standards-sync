@@ -11,6 +11,7 @@ use OrthoCode\StandardsSync\Core\Rule\Rule;
 use OrthoCode\StandardsSync\Formats\Php\DirAnchoredEntry;
 use OrthoCode\StandardsSync\Formats\Php\FluentChainWriter;
 use OrthoCode\StandardsSync\Rules\Ecs\EcsConfigFile;
+use OrthoCode\StandardsSync\Rules\General\ListContribution\DeclaredEntries;
 use LogicException;
 
 /**
@@ -24,16 +25,12 @@ final readonly class EcsBaseSet implements Rule, ContributesToList, ExplainsDrif
 {
     private const string METHOD = 'withSets';
 
-    /** @var non-empty-list<DirAnchoredEntry> */
-    private array $sets;
-
-    /** @var list<string> */
-    private array $retired;
+    /** @var DeclaredEntries<DirAnchoredEntry> */
+    private DeclaredEntries $sets;
 
     public function __construct(string $set)
     {
-        $this->sets = [DirAnchoredEntry::fromRelativeString($set)];
-        $this->retired = [];
+        $this->sets = DeclaredEntries::fromEntries([DirAnchoredEntry::fromRelativeString($set)], static fn(DirAnchoredEntry $set): string => $set->value());
     }
 
     #[\Override]
@@ -51,7 +48,7 @@ final readonly class EcsBaseSet implements Rule, ContributesToList, ExplainsDrif
     #[\Override]
     public function entries(): array
     {
-        return array_map(static fn(DirAnchoredEntry $set): string => $set->value(), $this->sets);
+        return $this->sets->keys();
     }
 
     #[\Override]
@@ -61,16 +58,9 @@ final readonly class EcsBaseSet implements Rule, ContributesToList, ExplainsDrif
             throw new LogicException('Only declarations of ECS base sets merge into one.');
         }
 
-        $sets = $this->sets;
-        foreach ($later->sets as $set) {
-            if (!array_any($sets, static fn(DirAnchoredEntry $declared): bool => $declared->value() === $set->value())) {
-                $sets[] = $set;
-            }
-        }
-
         /** @var static $merged psalm types clone-with as a plain object */
         $merged = clone($this, [
-            'sets' => $sets,
+            'sets' => $this->sets->withMerged($later->sets),
         ]);
 
         return $merged;
@@ -81,7 +71,7 @@ final readonly class EcsBaseSet implements Rule, ContributesToList, ExplainsDrif
     {
         /** @var static $retiring psalm types clone-with as a plain object */
         $retiring = clone($this, [
-            'retired' => $retired,
+            'sets' => $this->sets->withRetired($retired),
         ]);
 
         return $retiring;
@@ -91,38 +81,38 @@ final readonly class EcsBaseSet implements Rule, ContributesToList, ExplainsDrif
     public function apply(?string $content): ?string
     {
         // A project without an ECS config gets one: enforcing the standard is the point.
-        $content ??= EcsConfigFile::createConfig(FluentChainWriter::createArrayCall(self::METHOD, $this->sets[0]->value()));
+        $content ??= EcsConfigFile::createConfig(FluentChainWriter::createArrayCall(self::METHOD, $this->sets->keys()[0]));
 
         EcsConfigFile::assertFluentChain($content);
-        foreach ($this->entries() as $entry) {
-            $content = FluentChainWriter::ensureArrayEntry($content, self::METHOD, $entry, replacing: $this->retired);
+        foreach ($this->sets->keys() as $entry) {
+            $content = FluentChainWriter::ensureArrayEntry($content, self::METHOD, $entry, replacing: $this->sets->retired());
         }
 
-        return FluentChainWriter::removeArrayEntries($content, self::METHOD, $this->retired);
+        return FluentChainWriter::removeArrayEntries($content, self::METHOD, $this->sets->retired());
     }
 
     #[\Override]
     public function description(): string
     {
-        return sprintf('Ensures the ECS config registers %s in withSets().', self::paths($this->sets));
+        return sprintf('Ensures the ECS config registers %s in withSets().', self::paths($this->sets->entries()));
     }
 
     #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {
-            return sprintf('There is no ECS config yet; one is created registering %s.', self::paths($this->sets));
+            return sprintf('There is no ECS config yet; one is created registering %s.', self::paths($this->sets->entries()));
         }
 
         $registered = FluentChainWriter::readArrayEntries($content, self::METHOD) ?? [];
 
         $sentences = [];
-        $missing = array_values(array_filter($this->sets, static fn(DirAnchoredEntry $set): bool => !in_array($set->value(), $registered, true)));
+        $missing = $this->sets->missingFrom($registered);
         if ($missing !== []) {
             $sentences[] = sprintf('The ECS config does not register %s in withSets().', self::paths($missing));
         }
 
-        $retracted = array_values(array_intersect($this->retired, $registered));
+        $retracted = $this->sets->retractedFrom($registered);
         if ($retracted !== []) {
             $sentences[] = sprintf('It stops registering %s, which no standard declares any more.', implode(', ', $retracted));
         }

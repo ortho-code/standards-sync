@@ -23,12 +23,18 @@ final class DeclaredEntriesTest extends TestCase
     public function testMergingAppendsInDeclarationOrderAndKeepsEachKeysFirstDeclaration(): void
     {
         $key = static fn(array $entry): string => $entry[0];
-        $merged = DeclaredEntries::fromEntry(['a', 'first'], $key)
-            ->withMerged(DeclaredEntries::fromEntry(['b', 'only'], $key))
-            ->withMerged(DeclaredEntries::fromEntry(['a', 'second'], $key));
+        $merged = DeclaredEntries::fromEntries([['a', 'first']], $key)
+            ->withMerged(DeclaredEntries::fromEntries([['b', 'only'], ['a', 'second']], $key));
 
         self::assertSame([['a', 'first'], ['b', 'only']], $merged->entries());
         self::assertSame(['a', 'b'], $merged->keys());
+    }
+
+    public function testOneDeclarationsEntriesStayAsGiven(): void
+    {
+        $entries = DeclaredEntries::fromEntries(['b', 'a'], static fn(string $entry): string => $entry);
+
+        self::assertSame(['b', 'a'], $entries->keys());
     }
 
     public function testRetiredKeysAreCarriedAlongsideTheDeclaredEntries(): void
@@ -52,7 +58,7 @@ final class DeclaredEntriesTest extends TestCase
 
     public function testMissingEntriesAreReturnedAsDeclaredNotAsKeys(): void
     {
-        $entries = DeclaredEntries::fromEntry(['a', 'rich'], static fn(array $entry): string => $entry[0]);
+        $entries = DeclaredEntries::fromEntries([['a', 'rich']], static fn(array $entry): string => $entry[0]);
 
         self::assertSame([['a', 'rich']], $entries->missingFrom([]));
         self::assertSame([], $entries->missingFrom(['a']));

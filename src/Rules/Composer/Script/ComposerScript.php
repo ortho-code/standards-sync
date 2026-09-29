@@ -10,6 +10,7 @@ use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
 use OrthoCode\StandardsSync\Formats\Json\JsonObjectWriter;
 use OrthoCode\StandardsSync\Rules\Composer\ComposerManifest;
+use OrthoCode\StandardsSync\Rules\General\ListContribution\DeclaredEntries;
 use InvalidArgumentException;
 use LogicException;
 
@@ -21,11 +22,8 @@ use LogicException;
  */
 final readonly class ComposerScript implements Rule, ContributesToList, ExplainsDrift
 {
-    /** @var non-empty-list<ScriptCommand> */
-    private array $commands;
-
-    /** @var list<string> */
-    private array $retired;
+    /** @var DeclaredEntries<ScriptCommand> */
+    private DeclaredEntries $commands;
 
     /**
      * The commands are validated rather than only typed: an org package is plain PHP, so the docblock is a promise the caller can break.
@@ -45,8 +43,10 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
             throw new InvalidArgumentException(sprintf('The composer script "%s" needs at least one command.', $name));
         }
 
-        $this->commands = array_map(static fn(string $command): ScriptCommand => ScriptCommand::fromString($command, $acceptsArguments), $commands);
-        $this->retired = [];
+        $this->commands = DeclaredEntries::fromEntries(
+            array_map(static fn(string $command): ScriptCommand => ScriptCommand::fromString($command, $acceptsArguments), $commands),
+            static fn(ScriptCommand $command): string => $command->value(),
+        );
     }
 
     /** Exposed so an org can pin whatever calls this script by name against what it declares. */
@@ -70,7 +70,7 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
     #[\Override]
     public function entries(): array
     {
-        return array_map(static fn(ScriptCommand $command): string => $command->value(), $this->commands);
+        return $this->commands->keys();
     }
 
     #[\Override]
@@ -80,16 +80,9 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
             throw new LogicException(sprintf('Only declarations of the composer script "%s" merge into it.', $this->name));
         }
 
-        $commands = $this->commands;
-        foreach ($later->commands as $command) {
-            if (!array_any($commands, static fn(ScriptCommand $declared): bool => $declared->value() === $command->value())) {
-                $commands[] = $command;
-            }
-        }
-
         /** @var static $merged psalm types clone-with as a plain object */
         $merged = clone($this, [
-            'commands' => $commands,
+            'commands' => $this->commands->withMerged($later->commands),
         ]);
 
         return $merged;
@@ -100,7 +93,7 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
     {
         /** @var static $retiring psalm types clone-with as a plain object */
         $retiring = clone($this, [
-            'retired' => $retired,
+            'commands' => $this->commands->withRetired($retired),
         ]);
 
         return $retiring;
@@ -127,7 +120,7 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
 
         $sentences = [];
         $missing = array_values(array_filter(
-            $this->commands,
+            $this->commands->entries(),
             static fn(ScriptCommand $declared): bool => !array_any($current, static fn(string $actual): bool => $declared->matches($actual)),
         ));
         if ($missing !== []) {
@@ -150,9 +143,9 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
     #[\Override]
     public function description(): string
     {
-        $description = sprintf('Runs %s in the composer script "%s", beside any commands the project adds.', self::quoted(self::values($this->commands)), $this->name);
+        $description = sprintf('Runs %s in the composer script "%s", beside any commands the project adds.', self::quoted($this->commands->keys()), $this->name);
 
-        $accepting = array_values(array_filter($this->commands, static fn(ScriptCommand $command): bool => $command->acceptsArguments()));
+        $accepting = array_values(array_filter($this->commands->entries(), static fn(ScriptCommand $command): bool => $command->acceptsArguments()));
         if ($accepting !== []) {
             $description .= sprintf(' %s %s extra arguments.', self::quoted(self::values($accepting)), count($accepting) === 1 ? 'accepts' : 'accept');
         }
@@ -177,7 +170,7 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
         $commands = array_values(array_filter($current, fn(string $actual): bool => $this->declares($actual) || !$this->retires($actual)));
 
         $cursor = 0;
-        foreach ($this->commands as $declared) {
+        foreach ($this->commands->entries() as $declared) {
             /** @var int|null $position a list's keys are its positions */
             $position = array_find_key($commands, static fn(string $actual): bool => $declared->matches($actual));
             if ($position === null) {
@@ -193,13 +186,13 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
 
     private function declares(string $actual): bool
     {
-        return array_any($this->commands, static fn(ScriptCommand $declared): bool => $declared->matches($actual));
+        return array_any($this->commands->entries(), static fn(ScriptCommand $declared): bool => $declared->matches($actual));
     }
 
     /** A retired command is recognised with arguments after it too: the project's arguments do not make a command the standard stopped declaring the project's own. */
     private function retires(string $actual): bool
     {
-        return array_any($this->retired, static fn(string $retired): bool => ScriptCommand::fromString($retired, acceptsArguments: true)->matches($actual));
+        return array_any($this->commands->retired(), static fn(string $retired): bool => ScriptCommand::fromString($retired, acceptsArguments: true)->matches($actual));
     }
 
     /**

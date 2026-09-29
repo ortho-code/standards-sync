@@ -36,14 +36,16 @@ final readonly class DeclaredEntries
     }
 
     /**
+     * One declaration's entries, in the order given.
+     *
      * @template TNew
-     * @param TNew $entry
-     * @param Closure(TNew): string $key the text the entry is written into the list as
+     * @param non-empty-list<TNew> $entries
+     * @param Closure(TNew): string $key the text an entry is written into the list as
      * @return self<TNew>
      */
-    public static function fromEntry(mixed $entry, Closure $key): self
+    public static function fromEntries(array $entries, Closure $key): self
     {
-        return new self([$entry], $key, []);
+        return new self($entries, $key, []);
     }
 
     /**

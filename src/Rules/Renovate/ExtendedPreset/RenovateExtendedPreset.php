@@ -13,6 +13,7 @@ use OrthoCode\StandardsSync\Core\Rule\Rule;
 use OrthoCode\StandardsSync\Core\Text\Lines;
 use OrthoCode\StandardsSync\Formats\Json\JsonObjectWriter;
 use OrthoCode\StandardsSync\Formats\Json5\Json5ListWriter;
+use OrthoCode\StandardsSync\Rules\General\ListContribution\DeclaredEntries;
 use OrthoCode\StandardsSync\Rules\Renovate\RenovateConfigFile;
 use OrthoCode\StandardsSync\Rules\Renovate\RenovateConfigFormat;
 use JsonException;
@@ -32,19 +33,15 @@ final readonly class RenovateExtendedPreset implements Rule, ContributesToList, 
 {
     private const string SECTION = 'extends';
 
-    /** @var non-empty-list<Preset> */
-    private array $presets;
-
-    /** @var list<string> */
-    private array $retired;
+    /** @var DeclaredEntries<Preset> */
+    private DeclaredEntries $presets;
 
     public function __construct(
         string $preset,
         private RenovateConfigFormat $createAs = RenovateConfigFormat::Json,
         ?string $comment = null,
     ) {
-        $this->presets = [Preset::fromReference($preset, $comment)];
-        $this->retired = [];
+        $this->presets = DeclaredEntries::fromEntries([Preset::fromReference($preset, $comment)], static fn(Preset $preset): string => $preset->reference());
     }
 
     #[\Override]
@@ -62,7 +59,7 @@ final readonly class RenovateExtendedPreset implements Rule, ContributesToList, 
     #[\Override]
     public function entries(): array
     {
-        return array_map(static fn(Preset $preset): string => $preset->reference(), $this->presets);
+        return $this->presets->keys();
     }
 
     #[\Override]
@@ -72,16 +69,9 @@ final readonly class RenovateExtendedPreset implements Rule, ContributesToList, 
             throw new LogicException('Only declarations of extended renovate presets merge into one.');
         }
 
-        $presets = $this->presets;
-        foreach ($later->presets as $preset) {
-            if (!array_any($presets, static fn(Preset $declared): bool => $declared->reference() === $preset->reference())) {
-                $presets[] = $preset;
-            }
-        }
-
         /** @var static $merged psalm types clone-with as a plain object */
         $merged = clone($this, [
-            'presets' => $presets,
+            'presets' => $this->presets->withMerged($later->presets),
         ]);
 
         return $merged;
@@ -92,7 +82,7 @@ final readonly class RenovateExtendedPreset implements Rule, ContributesToList, 
     {
         /** @var static $retiring psalm types clone-with as a plain object */
         $retiring = clone($this, [
-            'retired' => $retired,
+            'presets' => $this->presets->withRetired($retired),
         ]);
 
         return $retiring;
@@ -114,11 +104,11 @@ final readonly class RenovateExtendedPreset implements Rule, ContributesToList, 
 
         if (RenovateConfigFile::isJson5($path)) {
             $content ??= '';
-            foreach ($this->presets as $preset) {
-                $content = Json5ListWriter::ensureEntry($content, self::SECTION, $preset->reference(), $preset->comment(), $this->retired);
+            foreach ($this->presets->entries() as $preset) {
+                $content = Json5ListWriter::ensureEntry($content, self::SECTION, $preset->reference(), $preset->comment(), $this->presets->retired());
             }
 
-            return Json5ListWriter::removeEntries($content, self::SECTION, $this->retired);
+            return Json5ListWriter::removeEntries($content, self::SECTION, $this->presets->retired());
         }
 
         // A project without a renovate config gets one: enforcing the standard is the point.
@@ -129,10 +119,10 @@ final readonly class RenovateExtendedPreset implements Rule, ContributesToList, 
             $this->assertStrictJson($path, $content);
         }
 
-        foreach ($this->entries() as $reference) {
-            $content = JsonObjectWriter::ensureListEntry($content, [self::SECTION], $reference, $this->retired);
+        foreach ($this->presets->keys() as $reference) {
+            $content = JsonObjectWriter::ensureListEntry($content, [self::SECTION], $reference, $this->presets->retired());
         }
-        $content = JsonObjectWriter::removeListEntries($content, [self::SECTION], $this->retired);
+        $content = JsonObjectWriter::removeListEntries($content, [self::SECTION], $this->presets->retired());
 
         return $created ? $content . Lines::LINE_BREAK : $content;
     }
@@ -140,36 +130,36 @@ final readonly class RenovateExtendedPreset implements Rule, ContributesToList, 
     #[\Override]
     public function description(): string
     {
-        return sprintf('Ensures the renovate config extends %s.', self::quoted($this->entries()));
+        return sprintf('Ensures the renovate config extends %s.', self::quoted($this->presets->keys()));
     }
 
     #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {
-            return sprintf('There is no renovate config yet; one is created extending %s.', self::quoted($this->entries()));
+            return sprintf('There is no renovate config yet; one is created extending %s.', self::quoted($this->presets->keys()));
         }
 
         // JSON5 reads strict JSON too, so one reader serves both grammars.
         $extended = Json5ListWriter::readList($content, self::SECTION) ?? [];
 
         $sentences = [];
-        $missing = array_values(array_diff($this->entries(), $extended));
+        $missing = self::references($this->presets->missingFrom($extended));
         if ($missing !== []) {
             $sentences[] = sprintf('The renovate config does not extend %s.', self::quoted($missing));
         }
 
-        $retracted = array_values(array_intersect($this->retired, $extended));
+        $retracted = $this->presets->retractedFrom($extended);
         if ($retracted !== []) {
             $sentences[] = sprintf('It stops extending %s, which no standard declares any more.', self::quoted($retracted));
         }
 
         // A comment is enforced only where the grammar has comments, so an annotation is named as the cause only when nothing else explains the drift.
         if ($sentences === []) {
-            $unannotated = array_values(array_map(
-                static fn(Preset $preset): string => $preset->reference(),
-                array_filter($this->presets, static fn(Preset $preset): bool => $preset->comment() !== null && Json5ListWriter::ensureEntry($content, self::SECTION, $preset->reference(), $preset->comment()) !== $content),
-            ));
+            $unannotated = self::references(array_values(array_filter(
+                $this->presets->entries(),
+                static fn(Preset $preset): bool => $preset->comment() !== null && Json5ListWriter::ensureEntry($content, self::SECTION, $preset->reference(), $preset->comment()) !== $content,
+            )));
             if ($unannotated !== []) {
                 $sentences[] = count($unannotated) === 1
                     ? sprintf('The %s entry is not annotated with the enforced comment.', self::quoted($unannotated))
@@ -194,5 +184,14 @@ final readonly class RenovateExtendedPreset implements Rule, ContributesToList, 
     private static function quoted(array $references): string
     {
         return '"' . implode('", "', $references) . '"';
+    }
+
+    /**
+     * @param list<Preset> $presets
+     * @return list<string>
+     */
+    private static function references(array $presets): array
+    {
+        return array_map(static fn(Preset $preset): string => $preset->reference(), $presets);
     }
 }
