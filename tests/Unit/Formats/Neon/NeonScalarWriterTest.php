@@ -39,6 +39,18 @@ final class NeonScalarWriterTest extends TestCase
         self::assertSame('6', NeonScalarWriter::read($content, ['parameters', 'level']));
     }
 
+    public function testReadsAHashWithoutWhitespaceBeforeItAsPartOfTheValue(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                parameters:
+                	level: 6#x
+                NEON,
+        );
+
+        self::assertSame('6#x', NeonScalarWriter::read($content, ['parameters', 'level']));
+    }
+
     public function testReadsAQuotedValueVerbatim(): void
     {
         $content = FileContent::fromString(

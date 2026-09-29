@@ -215,6 +215,21 @@ final class YamlListWriterTest extends TestCase
         YamlListWriter::ensureEntry($content, 'imports', 'vendor/other/deptrac.yaml');
     }
 
+    public function testRefusesASectionHoldingAValueOnTheLinesBelow(): void
+    {
+        $content = FileContent::fromString(
+            <<<'YAML'
+                imports:
+                  -vendor/acme/standards/deptrac.yaml
+                YAML,
+        );
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "imports:" section holds a value rather than a block list');
+
+        YamlListWriter::ensureEntry($content, 'imports', 'vendor/other/deptrac.yaml');
+    }
+
     public function testASupersededEntryIsReplacedInPlaceKeepingItsLine(): void
     {
         $content = FileContent::fromString(

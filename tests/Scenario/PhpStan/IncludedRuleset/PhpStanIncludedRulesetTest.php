@@ -22,5 +22,6 @@ final class PhpStanIncludedRulesetTest extends ScenarioTestCase
         yield 'a moved ruleset replaces its predecessor in place, keeping the line\'s comment' => ['replaces-a-moved-ruleset-in-place', $config];
         yield 'a ruleset no standard declares any more is retracted, and the project\'s include stays' => ['retracts-a-ruleset-no-longer-declared', $config];
         yield 'a second declaration adds its ruleset after the first' => ['merges-a-second-declaration', 'standards-sync-merged.php'];
+        yield 'an includes list at the section\'s own indentation gains the import at that indentation' => ['inserts-into-a-zero-indent-list', $config];
     }
 }

@@ -71,5 +71,8 @@ final class NeonValueTest extends TestCase
         yield 'a comment after a quoted hash value' => [' \'~foo#bar~\' # pattern', ' \'~foo#bar~\'', ' # pattern'];
         yield 'an escaped quote does not end a double-quoted value' => [' "a\\"#b" # c', ' "a\\"#b"', ' # c'];
         yield 'a quote inside the comment stays in the comment' => [' 4 # don\'t touch', ' 4', ' # don\'t touch'];
+        yield 'a hash without whitespace before it is content' => [' a.neon#note', ' a.neon#note', ''];
+        yield 'a tab before the hash opens a comment' => [" a.neon\t# note", ' a.neon', "\t# note"];
+        yield 'a hash at the start opens a comment' => ['# note', '', '# note'];
     }
 }

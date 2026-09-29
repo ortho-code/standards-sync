@@ -176,6 +176,94 @@ final class NeonListWriterTest extends TestCase
         NeonListWriter::ensureEntry($content, 'includes', 'vendor/other/phpstan.neon');
     }
 
+    public function testAnEntryAtTheSectionsOwnIndentationIsRecognized(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                - vendor/acme/standards/phpstan.neon
+                NEON,
+        );
+
+        self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'));
+    }
+
+    public function testInsertsAfterAZeroIndentedEntryCopyingItsIndentation(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                - phpstan-baseline.neon
+
+                parameters:
+                	level: 6
+                NEON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+                    includes:
+                    - phpstan-baseline.neon
+                    - vendor/acme/standards/phpstan.neon
+
+                    parameters:
+                    	level: 6
+                    NEON,
+            ),
+            NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon'),
+        );
+    }
+
+    public function testASupersededEntryAtTheSectionsOwnIndentationIsReplacedInPlace(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                - vendor/acme/standards/rules.neon
+                - phpstan-baseline.neon
+                NEON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+                    includes:
+                    - vendor/acme/standards/phpstan.neon
+                    - phpstan-baseline.neon
+                    NEON,
+            ),
+            NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon', ['vendor/acme/standards/rules.neon']),
+        );
+    }
+
+    public function testAHashWithoutWhitespaceBeforeItIsPartOfTheEntry(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                	- vendor/acme/standards/phpstan.neon#note
+                NEON,
+        );
+
+        self::assertSame(['vendor/acme/standards/phpstan.neon#note'], NeonListWriter::readList($content, 'includes'));
+    }
+
+    public function testRefusesASectionHoldingAValueOnTheLinesBelow(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                	-vendor/acme/standards/phpstan.neon
+                NEON,
+        );
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "includes:" section holds a value rather than a block list');
+
+        NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/strict.neon');
+    }
+
     public function testASupersededEntryIsReplacedInPlaceKeepingItsLine(): void
     {
         $content = FileContent::fromString(

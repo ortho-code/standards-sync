@@ -50,6 +50,7 @@ final readonly class NeonValue
 
     /**
      * Splits a written value from its trailing comment, quote-aware: a # inside a quoted value is content, not a comment boundary.
+     * A # opens a comment only at the start or after whitespace — in neon, foo#bar is one value.
      * The comment part carries its leading whitespace and is empty when there is no comment.
      *
      * @return array{string, string}
@@ -74,7 +75,7 @@ final readonly class NeonValue
                 $quote = $character;
                 continue;
             }
-            if ($character === '#') {
+            if ($character === '#' && ($offset === 0 || $text[$offset - 1] === ' ' || $text[$offset - 1] === "\t")) {
                 $value = rtrim(substr($text, 0, $offset));
 
                 return [$value, substr($text, strlen($value))];

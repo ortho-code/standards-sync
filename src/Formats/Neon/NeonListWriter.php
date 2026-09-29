@@ -14,9 +14,12 @@ use RuntimeException;
  */
 final readonly class NeonListWriter
 {
-    private const string ENTRY_LINE = '/^([ \t]+)-[ \t]*(.*)$/';
+    /** An entry line: neon requires whitespace after the dash, and allows entries at the section's own indentation. */
+    private const string ENTRY_LINE = '/^([ \t]*)-[ \t]+(.*)$/';
 
     private const string COMMENT_LINE = '/^[ \t]*#/';
+
+    private const string INDENTED_LINE = '/^[ \t]/';
 
     private const string ENTRY_PREFIX = '- ';
 
@@ -30,7 +33,7 @@ final readonly class NeonListWriter
         $lines = Lines::split($content);
         $sectionIndex = self::sectionIndex($lines, $section);
 
-        return $sectionIndex === null ? null : array_values(self::entries($lines, $sectionIndex));
+        return $sectionIndex === null ? null : array_values(self::entries($lines, $sectionIndex, $section));
     }
 
     /**
@@ -53,7 +56,7 @@ final readonly class NeonListWriter
             return self::createSection($section, $entry, NeonIndent::fromLines($lines)) . Lines::LINE_BREAK . $content;
         }
 
-        $entries = self::entries($lines, $sectionIndex);
+        $entries = self::entries($lines, $sectionIndex, $section);
         if (in_array(NeonValue::unquote($entry), $entries, true)) {
             return $content;
         }
@@ -88,7 +91,7 @@ final readonly class NeonListWriter
         }
 
         $unwanted = array_map(NeonValue::unquote(...), $entries);
-        $removed = array_filter(self::entries($lines, $sectionIndex), static fn(string $value): bool => in_array($value, $unwanted, true));
+        $removed = array_filter(self::entries($lines, $sectionIndex, $section), static fn(string $value): bool => in_array($value, $unwanted, true));
         if ($removed === []) {
             return $content;
         }
@@ -103,11 +106,12 @@ final readonly class NeonListWriter
 
     /**
      * The section's entry lines, from its header to the first line that is neither an entry, a comment nor blank: each line's index mapped to its unquoted value.
+     * An indented line that is none of those belongs to the section, which then holds a value rather than a list, and is refused.
      *
      * @param list<string> $lines
      * @return array<int, string>
      */
-    private static function entries(array $lines, int $sectionIndex): array
+    private static function entries(array $lines, int $sectionIndex, string $section): array
     {
         $entries = [];
         $counter = count($lines);
@@ -121,9 +125,13 @@ final readonly class NeonListWriter
             if (preg_match(self::COMMENT_LINE, $lines[$index]) === 1) {
                 continue;
             }
-            if (trim($lines[$index]) !== '') {
-                break;
+            if (trim($lines[$index]) === '') {
+                continue;
             }
+            if (preg_match(self::INDENTED_LINE, $lines[$index]) === 1) {
+                throw new RuntimeException(sprintf('The "%s:" section holds a value rather than a block list; convert it to one "- entry" per line so the entry can be managed.', $section));
+            }
+            break;
         }
 
         return $entries;

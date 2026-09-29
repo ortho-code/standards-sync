@@ -283,6 +283,49 @@ parameters:
 }
 ```
 
+## An includes list at the section's own indentation gains the import at that indentation
+
+Fixture: [`tests/Scenario/PhpStan/IncludedRuleset/fixtures/inserts-into-a-zero-indent-list`](../../../tests/Scenario/PhpStan/IncludedRuleset/fixtures/inserts-into-a-zero-indent-list)
+
+**Before** — `phpstan.neon`:
+
+```neon
+includes:
+- phpstan-baseline.neon
+
+parameters:
+	level: 6
+```
+
+**After:**
+
+```neon
+includes:
+- phpstan-baseline.neon
+- vendor/acme/standards/phpstan.neon
+
+parameters:
+	level: 6
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "phpstan.neon": {
+            "includes": [
+                "vendor/acme/standards/phpstan.neon"
+            ]
+        }
+    }
+}
+```
+
 Declared as:
 
 ```php
