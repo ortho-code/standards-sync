@@ -441,6 +441,20 @@ Three neon facts the writers had wrong, verified with nette/neon (require-dev), 
 An indented line under the header that is neither an entry, a comment nor blank means the section holds a value or a mapping rather than a list, and both list writers now refuse it — `includes:\n\t-a.neon` had been written into a file neon cannot parse. A line back at zero indent still ends the section.
 The yaml writer had all three rules right; the neon and yaml list grammars now differ only in their indentation default. The 2026-08-12 deptrac record said otherwise and carries a correction.
 
+## Changed 2026-09-30 — the fixture convention covers one-line files and names its exceptions
+
+The conventions line asked for file-content fixtures as nowdocs built with `FileContent::fromString()` and ended "single-line strings without a newline stay plain strings", which left the one-line file between its two halves: `"local\n"` is a single line and still ends in a line break.
+Most of the escapes a tidy-up converted across thirteen test files the same date were exactly that case.
+The line also named no exceptions, so a string whose escape is the point read as a violation to the next reader.
+
+**What changed.** File content goes through `FileContent::fromString()` whatever its length — a single-quoted argument for one line, a nowdoc for several.
+Block content passed to a rule stays a plain string, since the rule owns the line breaks around it, as the scenario fixtures already declared it.
+An escape stays only where the escaped character is the point — an input refused for containing it, a character invisible as a literal, a substring of rendered output — with a comment at the site saying which.
+
+**Rejected: enforcing it with a test over the test tree.** Tokenizing every test file and failing on a double-quoted string holding `\n` or `\t` without a comment above it would find the strings exactly, but the exemption needs a rule of its own.
+A comment per statement turns the renderer test's one comment above a group of assertions into one per line, and accepting a comment above a run of lines makes the check fuzzy; it would also be the repository's first test about its own tests.
+The convention stays prose, checked in review.
+
 ## Open choices — settled at R0 (2026-07-15)
 
 1. **Split "what" from "how", or self-contained per-format rules?** The cleaner answer: instead of one generic `ManagedBlockRule` plus a separate apply-strategy, have **per-format rule classes** — `EditorConfigRule`, `GitignoreRule`, … — each self-contained, baking its format knowledge in (sharing a common `AbstractBlockRule` for the marker mechanics). The format-specific class *is* the "how", so no separate strategy layer or `applicable()` pairing is needed, and it grows well — a contributor adds a `FooRule` for a new format. Caveat: for format-*generic* families (an `ImportRule` that varies only by a small syntax detail across `phpstan.neon` / `rector.php`), N per-format classes are overkill — there a single rule with a tiny format-applier is lighter. **Decided:** per rule *family* — per-format classes for the block family (resolves the split cleanly); a single rule + small applier only where a family is genuinely format-generic. Note `.editorconfig` and `.gitignore` currently do identical block-placement, so they can start on one shared base and split when real format-specifics appear (editorconfig key-merge, gitignore line-union).
