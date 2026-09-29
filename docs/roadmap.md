@@ -64,5 +64,6 @@ Each of these is designed as far as its entry records and waits for its trigger;
 - **The phpunit dev pin lifts back to `^13`** when psalm's `sebastian/diff` cap moves.
 - **Export-ignore this repository's own development files.** Composer installs the zip `git archive` builds, and `.gitattributes` leaves out `tests/`, `docs/` and a few others but not the configs this repository lints and syncs itself with, so `ecs.php`, `phpstan.neon`, `psalm.xml`, `rector.php`, `renovate.json5`, `standards-sync.php` and `standards-sync.lock` ship in every consumer's copy.
   Nothing reads them there, since the engine reads a lock only at a consumer's own root, so this is a tidy-up.
-  The standard this repository consumes records shipping a managed `.gitattributes` block for libraries; that block would cover every one of these, and the existing lines it duplicates could then go.
-  Trigger: none; any release can carry it, by hand or through the standard's block.
+  The standard this repository consumes now ships a managed `.gitattributes` block for libraries, not yet released, that covers every one of these; once it is synced here, the lines it duplicates go and only `/deptrac.yaml`, `/docker-compose.yml` and `/docs` stay this repository's own.
+  The same change adds a note to the [authoring guide](authoring-org-packages.md): a template named after a file git reads by name, such as `.gitattributes`, is live in the org package's own repository, so its lines apply to the templates beside it — an export-ignore list strips them from the package's archive (verified) — and it takes a name without the leading dot.
+  Trigger: the standard's next release, which carries the block.
