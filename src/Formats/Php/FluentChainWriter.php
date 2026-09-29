@@ -11,7 +11,7 @@ use RuntimeException;
 /**
  * Edits a fluent builder chain (`return Builder::configure()->…->…;`) in PHP config text.
  * Targeted line edits only — everything around the touched call stays byte-identical; no parse, no reserialization.
- * Brackets are matched with awareness of quoted strings, so an entry like `'/a(b)'` cannot derail the scan.
+ * Brackets are matched with awareness of quoted strings and comments, so neither an entry like `'/a(b)'` nor an apostrophe or bracket in a comment can derail the scan.
  */
 final readonly class FluentChainWriter
 {
@@ -19,6 +19,11 @@ final readonly class FluentChainWriter
     public const string INDENT = '    ';
 
     private const string LINE_INDENT = '/^([ \t]*)/';
+
+    private const string LINE_COMMENT = '//';
+    private const string BLOCK_COMMENT_OPEN = '/*';
+    private const string BLOCK_COMMENT_CLOSE = '*/';
+    private const string ATTRIBUTE_OPEN = '#[';
 
     /**
      * The entries of the block-form array argument of ->method([...]) as written, or null when the chain has no such call.
@@ -278,6 +283,12 @@ final readonly class FluentChainWriter
                 $quote = $character;
                 continue;
             }
+            // A comment is prose: an apostrophe in it would otherwise open a string that never closes, and a bracket in it would count.
+            $commentEnd = self::commentEnd($content, $offset, $method);
+            if ($commentEnd !== null) {
+                $offset = $commentEnd - 1;
+                continue;
+            }
             if ($character === $open) {
                 $depth++;
                 continue;
@@ -288,6 +299,31 @@ final readonly class FluentChainWriter
         }
 
         throw new RuntimeException(sprintf('The %s() call never closes its "%s"; the config cannot be edited.', $method, $open));
+    }
+
+    /**
+     * The offset just past the comment starting at $offset, or null when none starts there; a line comment ends before its line break.
+     * `#[` opens an attribute rather than a comment, as it has since PHP 8.0.
+     */
+    private static function commentEnd(string $content, int $offset, string $method): ?int
+    {
+        $opening = substr($content, $offset, 2);
+        if ($opening === self::BLOCK_COMMENT_OPEN) {
+            $close = strpos($content, self::BLOCK_COMMENT_CLOSE, $offset + strlen(self::BLOCK_COMMENT_OPEN));
+            if ($close === false) {
+                throw new RuntimeException(sprintf('A comment inside the %s() call never closes; the config cannot be edited.', $method));
+            }
+
+            return $close + strlen(self::BLOCK_COMMENT_CLOSE);
+        }
+
+        if ($opening === self::LINE_COMMENT || ($content[$offset] === '#' && $opening !== self::ATTRIBUTE_OPEN)) {
+            $lineBreak = strpos($content, Lines::LINE_BREAK, $offset);
+
+            return $lineBreak === false ? strlen($content) : $lineBreak;
+        }
+
+        return null;
     }
 
     /** The line index the byte offset falls on. */

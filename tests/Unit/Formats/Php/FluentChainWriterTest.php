@@ -266,6 +266,100 @@ final class FluentChainWriterTest extends TestCase
         self::assertNull(FluentChainWriter::readArrayEntries($content, 'withRules'));
     }
 
+    public function testQuotesInsideCommentsDoNotDerailTheScan(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'PHP'
+                    return RectorConfig::configure()
+                        ->withSets([
+                            // the project's own
+                            'local.php', # don't drop
+                            /* it's the org's */ 'org.php',
+                            'a.php',
+                        ]);
+                    PHP,
+            ),
+            FluentChainWriter::ensureArrayEntry(
+                FileContent::fromString(
+                    <<<'PHP'
+                        return RectorConfig::configure()
+                            ->withSets([
+                                // the project's own
+                                'local.php', # don't drop
+                                /* it's the org's */ 'org.php',
+                            ]);
+                        PHP,
+                ),
+                'withSets',
+                '\'a.php\'',
+            ),
+        );
+    }
+
+    public function testBracketsInsideCommentsDoNotCount(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'PHP'
+                    return RectorConfig::configure()
+                        ->withSets([
+                            'local.php', // keep this before the closing ]
+                            'a.php',
+                        ]);
+                    PHP,
+            ),
+            FluentChainWriter::ensureArrayEntry(
+                FileContent::fromString(
+                    <<<'PHP'
+                        return RectorConfig::configure()
+                            ->withSets([
+                                'local.php', // keep this before the closing ]
+                            ]);
+                        PHP,
+                ),
+                'withSets',
+                '\'a.php\'',
+            ),
+        );
+    }
+
+    // Since PHP 8.0 `#[` opens an attribute, so the brackets closing the call on the attribute's line are code.
+    public function testAnAttributeIsCodeNotAComment(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'PHP'
+                    return RectorConfig::configure()
+                        ->withSets([
+                            'local.php',
+                            'a.php',
+                            #[Attribute] static fn (): string => 'b.php']);
+                    PHP,
+            ),
+            FluentChainWriter::ensureArrayEntry(
+                FileContent::fromString(
+                    <<<'PHP'
+                        return RectorConfig::configure()
+                            ->withSets([
+                                'local.php',
+                                #[Attribute] static fn (): string => 'b.php']);
+                        PHP,
+                ),
+                'withSets',
+                '\'a.php\'',
+            ),
+        );
+    }
+
+    public function testRefusesABlockCommentThatNeverCloses(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('A comment inside the withSets() call never closes');
+
+        FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets([ /* open', 'withSets', '\'a.php\'');
+    }
+
     public function testBracketsInsideStringsDoNotDerailTheScan(): void
     {
         $content = FileContent::fromString(

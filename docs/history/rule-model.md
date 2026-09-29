@@ -406,6 +406,12 @@ Dropping a project's trailing comment with the replaced value — the comment an
 
 **Built one family at a time**, `PhpStanIncludedRuleset` first: list key `includes`, over `NeonListWriter`'s new `readList()` and `removeEntries()` and an `ensureEntry()` that takes the entries it replaces.
 
+## Fixed 2026-09-29 — the fluent-chain bracket scan skips comments
+
+`FluentChainWriter` matched brackets with awareness of quoted strings but not of comments, so an apostrophe in a comment inside the scanned call (`// the project's own`) opened a string that never closed and the writer refused the config, and a bracket in a comment counted as code.
+It now skips `//`, `#` and `/* */` comments, leaving `#[` as code, since it has opened an attribute since PHP 8.0; a block comment that never closes is refused.
+Found while building the `withSets()` contributions, and reproduced on the code before them.
+
 ## Open choices — settled at R0 (2026-07-15)
 
 1. **Split "what" from "how", or self-contained per-format rules?** The cleaner answer: instead of one generic `ManagedBlockRule` plus a separate apply-strategy, have **per-format rule classes** — `EditorConfigRule`, `GitignoreRule`, … — each self-contained, baking its format knowledge in (sharing a common `AbstractBlockRule` for the marker mechanics). The format-specific class *is* the "how", so no separate strategy layer or `applicable()` pairing is needed, and it grows well — a contributor adds a `FooRule` for a new format. Caveat: for format-*generic* families (an `ImportRule` that varies only by a small syntax detail across `phpstan.neon` / `rector.php`), N per-format classes are overkill — there a single rule with a tiny format-applier is lighter. **Decided:** per rule *family* — per-format classes for the block family (resolves the split cleanly); a single rule + small applier only where a family is genuinely format-generic. Note `.editorconfig` and `.gitignore` currently do identical block-placement, so they can start on one shared base and split when real format-specifics appear (editorconfig key-merge, gitignore line-union).
