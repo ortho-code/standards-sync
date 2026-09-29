@@ -51,7 +51,7 @@ final readonly class PhpStanMinLevel implements Rule, ExplainsDrift
             return $this->comment === null ? $content : NeonScalarWriter::ensureTrailingComment($content, self::LEVEL_PATH, $this->comment);
         }
 
-        // Below the floor, no level line, or no config at all: write the floor — enforcing the standard is the point, and withoutRule() is the opt-out.
+        // Below the floor, no level line, or no config at all: write the floor — enforcing the standard is the point.
         return NeonScalarWriter::write($content ?? '', self::LEVEL_PATH, $this->minLevel->value(), $this->comment);
     }
 

@@ -80,7 +80,7 @@ The engine owns the file end to end: files and list keys sort, so its rendering 
 - Rules compose by declaration order; a later same-label block rule replaces an earlier one (last-wins), which is also how a child tier overrides a parent wholesale.
 - Contributions to one list are the exception: they merge rather than replace, in declaration order, so a standard declared beside another adds to what that one declares.
 - An org hierarchy composes with `include()`: the second tier's standard includes the base and adds or overrides rules. Tool imports layer additively — each tier registers its own entry, and the tools' own later-wins semantics deliver the override.
-- Consumer-side disabling follows a ladder: an FQCN list (`withoutRule(X::class)`), then a predicate for full precision; overriding is `withoutRule()` plus `addRule(new X(...))` — rules stay immutable.
+- Consumer-side disabling is decided and not yet built ([roadmap](roadmap.md)): a ladder of an FQCN list (`withoutRule(X::class)`), then a predicate for full precision, with overriding as `withoutRule()` plus `addRule(new X(...))` — rules stay immutable.
 
 ## The Authoring layer
 

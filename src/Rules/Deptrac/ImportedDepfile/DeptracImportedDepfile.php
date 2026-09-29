@@ -35,7 +35,7 @@ final readonly class DeptracImportedDepfile implements Rule, ExplainsDrift
     #[\Override]
     public function apply(?string $content): ?string
     {
-        // A project without a deptrac config gets one: enforcing the standard is the point, and withoutRule() is the opt-out.
+        // A project without a deptrac config gets one: enforcing the standard is the point.
         return YamlListWriter::ensureEntry($content ?? '', self::SECTION, $this->depfile->value());
     }
 

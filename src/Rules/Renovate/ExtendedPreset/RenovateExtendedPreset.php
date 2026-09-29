@@ -68,7 +68,7 @@ final readonly class RenovateExtendedPreset implements Rule, ExplainsDrift, Appl
             return Json5ListWriter::ensureEntry($content ?? '', self::SECTION, $this->preset, $this->comment);
         }
 
-        // A project without a renovate config gets one: enforcing the standard is the point, and withoutRule() is the opt-out.
+        // A project without a renovate config gets one: enforcing the standard is the point.
         if ($content === null) {
             return JsonObjectWriter::ensureListEntry('{}', [self::SECTION], $this->preset) . Lines::LINE_BREAK;
         }

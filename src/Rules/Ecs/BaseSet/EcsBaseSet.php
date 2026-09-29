@@ -37,7 +37,7 @@ final readonly class EcsBaseSet implements Rule, ExplainsDrift
     #[\Override]
     public function apply(?string $content): ?string
     {
-        // A project without an ECS config gets one: enforcing the standard is the point, and withoutRule() is the opt-out.
+        // A project without an ECS config gets one: enforcing the standard is the point.
         if ($content === null) {
             return EcsConfigFile::createConfig(FluentChainWriter::createArrayCall(self::METHOD, $this->entry->value()));
         }

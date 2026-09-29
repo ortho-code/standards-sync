@@ -81,7 +81,7 @@ final readonly class PhpStanIncludedRuleset implements Rule, ContributesToList, 
     #[\Override]
     public function apply(?string $content): ?string
     {
-        // A project without a PHPStan config gets one: enforcing the standard is the point, and withoutRule() is the opt-out.
+        // A project without a PHPStan config gets one: enforcing the standard is the point.
         $content ??= '';
         foreach ($this->rulesets as $ruleset) {
             $content = NeonListWriter::ensureEntry($content, self::SECTION, $ruleset, replacing: $this->retired);
