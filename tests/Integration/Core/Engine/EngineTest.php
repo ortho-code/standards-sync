@@ -13,7 +13,9 @@ use OrthoCode\StandardsSync\Core\Lock\SyncLock;
 use OrthoCode\StandardsSync\Core\Plan\Change;
 use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
 use OrthoCode\StandardsSync\Core\Plan\ForgottenList;
+use OrthoCode\StandardsSync\Core\Rule\ContributesToList;
 use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Core\Text\Lines;
 use OrthoCode\StandardsSync\Rules\Composer\Script\ComposerScript;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
 use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
@@ -289,6 +291,49 @@ final class EngineTest extends TestCase
         );
     }
 
+    public function testContributionsResolvingToOneFileMergeWhateverCandidatesTheyDeclare(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/list.json5' => FileContent::fromString('a'),
+        ]);
+        $config = SyncConfig::create()
+            ->withRoots(['/a'])
+            ->withRuleSet($this->ruleSetWith($this->contribution(FileTarget::fromStrings('list.json', 'list.json5'), 'entries', 'a')))
+            ->withRuleSet($this->ruleSetWith($this->contribution(FileTarget::fromStrings('list.json5', 'list.json'), 'entries', 'b')));
+
+        [$list, $lock] = new Engine($filesystem)->plan($config)->changes();
+
+        self::assertCount(1, $list->applications());
+        self::assertSame(
+            FileContent::fromString(
+                <<<'TEXT'
+                    a
+                    b
+                    TEXT,
+            ),
+            $list->desired(),
+        );
+        self::assertSame(['a', 'b'], SyncLock::fromJson($lock->desired(), $lock->path())->entries(Path::fromString('list.json5'), 'entries'));
+    }
+
+    public function testRefusesTwoRuleClassesContributingToOneList(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/composer.json' => FileContent::fromString('{}'),
+        ]);
+        $config = SyncConfig::create()
+            ->withRoots(['/a'])
+            ->withRuleSet($this->ruleSetWith(
+                new ComposerScript(name: 'app-checks', commands: ['@app-sync-check']),
+                $this->contribution(FileTarget::fromString('composer.json'), 'scripts.app-checks', '@app-lint'),
+            ));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('~^Both .+ComposerScript and .+ contribute to "scripts\.app-checks" in "/a/composer\.json"; a list takes contributions from one rule class\.$~');
+
+        new Engine($filesystem)->plan($config);
+    }
+
     public function testTheLockIsPlannedAfterTheRootsFilesAndRecordsWhatWasDeclared(): void
     {
         $filesystem = new InMemoryFilesystem([
@@ -425,6 +470,59 @@ final class EngineTest extends TestCase
             public function description(): string
             {
                 return 'Stub rule for engine tests.';
+            }
+        };
+    }
+
+    /** A contribution that writes its merged entries as the whole file, one per line. */
+    private function contribution(FileTarget $target, string $listKey, string $entry): Rule&ContributesToList
+    {
+        return new readonly class ($target, $listKey, [$entry]) implements Rule, ContributesToList {
+            /** @param non-empty-list<string> $entries */
+            public function __construct(
+                private FileTarget $target,
+                private string $listKey,
+                private array $entries,
+            ) {}
+
+            public function target(): FileTarget
+            {
+                return $this->target;
+            }
+
+            public function listKey(): string
+            {
+                return $this->listKey;
+            }
+
+            public function entries(): array
+            {
+                return $this->entries;
+            }
+
+            public function withMerged(ContributesToList $later): static
+            {
+                /** @var static $merged psalm types clone-with as a plain object */
+                $merged = clone($this, [
+                    'entries' => [...$this->entries, ...$later->entries()],
+                ]);
+
+                return $merged;
+            }
+
+            public function withRetired(array $retired): static
+            {
+                return $this;
+            }
+
+            public function apply(?string $content): ?string
+            {
+                return Lines::join($this->entries) . Lines::LINE_BREAK;
+            }
+
+            public function description(): string
+            {
+                return 'Stub contribution for engine tests.';
             }
         };
     }

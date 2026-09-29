@@ -61,7 +61,7 @@ Dist-ness derives from the filename (a dotted segment exactly `dist`), owned by 
 ## How the engine runs rules
 
 The engine groups rules by resolved target and folds each file's rules in declaration order over the content; rules never touch the filesystem.
-Before that, contributions to one list (same class, target and list key) merge into one rule, standing at the first declaration's position.
+Before that, contributions to one list (the same list key in the same resolved file) merge into one rule, standing at the first declaration's position; a list receiving contributions from two rule classes is refused at plan time.
 One `Change` per file; `Engine::apply` is the only writer; `--check` computes the same plan and writes nothing, exiting non-zero on drift.
 `ChangeKind` derives from the fold's endpoints (create, update, in sync).
 The report attributes drift per rule (description plus `explain()` where implemented) and carries three note kinds: a shadowing note (a local file the tool reads in preference to the synced dist file), an abstention note (a resolved file whose rules all had no opinion) and a forgotten-list note (a list the lock recorded that no rule contributes to any more).

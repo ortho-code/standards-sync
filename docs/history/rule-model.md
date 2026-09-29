@@ -345,6 +345,8 @@ Declaration order therefore places contributions and never discards one.
 
 **Agreed with it, built as later steps.** A lock remembering what the contributions declared, so that the project's own entries can be kept and the ones the standards stop declaring retracted; each gets its own entry when it lands.
 
+*(Changed 2026-09-29: contributions group per resolved file rather than per declared target, and one list takes one rule class — see [the change](#changed-2026-09-29--contributions-merge-per-resolved-file).)*
+
 ## Decided 2026-09-28 — a lock records what list contributions declared
 
 **Why memory at all.** Keeping a project's own entries in a list means an entry the standards stop declaring is indistinguishable from one the project added, unless something remembers what the standards declared.
@@ -377,6 +379,16 @@ The note derives from the two locks — the lists the one on disk records and th
 A file that is absent keeps its lists in the lock, so a manifest missing for one run is never reported as forgotten.
 *Rejected*: the lock's own diff as the only trace — it shows that the record changed, not that a script was left behind for the project to delete.
 Removing the list itself stays deferred on the [roadmap](../roadmap.md).
+
+## Changed 2026-09-29 — contributions merge per resolved file
+
+**The problem.** The merge grouped contributions by class, declared target and list key before resolution, while the lock records per resolved file and list key.
+The two keys disagree once a rule's declared target varies with its configuration: `RenovateExtendedPreset` orders its candidates by its `createAs:`, so two standards extending presets with different creation formats would not have merged, yet would have folded into one existing config — the second's lock record overwriting the first's, each then retracting the other's preset, the list changing on every sync.
+It stayed latent while `ComposerScript`, whose target is fixed, was the only contribution; the import-tier rules becoming contributions made it real.
+
+**What changed.** The merge runs within each root, after resolution, over the rules folding into one file, keyed by list key — exactly the key the lock records under.
+Two rule classes contributing to one list in one file would collide in the lock the same way, so that is refused at plan time, naming both classes; a rule's own `withMerged()` therefore only ever receives its own class.
+*Rejected*: keying the lock by rule class as well — its rendered form is a compatibility surface since its first release, and the change would serve a case no rule has.
 
 ## Open choices — settled at R0 (2026-07-15)
 
@@ -435,3 +447,4 @@ Carry the fixture discipline forward from the block engine: each rule ships a **
 - **Built 2026-09-29: retraction through the lock** — `ContributesToList::withRetired()`, through which the engine hands each contribution the entries it declared at the last sync and declares no longer, and `ComposerScript` keeping the project's commands; see the [composer-family entry](composer-family.md#changed-2026-09-29--the-projects-commands-stay-and-commands-the-standards-stop-declaring-are-retracted).
 - **Built 2026-09-29: the forgotten-list note** — `ForgottenList`, `Plan::forgottenLists()` and the report's third note kind; see [the decision](#decided-2026-09-28--a-list-nothing-contributes-to-any-more-is-reported-once).
 - **Built 2026-09-29: argument tolerance, opt-in** — `ComposerScript`'s `acceptsArguments:` over the new `ScriptCommand`; see the [composer-family entry](composer-family.md#changed-2026-09-29--a-declared-command-may-accept-the-projects-arguments).
+- **Built 2026-09-29: contributions merge per resolved file** — the merge moved after resolution, keyed as the lock is, and a list receiving contributions from two rule classes is refused; see [the change](#changed-2026-09-29--contributions-merge-per-resolved-file).

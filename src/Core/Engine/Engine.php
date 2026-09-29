@@ -35,7 +35,7 @@ final readonly class Engine
 
     public function plan(SyncConfig $config): Plan
     {
-        $rules = $this->mergeContributions($this->collectRules($config));
+        $rules = $this->collectRules($config);
 
         $outcomes = [];
         foreach ($config->roots() as $root) {
@@ -70,37 +70,6 @@ final readonly class Engine
     }
 
     /**
-     * Contributions to one list in one target merge into the first of them through the rule's own withMerged(), so the fold sees one rule per list.
-     *
-     * @param list<Rule> $rules
-     * @return list<Rule>
-     */
-    private function mergeContributions(array $rules): array
-    {
-        $merged = [];
-        /** @var array<string, array<string, array<string, int>>> $positions */
-        $positions = [];
-        foreach ($rules as $rule) {
-            if ($rule instanceof ContributesToList) {
-                $position = $positions[$rule::class][$rule->target()->toString()][$rule->listKey()] ?? null;
-                $earlier = $position === null ? null : $merged[$position];
-                if ($position !== null && $earlier instanceof ContributesToList) {
-                    /** @var Rule&ContributesToList $combined psalm does not bind static to the intersection it was called on */
-                    $combined = $earlier->withMerged($rule);
-                    $merged[$position] = $combined;
-                    continue;
-                }
-
-                $positions[$rule::class][$rule->target()->toString()][$rule->listKey()] = count($merged);
-            }
-
-            $merged[] = $rule;
-        }
-
-        return array_values($merged);
-    }
-
-    /**
      * @param list<Rule> $rules
      * @return list<Change|Abstention|ForgottenList>
      */
@@ -130,7 +99,7 @@ final readonly class Engine
                 static fn(Rule $rule): Rule => $rule instanceof ContributesToList
                     ? $rule->withRetired($lock->retired($target->candidate(), $rule->listKey(), $rule->entries()))
                     : $rule,
-                $fileRules,
+                self::mergeContributions($target, $fileRules),
             );
 
             $outcome = $this->foldFile($target, $fileRules);
@@ -146,6 +115,43 @@ final readonly class Engine
         }
 
         return $outcomes;
+    }
+
+    /**
+     * Contributions to one list in one file merge into the first of them through the rule's own withMerged(), so the fold sees one rule per list and the lock one record.
+     * The list key is what the lock records a list under, so two rule classes contributing to one list would overwrite each other's record and retract each other's entries; that is refused.
+     *
+     * @param non-empty-list<Rule> $rules the rules folding into the file, in declaration order
+     * @return non-empty-list<Rule>
+     */
+    private static function mergeContributions(ResolvedTarget $target, array $rules): array
+    {
+        $merged = [];
+        /** @var array<string, int> $positions */
+        $positions = [];
+        foreach ($rules as $rule) {
+            if ($rule instanceof ContributesToList) {
+                $position = $positions[$rule->listKey()] ?? null;
+                $earlier = $position === null ? null : $merged[$position];
+                if ($position !== null && $earlier instanceof ContributesToList) {
+                    if ($earlier::class !== $rule::class) {
+                        throw new RuntimeException(sprintf('Both %s and %s contribute to "%s" in "%s"; a list takes contributions from one rule class.', $earlier::class, $rule::class, $rule->listKey(), $target->path()->value()));
+                    }
+
+                    /** @var Rule&ContributesToList $combined psalm does not bind static to the intersection it was called on */
+                    $combined = $earlier->withMerged($rule);
+                    $merged[$position] = $combined;
+                    continue;
+                }
+
+                $positions[$rule->listKey()] = count($merged);
+            }
+
+            $merged[] = $rule;
+        }
+
+        /** @var non-empty-list<Rule> $merged the first rule always lands, and a merge only replaces a position already taken */
+        return $merged;
     }
 
     /**
