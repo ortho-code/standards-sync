@@ -34,7 +34,7 @@ final class SyncCommandTest extends IntegrationTestCase
                 $this->addRule(new ManagedBlock(
                     FileTarget::fromString('.editorconfig'),
                     Label::fromString('test'),
-                    "root = true\n",
+                    'root = true',
                 ));
             }
         };

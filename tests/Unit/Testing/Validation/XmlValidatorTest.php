@@ -36,13 +36,13 @@ final class XmlValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The synced ./broken.xml is not well-formed XML');
 
-        new XmlValidator()->assertValid('./broken.xml', "<foo><bar></foo>\n");
+        new XmlValidator()->assertValid('./broken.xml', FileContent::fromString('<foo><bar></foo>'));
     }
 
     public function testIgnoresAFileThatIsNotXml(): void
     {
         $this->expectNotToPerformAssertions();
 
-        new XmlValidator()->assertValid('./notes.txt', "<foo><bar></foo>\n");
+        new XmlValidator()->assertValid('./notes.txt', FileContent::fromString('<foo><bar></foo>'));
     }
 }

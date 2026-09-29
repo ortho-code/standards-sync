@@ -17,7 +17,7 @@ final class PhpUnitConfigValidatorTest extends TestCase
     {
         $this->expectNotToPerformAssertions();
 
-        new PhpUnitConfigValidator()->assertValid('./other.xml', "<foo><bar></foo>\n");
+        new PhpUnitConfigValidator()->assertValid('./other.xml', FileContent::fromString('<foo><bar></foo>'));
     }
 
     public function testAcceptsAConfigTheSchemaAllows(): void
@@ -45,7 +45,7 @@ final class PhpUnitConfigValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('violates the phpunit config schema');
 
-        new PhpUnitConfigValidator()->assertValid('./phpunit.xml', "<phpunit bogusAttribute=\"nonsense\" />\n");
+        new PhpUnitConfigValidator()->assertValid('./phpunit.xml', FileContent::fromString('<phpunit bogusAttribute="nonsense" />'));
     }
 
     public function testFailsLoudOnMalformedXml(): void
@@ -53,7 +53,7 @@ final class PhpUnitConfigValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('is not well-formed XML');
 
-        new PhpUnitConfigValidator()->assertValid('./phpunit.xml', "<phpunit>\n");
+        new PhpUnitConfigValidator()->assertValid('./phpunit.xml', FileContent::fromString('<phpunit>'));
     }
 
     public function testFailsLoudWhenPhpUnitIsMissing(): void
@@ -61,7 +61,7 @@ final class PhpUnitConfigValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('install phpunit/phpunit');
 
-        new PhpUnitConfigValidator(phpunitInstalled: false)->assertValid('./phpunit.xml', "<phpunit />\n");
+        new PhpUnitConfigValidator(phpunitInstalled: false)->assertValid('./phpunit.xml', FileContent::fromString('<phpunit />'));
     }
 
     public function testIgnoresAFileItDoesNotCoverEvenWithoutPhpUnit(): void

@@ -18,6 +18,7 @@ final class NeonIndentTest extends TestCase
 
     public function testFallsBackToTheNeonDefaultWhenNothingIsIndented(): void
     {
+        // The indent unit alone rather than file content, and a literal tab would be invisible where the escape names it.
         self::assertSame("\t", NeonIndent::fromLines(['parameters:']));
         self::assertSame("\t", NeonIndent::fromLines([]));
     }

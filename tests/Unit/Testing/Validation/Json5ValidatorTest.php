@@ -36,14 +36,14 @@ final class Json5ValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The synced ./renovate.json5 is not valid JSON5');
 
-        new Json5Validator()->assertValid('./renovate.json5', "{ extends: [broken\n");
+        new Json5Validator()->assertValid('./renovate.json5', FileContent::fromString('{ extends: [broken'));
     }
 
     public function testIgnoresOtherExtensions(): void
     {
         $this->expectNotToPerformAssertions();
 
-        new Json5Validator()->assertValid('./renovate.json', "{ not json5\n");
+        new Json5Validator()->assertValid('./renovate.json', FileContent::fromString('{ not json5'));
     }
 
     public function testFailsLoudWhenTheParserIsMissing(): void
@@ -51,6 +51,6 @@ final class Json5ValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('install colinodell/json5 (require-dev) to parse synced json5');
 
-        new Json5Validator(parserInstalled: false)->assertValid('./renovate.json5', "{}\n");
+        new Json5Validator(parserInstalled: false)->assertValid('./renovate.json5', FileContent::fromString('{}'));
     }
 }

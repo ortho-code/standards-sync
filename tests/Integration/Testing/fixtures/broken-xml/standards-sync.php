@@ -6,6 +6,7 @@ use OrthoCode\StandardsSync\Core\Config\SyncConfig;
 use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
 use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
+use OrthoCode\StandardsSync\Testing\FileContent;
 
 // A rule that deliberately syncs broken XML, so the tester's well-formedness tier has something to catch.
 return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
@@ -19,7 +20,7 @@ return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
 
             public function apply(?string $content): ?string
             {
-                return "<foo><bar></foo>\n";
+                return FileContent::fromString('<foo><bar></foo>');
             }
 
             public function description(): string

@@ -19,6 +19,7 @@ use OrthoCode\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
 use OrthoCode\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
 use OrthoCode\StandardsSync\Rules\Composer\Script\ComposerScript;
 use OrthoCode\StandardsSync\Presentation\Cli\Output\DriftReport;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -57,8 +58,8 @@ final class DriftReportTest extends TestCase
     public function testNotesTheLocalFileShadowingADriftingDistTarget(): void
     {
         $filesystem = new InMemoryFilesystem([
-            './phpstan.neon' => "local override\n",
-            './phpstan.neon.dist' => "committed home\n",
+            './phpstan.neon' => FileContent::fromString('local override'),
+            './phpstan.neon.dist' => FileContent::fromString('committed home'),
         ]);
 
         $report = $this->renderFor($filesystem, $this->blockRuleWithCandidates(['phpstan.neon', 'phpstan.neon.dist'], 'org', 'level'));
@@ -71,7 +72,7 @@ final class DriftReportTest extends TestCase
     {
         $rule = $this->blockRuleWithCandidates(['phpstan.neon', 'phpstan.neon.dist'], 'org', 'level');
         $filesystem = new InMemoryFilesystem([
-            './phpstan.neon' => "local override\n",
+            './phpstan.neon' => FileContent::fromString('local override'),
             './phpstan.neon.dist' => (string) $rule->apply(null),
         ]);
 
@@ -114,7 +115,7 @@ final class DriftReportTest extends TestCase
     public function testTheLockShowsAsItsFileLineAlone(): void
     {
         $filesystem = new InMemoryFilesystem([
-            './composer.json' => "{\"scripts\": {\"app-checks\": [\"@app-sync-check\"]}}\n",
+            './composer.json' => FileContent::fromString('{"scripts": {"app-checks": ["@app-sync-check"]}}'),
         ]);
 
         $report = $this->renderFor($filesystem, new ComposerScript(name: 'app-checks', commands: ['@app-sync-check']));
@@ -127,7 +128,7 @@ final class DriftReportTest extends TestCase
     public function testNotesAListNoStandardDeclaresAnyMore(): void
     {
         $filesystem = new InMemoryFilesystem([
-            './composer.json' => "{\"scripts\": {\"app-checks\": [\"@app-sync-check\"], \"app-phpcs\": [\"phpcs\"]}}\n",
+            './composer.json' => FileContent::fromString('{"scripts": {"app-checks": ["@app-sync-check"], "app-phpcs": ["phpcs"]}}'),
             './standards-sync.lock' => SyncLock::create()
                 ->withEntries(Path::fromString('composer.json'), 'scripts.app-checks', ['@app-sync-check'])
                 ->withEntries(Path::fromString('composer.json'), 'scripts.app-phpcs', ['phpcs'])

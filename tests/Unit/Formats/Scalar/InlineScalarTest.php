@@ -42,6 +42,7 @@ final class InlineScalarTest extends TestCase
         yield 'a plain comment' => [' 6 # keep in step with CI', ' 6', ' # keep in step with CI'];
         yield 'a hash without whitespace before it is content' => [' a.neon#note', ' a.neon#note', ''];
         yield 'a comment after an embedded hash' => ['foo#bar # note', 'foo#bar', ' # note'];
+        // A fragment of one line rather than file content, and a literal tab would be invisible where the escape names the character this case is about.
         yield 'a tab before the hash opens a comment' => [" a.neon\t# note", ' a.neon', "\t# note"];
         yield 'a hash at the start opens a comment' => ['# note', '', '# note'];
         yield 'a hash inside single quotes is content' => [' \'~foo #bar~\'', ' \'~foo #bar~\'', ''];

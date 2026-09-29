@@ -32,14 +32,28 @@ final class NeonValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The synced ./phpstan.neon is not valid neon');
 
-        new NeonValidator()->assertValid('./phpstan.neon', "parameters:\n\tlevel: [6\n");
+        $content = FileContent::fromString(
+            <<<'NEON'
+                parameters:
+                	level: [6
+                NEON,
+        );
+
+        new NeonValidator()->assertValid('./phpstan.neon', $content);
     }
 
     public function testIgnoresAFileThatIsNotNeon(): void
     {
         $this->expectNotToPerformAssertions();
 
-        new NeonValidator()->assertValid('./notes.txt', "parameters:\n\tlevel: [6\n");
+        $content = FileContent::fromString(
+            <<<'NEON'
+                parameters:
+                	level: [6
+                NEON,
+        );
+
+        new NeonValidator()->assertValid('./notes.txt', $content);
     }
 
     public function testFailsLoudWhenTheParserIsMissing(): void
@@ -47,7 +61,14 @@ final class NeonValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('install nette/neon');
 
-        new NeonValidator(parserInstalled: false)->assertValid('./phpstan.neon', "parameters:\n\tlevel: 6\n");
+        $content = FileContent::fromString(
+            <<<'NEON'
+                parameters:
+                	level: 6
+                NEON,
+        );
+
+        new NeonValidator(parserInstalled: false)->assertValid('./phpstan.neon', $content);
     }
 
     public function testIgnoresAFileItDoesNotCoverEvenWithoutTheParser(): void

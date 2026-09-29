@@ -94,10 +94,19 @@ final class MarkdownRendererTest extends TestCase
     {
         $page = new RulePage('General', 'ManagedBlock', 'Places a template as a managed block.', [
             new Subsection(null, [
-                new DeclarationGroup("return config();\n", ['Places a block.'], [
+                new DeclarationGroup(FileContent::fromString('return config();'), ['Places a block.'], [
                     new ScenarioEntry('a fenced template', 'tests/Scenario/General/f', [
-                        new FileExample('README.md', ExampleKind::Created, null, "```\ninside\n```\n"),
-                        new FileExample('phpstan.neon.dist', ExampleKind::Created, null, "parameters:\n"),
+                        new FileExample(
+                            'README.md',
+                            ExampleKind::Created,
+                            null,
+                            FileContent::fromString(<<<'MD'
+                                ```
+                                inside
+                                ```
+                                MD),
+                        ),
+                        new FileExample('phpstan.neon.dist', ExampleKind::Created, null, FileContent::fromString('parameters:')),
                     ]),
                 ]),
             ]),
@@ -105,6 +114,7 @@ final class MarkdownRendererTest extends TestCase
 
         $rendered = (new MarkdownRenderer())->renderRulePage($page);
 
+        // Substrings of the rendered page rather than file fixtures, so the escapes mark where each line of a fence ends.
         self::assertStringContainsString("````\n```\ninside\n```\n````", $rendered);
         self::assertStringContainsString("```neon\nparameters:\n```", $rendered);
     }
@@ -113,9 +123,9 @@ final class MarkdownRendererTest extends TestCase
     {
         $page = new RulePage('General', 'ManagedBlock', 'Places a template as a managed block.', [
             new Subsection('First Sync', [
-                new DeclarationGroup("return config();\n", ['Places the "ci" block.', 'Places the "framework" block.'], [
+                new DeclarationGroup(FileContent::fromString('return config();'), ['Places the "ci" block.', 'Places the "framework" block.'], [
                     new ScenarioEntry('two blocks land', 'tests/Scenario/General/f', [
-                        new FileExample('.gitignore', ExampleKind::Unchanged, "kept\n", "kept\n"),
+                        new FileExample('.gitignore', ExampleKind::Unchanged, FileContent::fromString('kept'), FileContent::fromString('kept')),
                     ]),
                 ]),
             ]),
@@ -123,6 +133,7 @@ final class MarkdownRendererTest extends TestCase
 
         $rendered = (new MarkdownRenderer())->renderRulePage($page);
 
+        // Substrings of the rendered page rather than file fixtures, and the blank lines around a heading are part of what each one pins.
         self::assertStringContainsString("…which report as:\n\n- *Places the \"ci\" block.*\n- *Places the \"framework\" block.*", $rendered);
         self::assertStringContainsString("\n\n## First Sync\n\n", $rendered);
         self::assertStringContainsString("\n\n### Two blocks land\n\n", $rendered);
@@ -134,9 +145,9 @@ final class MarkdownRendererTest extends TestCase
         $page = new FamilyPage('PhpStan', ['PhpStanIncludedRuleset', 'PhpStanMinLevel'], [
             new CompositionSection('Family', [
                 new Subsection(null, [
-                    new DeclarationGroup("return config();\n", ['Includes the ruleset.', 'Keeps the level.'], [
+                    new DeclarationGroup(FileContent::fromString('return config();'), ['Includes the ruleset.', 'Keeps the level.'], [
                         new ScenarioEntry('both rules fold together', 'tests/Scenario/PhpStan/Family/fixtures/from-scratch', [
-                            new FileExample('phpstan.neon', ExampleKind::Created, null, "parameters:\n"),
+                            new FileExample('phpstan.neon', ExampleKind::Created, null, FileContent::fromString('parameters:')),
                         ]),
                     ]),
                 ]),
@@ -145,6 +156,7 @@ final class MarkdownRendererTest extends TestCase
 
         $rendered = (new MarkdownRenderer())->renderFamilyPage($page);
 
+        // Substrings of the rendered page rather than file fixtures, and the blank lines around a heading are part of what each one pins.
         self::assertStringContainsString("# PhpStan\n\nRules: [PhpStanIncludedRuleset](PhpStanIncludedRuleset.md) · [PhpStanMinLevel](PhpStanMinLevel.md)", $rendered);
         self::assertStringContainsString("\n\n## Family\n\n", $rendered);
         self::assertStringContainsString("\n\n### Both rules fold together\n\n", $rendered);
@@ -184,9 +196,9 @@ final class MarkdownRendererTest extends TestCase
         $sections = [
             new CompositionSection('Target Resolution', [
                 new Subsection(null, [
-                    new DeclarationGroup("return config();\n", ['Keeps the level.'], [
+                    new DeclarationGroup(FileContent::fromString('return config();'), ['Keeps the level.'], [
                         new ScenarioEntry('a lone dist file is synced', 'tests/Scenario/Engine/TargetResolution/fixtures/lone-dist-file', [
-                            new FileExample('phpstan.neon.dist', ExampleKind::Created, null, "parameters:\n"),
+                            new FileExample('phpstan.neon.dist', ExampleKind::Created, null, FileContent::fromString('parameters:')),
                         ]),
                     ]),
                 ]),
@@ -195,6 +207,7 @@ final class MarkdownRendererTest extends TestCase
 
         $rendered = (new MarkdownRenderer())->renderEnginePage($sections);
 
+        // Substrings of the rendered page rather than file fixtures, and the blank lines around a heading are part of what each one pins.
         self::assertStringContainsString("# Engine behaviours\n\n## Target Resolution\n\n", $rendered);
         self::assertStringContainsString("\n\n### A lone dist file is synced\n\n", $rendered);
         self::assertStringContainsString('(../../tests/Scenario/Engine/TargetResolution/fixtures/lone-dist-file)', $rendered);

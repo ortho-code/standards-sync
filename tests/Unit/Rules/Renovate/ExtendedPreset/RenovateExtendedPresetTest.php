@@ -33,6 +33,7 @@ final class RenovateExtendedPresetTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A preset reference is one non-empty line.');
 
+        // The line break is the input being refused rather than file content, so it stays an escape.
         new RenovateExtendedPreset(preset: "a\nb");
     }
 
@@ -136,7 +137,7 @@ final class RenovateExtendedPresetTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('"renovate.jsonc" is a JSONC config, which this standard does not manage');
 
-        new RenovateExtendedPreset(preset: self::PRESET)->applyAt(Path::fromString('renovate.jsonc'), "{}\n");
+        new RenovateExtendedPreset(preset: self::PRESET)->applyAt(Path::fromString('renovate.jsonc'), FileContent::fromString('{}'));
     }
 
     public function testRefusesALenientJsonConfig(): void
@@ -158,10 +159,17 @@ final class RenovateExtendedPresetTest extends TestCase
 
     public function testTreatsTheExtensionlessRenovatercAsStrictJson(): void
     {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                { // lenient
+                }
+                JSON,
+        );
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('".renovaterc" is not strict JSON');
 
-        new RenovateExtendedPreset(preset: self::PRESET)->applyAt(Path::fromString('.renovaterc'), "{ // lenient\n}\n");
+        new RenovateExtendedPreset(preset: self::PRESET)->applyAt(Path::fromString('.renovaterc'), $content);
     }
 
     public function testDispatchesAJson5NameInAPlatformDirectory(): void
@@ -215,7 +223,7 @@ final class RenovateExtendedPresetTest extends TestCase
     {
         self::assertSame(
             'The renovate config does not extend "local>acme/renovate-config".',
-            new RenovateExtendedPreset(preset: self::PRESET)->explain("{}\n"),
+            new RenovateExtendedPreset(preset: self::PRESET)->explain(FileContent::fromString('{}')),
         );
     }
 

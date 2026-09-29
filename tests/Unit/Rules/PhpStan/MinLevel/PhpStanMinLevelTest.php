@@ -291,6 +291,7 @@ final class PhpStanMinLevelTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
+        // The line break is the input being refused rather than file content, so it stays an escape.
         new PhpStanMinLevel(minLevel: PhpStanLevel::fromInt(7), comment: "one\ntwo");
     }
 

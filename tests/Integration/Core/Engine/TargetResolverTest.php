@@ -9,6 +9,7 @@ use OrthoCode\StandardsSync\Core\Filesystem\Path;
 use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use OrthoCode\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
 use OrthoCode\StandardsSync\Rules\Renovate\RenovateConfigFile;
+use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -20,8 +21,8 @@ final class TargetResolverTest extends TestCase
     public function testPrefersTheDistVariantInASubdirectory(): void
     {
         $resolved = $this->resolver([
-            '/a/tools/phpunit.xml' => "local\n",
-            '/a/tools/phpunit.xml.dist' => "committed\n",
+            '/a/tools/phpunit.xml' => FileContent::fromString('local'),
+            '/a/tools/phpunit.xml.dist' => FileContent::fromString('committed'),
         ])->resolve(Path::fromString('/a'), FileTarget::fromStrings('tools/phpunit.xml', 'tools/phpunit.xml.dist'));
 
         self::assertSame('/a/tools/phpunit.xml.dist', $resolved->path()->value());
@@ -31,8 +32,8 @@ final class TargetResolverTest extends TestCase
     public function testPrefersADistVariantWithAMiddleSegment(): void
     {
         $resolved = $this->resolver([
-            '/a/psalm.xml' => "local\n",
-            '/a/psalm.dist.xml' => "committed\n",
+            '/a/psalm.xml' => FileContent::fromString('local'),
+            '/a/psalm.dist.xml' => FileContent::fromString('committed'),
         ])->resolve(Path::fromString('/a'), FileTarget::fromStrings('psalm.xml', 'psalm.dist.xml'));
 
         self::assertSame('/a/psalm.dist.xml', $resolved->path()->value());
@@ -41,8 +42,8 @@ final class TargetResolverTest extends TestCase
     public function testPrefersTheDistVariantInADotfileName(): void
     {
         $resolved = $this->resolver([
-            '/a/.php-cs-fixer.php' => "local\n",
-            '/a/.php-cs-fixer.dist.php' => "committed\n",
+            '/a/.php-cs-fixer.php' => FileContent::fromString('local'),
+            '/a/.php-cs-fixer.dist.php' => FileContent::fromString('committed'),
         ])->resolve(Path::fromString('/a'), FileTarget::fromStrings('.php-cs-fixer.php', '.php-cs-fixer.dist.php'));
 
         self::assertSame('/a/.php-cs-fixer.dist.php', $resolved->path()->value());
@@ -55,8 +56,8 @@ final class TargetResolverTest extends TestCase
         $this->expectExceptionMessage('Both "/a/dist/a.conf" and "/a/etc/a.conf" exist for one target; remove all but one.');
 
         $this->resolver([
-            '/a/dist/a.conf' => "one\n",
-            '/a/etc/a.conf' => "two\n",
+            '/a/dist/a.conf' => FileContent::fromString('one'),
+            '/a/etc/a.conf' => FileContent::fromString('two'),
         ])->resolve(Path::fromString('/a'), FileTarget::fromStrings('dist/a.conf', 'etc/a.conf'));
     }
 
@@ -66,8 +67,8 @@ final class TargetResolverTest extends TestCase
         $this->expectExceptionMessage('Both "/a/distribution.neon" and "/a/phpstan.neon" exist for one target; remove all but one.');
 
         $this->resolver([
-            '/a/distribution.neon' => "one\n",
-            '/a/phpstan.neon' => "two\n",
+            '/a/distribution.neon' => FileContent::fromString('one'),
+            '/a/phpstan.neon' => FileContent::fromString('two'),
         ])->resolve(Path::fromString('/a'), FileTarget::fromStrings('distribution.neon', 'phpstan.neon'));
     }
 
@@ -78,15 +79,15 @@ final class TargetResolverTest extends TestCase
         $this->expectExceptionMessage('Both "/a/renovate.json" and "/a/renovate.json5" exist for one target; remove all but one.');
 
         $this->resolver([
-            '/a/renovate.json' => "{}\n",
-            '/a/renovate.json5' => "{}\n",
+            '/a/renovate.json' => FileContent::fromString('{}'),
+            '/a/renovate.json5' => FileContent::fromString('{}'),
         ])->resolve(Path::fromString('/a'), RenovateConfigFile::target());
     }
 
     public function testALoneRenovateFileWinsWhateverTheCreationPreference(): void
     {
         $resolved = $this->resolver([
-            '/a/renovate.json5' => "{}\n",
+            '/a/renovate.json5' => FileContent::fromString('{}'),
         ])
             ->resolve(Path::fromString('/a'), RenovateConfigFile::target());
 

@@ -17,7 +17,7 @@ final class PsalmConfigValidatorTest extends TestCase
     {
         $this->expectNotToPerformAssertions();
 
-        new PsalmConfigValidator()->assertValid('./other.xml', "<foo><bar></foo>\n");
+        new PsalmConfigValidator()->assertValid('./other.xml', FileContent::fromString('<foo><bar></foo>'));
     }
 
     public function testAcceptsAConfigTheSchemaAllows(): void
@@ -43,7 +43,7 @@ final class PsalmConfigValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('violates the psalm config schema');
 
-        new PsalmConfigValidator()->assertValid('./psalm.xml', "<psalm errorLevel=\"4\"><bogus /></psalm>\n");
+        new PsalmConfigValidator()->assertValid('./psalm.xml', FileContent::fromString('<psalm errorLevel="4"><bogus /></psalm>'));
     }
 
     public function testFailsLoudWhenPsalmIsMissing(): void
@@ -51,7 +51,7 @@ final class PsalmConfigValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('install vimeo/psalm');
 
-        new PsalmConfigValidator(psalmInstalled: false)->assertValid('./psalm.xml', "<psalm errorLevel=\"4\" />\n");
+        new PsalmConfigValidator(psalmInstalled: false)->assertValid('./psalm.xml', FileContent::fromString('<psalm errorLevel="4" />'));
     }
 
     public function testIgnoresAFileItDoesNotCoverEvenWithoutPsalm(): void

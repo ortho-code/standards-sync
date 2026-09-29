@@ -32,7 +32,7 @@ final class YamlValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The synced ./deptrac.yaml is not valid yaml');
 
-        new YamlValidator()->assertValid('./deptrac.yaml', "imports: [broken\n");
+        new YamlValidator()->assertValid('./deptrac.yaml', FileContent::fromString('imports: [broken'));
     }
 
     public function testCoversTheYmlSpellingToo(): void
@@ -40,14 +40,14 @@ final class YamlValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The synced ./pipeline.yml is not valid yaml');
 
-        new YamlValidator()->assertValid('./pipeline.yml', "imports: [broken\n");
+        new YamlValidator()->assertValid('./pipeline.yml', FileContent::fromString('imports: [broken'));
     }
 
     public function testIgnoresAFileThatIsNotYaml(): void
     {
         $this->expectNotToPerformAssertions();
 
-        new YamlValidator()->assertValid('./notes.txt', "imports: [broken\n");
+        new YamlValidator()->assertValid('./notes.txt', FileContent::fromString('imports: [broken'));
     }
 
     public function testFailsLoudWhenTheParserIsMissing(): void
@@ -55,7 +55,7 @@ final class YamlValidatorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('install symfony/yaml');
 
-        new YamlValidator(parserInstalled: false)->assertValid('./deptrac.yaml', "imports: []\n");
+        new YamlValidator(parserInstalled: false)->assertValid('./deptrac.yaml', FileContent::fromString('imports: []'));
     }
 
     public function testIgnoresAFileItDoesNotCoverEvenWithoutTheParser(): void

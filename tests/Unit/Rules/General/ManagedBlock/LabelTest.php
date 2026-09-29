@@ -39,6 +39,7 @@ final class LabelTest extends TestCase
     public static function invalidLabels(): iterable
     {
         yield 'space' => ['has space'];
+        // The line break is the input being refused rather than file content, so it stays an escape.
         yield 'newline' => ["two\nlines"];
         yield 'regex metacharacters' => ['a*b('];
         yield 'empty' => [''];

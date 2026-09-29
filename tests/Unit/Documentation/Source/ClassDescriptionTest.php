@@ -18,6 +18,7 @@ final class ClassDescriptionTest extends TestCase
 
     public function testLinesJoinIntoParagraphsAndTagLinesDrop(): void
     {
+        // The description's text rather than file content, and its one paragraph break is the join being pinned.
         self::assertSame(
             "First sentence. Second sentence.\n\nNew paragraph.",
             ClassDescription::fromClass(MultiParagraphDocblock::class)?->text(),
