@@ -1,0 +1,8 @@
+imports:
+  - local/architecture.yaml
+  - vendor/acme/standards/deptrac.yaml
+  - vendor/acme/framework/deptrac.yaml
+
+deptrac:
+  paths:
+    - ./src

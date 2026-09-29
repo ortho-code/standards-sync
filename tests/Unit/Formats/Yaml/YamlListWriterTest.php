@@ -215,6 +215,170 @@ final class YamlListWriterTest extends TestCase
         YamlListWriter::ensureEntry($content, 'imports', 'vendor/other/deptrac.yaml');
     }
 
+    public function testASupersededEntryIsReplacedInPlaceKeepingItsLine(): void
+    {
+        $content = FileContent::fromString(
+            <<<'YAML'
+                imports:
+                  -  'vendor/acme/standards/layers.yaml' # the org layers
+                  - local/architecture.yaml
+                YAML,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    imports:
+                      -  vendor/acme/standards/deptrac.yaml # the org layers
+                      - local/architecture.yaml
+                    YAML,
+            ),
+            YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml', ['vendor/acme/standards/layers.yaml']),
+        );
+    }
+
+    public function testASupersededEntryAtTheSectionsOwnIndentationIsReplacedInPlace(): void
+    {
+        $content = FileContent::fromString(
+            <<<'YAML'
+                imports:
+                - vendor/acme/standards/layers.yaml
+                - local/architecture.yaml
+                YAML,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    imports:
+                    - vendor/acme/standards/deptrac.yaml
+                    - local/architecture.yaml
+                    YAML,
+            ),
+            YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml', ['vendor/acme/standards/layers.yaml']),
+        );
+    }
+
+    public function testOnlyTheFirstSupersededEntryIsReplaced(): void
+    {
+        $content = FileContent::fromString(
+            <<<'YAML'
+                imports:
+                  - vendor/acme/standards/layers.yaml
+                  - vendor/acme/standards/strict.yaml
+                YAML,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    imports:
+                      - vendor/acme/standards/deptrac.yaml
+                      - vendor/acme/standards/strict.yaml
+                    YAML,
+            ),
+            YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml', ['vendor/acme/standards/strict.yaml', 'vendor/acme/standards/layers.yaml']),
+        );
+    }
+
+    public function testAPresentEntryIsKeptWhateverItSupersedes(): void
+    {
+        $content = FileContent::fromString(
+            <<<'YAML'
+                imports:
+                  - vendor/acme/standards/layers.yaml
+                  - vendor/acme/standards/deptrac.yaml
+                YAML,
+        );
+
+        self::assertSame($content, YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml', ['vendor/acme/standards/layers.yaml']));
+    }
+
+    public function testAnEntrySupersedingNothingPresentIsInserted(): void
+    {
+        $content = FileContent::fromString(
+            <<<'YAML'
+                imports:
+                  - local/architecture.yaml
+                YAML,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    imports:
+                      - local/architecture.yaml
+                      - vendor/acme/standards/deptrac.yaml
+                    YAML,
+            ),
+            YamlListWriter::ensureEntry($content, 'imports', 'vendor/acme/standards/deptrac.yaml', ['vendor/acme/standards/layers.yaml']),
+        );
+    }
+
+    public function testRemovesEveryLineHoldingOneOfTheEntries(): void
+    {
+        $content = FileContent::fromString(
+            <<<'YAML'
+                imports:
+                  - vendor/acme/standards/strict.yaml
+                  # the local layers
+                  - local/architecture.yaml
+                  - 'vendor/acme/standards/strict.yaml' # again
+                  - vendor/acme/standards/layers.yaml
+
+                deptrac:
+                  paths:
+                    - ./src
+                YAML,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    imports:
+                      # the local layers
+                      - local/architecture.yaml
+
+                    deptrac:
+                      paths:
+                        - ./src
+                    YAML,
+            ),
+            YamlListWriter::removeEntries($content, 'imports', ['vendor/acme/standards/strict.yaml', 'vendor/acme/standards/layers.yaml']),
+        );
+    }
+
+    public function testRemovingAbsentEntriesLeavesTheContentUntouched(): void
+    {
+        $content = FileContent::fromString(
+            <<<'YAML'
+                services:
+                  - vendor/acme/standards/strict.yaml
+
+                imports:
+                  - local/architecture.yaml
+                YAML,
+        );
+
+        self::assertSame($content, YamlListWriter::removeEntries($content, 'imports', ['vendor/acme/standards/strict.yaml']));
+        self::assertSame($content, YamlListWriter::removeEntries($content, 'excludes', ['vendor/acme/standards/strict.yaml']));
+        self::assertSame($content, YamlListWriter::removeEntries($content, 'imports', []));
+    }
+
+    public function testReadsTheSectionsEntriesUnquoted(): void
+    {
+        $content = FileContent::fromString(
+            <<<'YAML'
+                imports:
+                  - 'vendor/acme/standards/deptrac.yaml' # the org layers
+                  - local/architecture.yaml
+                YAML,
+        );
+
+        self::assertSame(['vendor/acme/standards/deptrac.yaml', 'local/architecture.yaml'], YamlListWriter::readList($content, 'imports'));
+        self::assertNull(YamlListWriter::readList($content, 'excludes'));
+    }
+
     public function testOnlyTouchesTheNamedSection(): void
     {
         $content = FileContent::fromString(

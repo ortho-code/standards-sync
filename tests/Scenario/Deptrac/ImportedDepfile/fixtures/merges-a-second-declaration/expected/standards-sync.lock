@@ -1,0 +1,14 @@
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "deptrac.yaml": {
+            "imports": [
+                "vendor/acme/standards/deptrac.yaml",
+                "vendor/acme/framework/deptrac.yaml"
+            ]
+        }
+    }
+}

@@ -53,3 +53,10 @@ Probed against deptrac 4.7.1: a depfile holding `paths:` and no `layers:` or `ru
 
 The consequence for an org standard: requiring the tool and running it in a check script imposes no shared layer model on consumers. An org with no architecture worth sharing can still make deptrac a required, running part of the standard and leave every repo's layers to that repo, and the import rule stays available for the day shared layers exist. A repo with no depfile at all still fails loudly, which is the intended nudge rather than a silent pass.
 
+## Changed 2026-09-29 — the imports entry contributes to `imports`
+
+`DeptracImportedDepfile` implements `ContributesToList` with the list key `imports`, per [the cross-family decision](rule-model.md#decided-2026-09-29--the-import-tier-rules-contribute-to-their-lists-and-a-replacement-takes-its-predecessors-place).
+The lock records the depfile path, so a moved depfile is retracted and its successor takes its line, trailing comment included; a depfile nobody declares any more is removed; declarations merge, a depfile declared twice counting once.
+`YamlListWriter` gained `readList()` and `removeEntries()`, and `ensureEntry()` takes the entries an entry replaces, the same operations its neon sibling gained, including for entries at the section's own indentation.
+The union semantics recorded above still govern what the imports mean to deptrac; retraction changes only which imports the file carries.
+
