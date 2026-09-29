@@ -25,6 +25,8 @@ final readonly class JsonObjectWriter
     /** Slashes and unicode stay literal, so a written value reads in the file exactly as it was declared. */
     private const int RENDER_FLAGS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR;
 
+    private const string EMPTY_LIST = '[]';
+
     /**
      * The string written at a nested key path, or null when the path is not written.
      *
@@ -311,7 +313,7 @@ final readonly class JsonObjectWriter
 
         $listEnd = self::skipBracketed($content, $member->valueStart());
 
-        return substr($content, 0, $member->valueStart()) . '[]' . substr($content, $listEnd);
+        return substr($content, 0, $member->valueStart()) . self::EMPTY_LIST . substr($content, $listEnd);
     }
 
     /**

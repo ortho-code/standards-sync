@@ -20,9 +20,10 @@ final readonly class FluentChainWriter
 
     private const string LINE_INDENT = '/^([ \t]*)/';
 
-    private const string LINE_COMMENT = '//';
-    private const string BLOCK_COMMENT_OPEN = '/*';
-    private const string BLOCK_COMMENT_CLOSE = '*/';
+    private const string COMMENT_LINE = '//';
+    private const string COMMENT_BLOCK_OPEN = '/*';
+    private const string COMMENT_BLOCK_CLOSE = '*/';
+
     private const string ATTRIBUTE_OPEN = '#[';
 
     /**
@@ -326,16 +327,16 @@ final readonly class FluentChainWriter
         }
 
         $opening = substr($content, $offset, 2);
-        if ($opening === self::BLOCK_COMMENT_OPEN) {
-            $close = strpos($content, self::BLOCK_COMMENT_CLOSE, $offset + strlen(self::BLOCK_COMMENT_OPEN));
+        if ($opening === self::COMMENT_BLOCK_OPEN) {
+            $close = strpos($content, self::COMMENT_BLOCK_CLOSE, $offset + strlen(self::COMMENT_BLOCK_OPEN));
             if ($close === false) {
                 throw new RuntimeException('A block comment in the config never closes; the config cannot be edited.');
             }
 
-            return $close + strlen(self::BLOCK_COMMENT_CLOSE);
+            return $close + strlen(self::COMMENT_BLOCK_CLOSE);
         }
 
-        if ($opening === self::LINE_COMMENT || ($content[$offset] === '#' && $opening !== self::ATTRIBUTE_OPEN)) {
+        if ($opening === self::COMMENT_LINE || ($content[$offset] === '#' && $opening !== self::ATTRIBUTE_OPEN)) {
             $lineBreak = strpos($content, Lines::LINE_BREAK, $offset);
 
             return $lineBreak === false ? strlen($content) : $lineBreak;

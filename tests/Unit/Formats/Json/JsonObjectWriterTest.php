@@ -723,7 +723,7 @@ final class JsonObjectWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('"extends" does not hold a list');
 
-        JsonObjectWriter::removeListEntries("{ \"extends\": true }\n", ['extends'], ['a']);
+        JsonObjectWriter::removeListEntries(FileContent::fromString('{ "extends": true }'), ['extends'], ['a']);
     }
 
     public function testEnsureListEntryIsIdempotent(): void

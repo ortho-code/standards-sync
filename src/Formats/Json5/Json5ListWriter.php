@@ -33,6 +33,9 @@ final readonly class Json5ListWriter
     private const string BLOCK_COMMENT_OPEN = '/*';
     private const string BLOCK_COMMENT_CLOSE = '*/';
 
+    /** What may follow an entry on its line with the line still its own: an optional separating comma, then an optional line comment. */
+    private const string ENTRY_LINE_TAIL = '~^(?<comma>[ \t]*,)?[ \t]*(?://.*)?$~';
+
     /**
      * The string entries of the key's list as unquoted values, or null when the document or the key is absent.
      *
@@ -148,7 +151,7 @@ final readonly class Json5ListWriter
 
         $lineStart = self::lineStart($content, $start);
         $lineEnd = self::lineEnd($content, $end);
-        $endsItsLine = preg_match('~^(?<comma>[ \t]*,)?[ \t]*(?://.*)?$~', substr($content, $end, $lineEnd - $end), $tail) === 1;
+        $endsItsLine = preg_match(self::ENTRY_LINE_TAIL, substr($content, $end, $lineEnd - $end), $tail) === 1;
         $ownsLine = $endsItsLine && trim(substr($content, $lineStart, $start - $lineStart)) === '';
         if ($ownsLine && (($tail['comma'] ?? '') !== '' || $next === null)) {
             return substr($content, 0, $lineStart) . substr($content, min($lineEnd + 1, strlen($content)));
@@ -254,11 +257,11 @@ final readonly class Json5ListWriter
         $lineEnd = self::lineEnd($content, $end);
         $tail = substr($content, $end, $lineEnd - $end);
 
-        if (preg_match('~^(?<lead>[ \t]*,)?[ \t]*(?://.*)?$~', $tail, $match) !== 1) {
+        if (preg_match(self::ENTRY_LINE_TAIL, $tail, $match) !== 1) {
             return $content;
         }
 
-        $expected = (($match['lead'] ?? '') !== '' ? ',' : '') . self::COMMENT_LEAD . $comment;
+        $expected = (($match['comma'] ?? '') !== '' ? ',' : '') . self::COMMENT_LEAD . $comment;
         if ($tail === $expected) {
             return $content;
         }
