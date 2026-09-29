@@ -195,27 +195,71 @@ final class JsonObjectWriterTest extends TestCase
         self::assertSame($expected, JsonObjectWriter::write($content, ['require-dev', 'phpstan/phpstan'], '^2.5'));
     }
 
-    /** @return iterable<string, array{string}> */
+    /** @return iterable<string, array{string, string}> */
     public static function indentations(): iterable
     {
-        yield 'two spaces' => ['  '];
-        yield 'four spaces' => ['    '];
-        yield 'tabs' => ["\t"];
+        yield 'two spaces' => [
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                      "name": "acme/project"
+                    }
+                    JSON,
+            ),
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                      "name": "acme/project",
+                      "require-dev": {
+                        "phpstan/phpstan": "^2.5"
+                      }
+                    }
+                    JSON,
+            ),
+        ];
+        yield 'four spaces' => [
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                        "name": "acme/project"
+                    }
+                    JSON,
+            ),
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                        "name": "acme/project",
+                        "require-dev": {
+                            "phpstan/phpstan": "^2.5"
+                        }
+                    }
+                    JSON,
+            ),
+        ];
+        yield 'tabs' => [
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                    	"name": "acme/project"
+                    }
+                    JSON,
+            ),
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                    	"name": "acme/project",
+                    	"require-dev": {
+                    		"phpstan/phpstan": "^2.5"
+                    	}
+                    }
+                    JSON,
+            ),
+        ];
     }
 
     #[DataProvider('indentations')]
-    public function testInsertionCopiesTheFilesOwnIndentation(string $indent): void
+    public function testInsertionCopiesTheFilesOwnIndentation(string $content, string $expected): void
     {
-        $content = FileContent::fromString(
-            '{' . "\n" . $indent . '"name": "acme/project"' . "\n" . '}',
-        );
-        $expected = FileContent::fromString(
-            '{' . "\n" . $indent . '"name": "acme/project",' . "\n"
-            . $indent . '"require-dev": {' . "\n"
-            . $indent . $indent . '"phpstan/phpstan": "^2.5"' . "\n"
-            . $indent . '}' . "\n" . '}',
-        );
-
         self::assertSame($expected, JsonObjectWriter::write($content, ['require-dev', 'phpstan/phpstan'], '^2.5'));
     }
 
@@ -575,16 +619,16 @@ final class JsonObjectWriterTest extends TestCase
     public function testEnsureListEntryAppendsToAOneLineList(): void
     {
         self::assertSame(
-            "{ \"extends\": [\"a\", \"b\"] }\n",
-            JsonObjectWriter::ensureListEntry("{ \"extends\": [\"a\"] }\n", ['extends'], 'b'),
+            FileContent::fromString('{ "extends": ["a", "b"] }'),
+            JsonObjectWriter::ensureListEntry(FileContent::fromString('{ "extends": ["a"] }'), ['extends'], 'b'),
         );
     }
 
     public function testEnsureListEntryFillsAnEmptyListInline(): void
     {
         self::assertSame(
-            "{ \"extends\": [\"a\"] }\n",
-            JsonObjectWriter::ensureListEntry("{ \"extends\": [] }\n", ['extends'], 'a'),
+            FileContent::fromString('{ "extends": ["a"] }'),
+            JsonObjectWriter::ensureListEntry(FileContent::fromString('{ "extends": [] }'), ['extends'], 'a'),
         );
     }
 
@@ -618,7 +662,7 @@ final class JsonObjectWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('"extends" does not hold a list');
 
-        JsonObjectWriter::ensureListEntry("{ \"extends\": true }\n", ['extends'], 'a');
+        JsonObjectWriter::ensureListEntry(FileContent::fromString('{ "extends": true }'), ['extends'], 'a');
     }
 
     public function testEnsureListEntryReplacesTheFirstSupersededEntryInPlace(): void
@@ -728,7 +772,7 @@ final class JsonObjectWriterTest extends TestCase
 
     public function testEnsureListEntryIsIdempotent(): void
     {
-        $once = JsonObjectWriter::ensureListEntry("{ \"extends\": [\"a\"] }\n", ['extends'], 'b');
+        $once = JsonObjectWriter::ensureListEntry(FileContent::fromString('{ "extends": ["a"] }'), ['extends'], 'b');
 
         self::assertSame($once, JsonObjectWriter::ensureListEntry($once, ['extends'], 'b'));
     }

@@ -133,8 +133,8 @@ final class Json5ListWriterTest extends TestCase
     public function testAppendsToAOneLineList(): void
     {
         self::assertSame(
-            "{ \"extends\": [\"config:recommended\", \"local>acme/renovate-config\"] }\n",
-            Json5ListWriter::ensureEntry("{ \"extends\": [\"config:recommended\"] }\n", 'extends', self::ENTRY),
+            FileContent::fromString('{ "extends": ["config:recommended", "local>acme/renovate-config"] }'),
+            Json5ListWriter::ensureEntry(FileContent::fromString('{ "extends": ["config:recommended"] }'), 'extends', self::ENTRY),
         );
     }
 
@@ -286,7 +286,11 @@ final class Json5ListWriterTest extends TestCase
 
     public function testSkipsTheCommentWhereTheEntryDoesNotEndItsLine(): void
     {
-        $content = "{ extends: ['local>acme/renovate-config', 'config:recommended'] }\n";
+        $content = FileContent::fromString(
+            <<<'JSON5'
+                { extends: ['local>acme/renovate-config', 'config:recommended'] }
+                JSON5,
+        );
 
         self::assertSame($content, Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY, 'org standard'));
     }
@@ -319,8 +323,8 @@ final class Json5ListWriterTest extends TestCase
     public function testAppendsTheKeyToAOneLineObject(): void
     {
         self::assertSame(
-            "{ labels: [\"x\"], extends: [\"local>acme/renovate-config\"] }\n",
-            Json5ListWriter::ensureEntry("{ labels: [\"x\"] }\n", 'extends', self::ENTRY),
+            FileContent::fromString('{ labels: ["x"], extends: ["local>acme/renovate-config"] }'),
+            Json5ListWriter::ensureEntry(FileContent::fromString('{ labels: ["x"] }'), 'extends', self::ENTRY),
         );
     }
 
@@ -336,7 +340,7 @@ final class Json5ListWriterTest extends TestCase
                     }
                     JSON5,
             ),
-            Json5ListWriter::ensureEntry("{}\n", 'extends', self::ENTRY),
+            Json5ListWriter::ensureEntry(FileContent::fromString('{}'), 'extends', self::ENTRY),
         );
     }
 
@@ -418,7 +422,7 @@ final class Json5ListWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('does not hold a JSON5 object');
 
-        Json5ListWriter::ensureEntry("[]\n", 'extends', self::ENTRY);
+        Json5ListWriter::ensureEntry(FileContent::fromString('[]'), 'extends', self::ENTRY);
     }
 
     public function testRefusesADuplicateKey(): void
@@ -426,7 +430,7 @@ final class Json5ListWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('sets "extends" more than once');
 
-        Json5ListWriter::ensureEntry("{ extends: [], \"extends\": [] }\n", 'extends', self::ENTRY);
+        Json5ListWriter::ensureEntry(FileContent::fromString('{ extends: [], "extends": [] }'), 'extends', self::ENTRY);
     }
 
     public function testRefusesAKeyThatHoldsNoList(): void
@@ -434,7 +438,7 @@ final class Json5ListWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('"extends" does not hold a list');
 
-        Json5ListWriter::ensureEntry("{ extends: true }\n", 'extends', self::ENTRY);
+        Json5ListWriter::ensureEntry(FileContent::fromString('{ extends: true }'), 'extends', self::ENTRY);
     }
 
     public function testRefusesAStringThatNeverCloses(): void
@@ -442,7 +446,15 @@ final class Json5ListWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('A JSON5 string never closes');
 
-        Json5ListWriter::ensureEntry("{ extends: ['broken] }\n", 'extends', self::ENTRY);
+        Json5ListWriter::ensureEntry(
+            FileContent::fromString(
+                <<<'JSON5'
+                    { extends: ['broken] }
+                    JSON5,
+            ),
+            'extends',
+            self::ENTRY,
+        );
     }
 
     public function testRefusesACommentThatNeverCloses(): void
@@ -450,7 +462,16 @@ final class Json5ListWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('A JSON5 comment never closes');
 
-        Json5ListWriter::ensureEntry("{ /* broken\n  extends: [] }\n", 'extends', self::ENTRY);
+        Json5ListWriter::ensureEntry(
+            FileContent::fromString(
+                <<<'JSON5'
+                    { /* broken
+                      extends: [] }
+                    JSON5,
+            ),
+            'extends',
+            self::ENTRY,
+        );
     }
 
     /** Applying a write twice is the engine's free property test; the writer owes the same guarantee on its own. */
@@ -605,7 +626,16 @@ final class Json5ListWriterTest extends TestCase
 
     public function testEnsuringIsIdempotent(): void
     {
-        $once = Json5ListWriter::ensureEntry("{\n  extends: [\n    'config:recommended',\n  ],\n}\n", 'extends', self::ENTRY, 'org standard');
+        $content = FileContent::fromString(
+            <<<'JSON5'
+                {
+                  extends: [
+                    'config:recommended',
+                  ],
+                }
+                JSON5,
+        );
+        $once = Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY, 'org standard');
 
         self::assertSame($once, Json5ListWriter::ensureEntry($once, 'extends', self::ENTRY, 'org standard'));
     }
