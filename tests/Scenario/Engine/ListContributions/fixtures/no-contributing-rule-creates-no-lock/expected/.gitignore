@@ -1,0 +1,5 @@
+/.idea/
+
+# >>> acme - managed >>>
+/vendor/
+# <<< acme <<<

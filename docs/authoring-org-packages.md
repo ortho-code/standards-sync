@@ -103,6 +103,7 @@ These facts govern how they behave in a consumer:
 - Composer puts its bin-dir on PATH when running scripts, so a script entry names the bare binary with no `vendor/bin/` prefix.
 - That bin-dir holds the binaries of a project's *dependencies*, never the root package's own. A package that ships a tool and also adopts a standard that runs it therefore cannot invoke it by bare name — the script fails with `<tool>: not found` while every other script works. Linking the package's own binary into the bin-dir from a `post-install-cmd` resolves it, and is the only case where a consumer needs anything beyond the three rules above.
 - A consumer wraps an owned script rather than editing it: composer passes arguments through an `@name` reference, so `"app-phpstan-local": ["@app-phpstan --memory-limit=1G"]` runs the owned command with the argument added, and keeps working when the standard changes what that command is. The standard's own aggregate still calls the owned name, so a wrapper serves a person at a terminal, not CI.
+- The engine records the commands each root's standards declared in `standards-sync.lock`, which the consumer commits beside `standards-sync.php`. A missing lock is drift, so the first `sync --check` after upgrading to an engine that writes one fails until a sync writes it.
 - To add a step to another standard's aggregate, declare the same script with only your own commands. `new ComposerScript(name: 'app-checks', commands: ['@app-lint'])` beside a tier's `app-checks` adds `@app-lint` after the tier's commands when it is declared after the tier, and before them when declared before; a command both declare counts once.
 - Nothing in the engine ties a CI config's call to the name `ComposerScript` declares. The two are matched only by the text of the call, so a renamed script leaves the CI file calling a script that no longer exists.
 
@@ -122,6 +123,8 @@ The engine ships framework-neutral helpers under `Testing/`; they return plain d
 - **`SyncFixtureTester`** runs a sync against an on-disk fixture — an input tree, an expected tree, and the fixture's own `standards-sync.php` unless another is supplied — and reports how the result differs from the expected tree.
 - **`ScenarioTestCase`** is the phpunit base class over that: fixtures live in a `fixtures/` directory beside the concrete test class, scenarios come from `scenarios()`, and each is synced and asserted to match.
 - **`FileContent::fromString()`** builds file content for seeded and expected files, appending the trailing line break.
+
+A standard declaring a composer script makes every sync write `standards-sync.lock`, so a fixture's expected tree carries the lock beside the manifest, and `SyncTester`'s result map holds it too.
 
 Fixture runs additionally parse-validate every synced file (`Testing/Validation/`), so a writer cannot produce syntactically broken output unnoticed. A synced file whose parser is not installed **fails loud** rather than skipping: the parsers for the formats a package ships must be present — nette/neon for neon, symfony/yaml for yaml, vimeo/psalm for the psalm schema check, phpunit/phpunit for the phpunit schema check (which any suite running these fixtures has by construction) — or the validator is left out through `SyncFixtureTester`'s `validators:` parameter.
 

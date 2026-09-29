@@ -42,6 +42,24 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/adds-the-script`](../../../te
 }
 ```
 
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-check-standards": [
+                "vendor/bin/standards-sync sync --check"
+            ]
+        }
+    }
+}
+```
+
 ## A script running something else is rewritten, its neighbours untouched
 
 Fixture: [`tests/Scenario/Composer/Script/fixtures/rewrites-a-drifted-script`](../../../tests/Scenario/Composer/Script/fixtures/rewrites-a-drifted-script)
@@ -76,7 +94,25 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/rewrites-a-drifted-script`](.
 }
 ```
 
-## A script already running the declared commands is never touched
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-check-standards": [
+                "vendor/bin/standards-sync sync --check"
+            ]
+        }
+    }
+}
+```
+
+## A script already running the declared commands keeps its bytes; only the lock is written
 
 Fixture: [`tests/Scenario/Composer/Script/fixtures/leaves-a-matching-script`](../../../tests/Scenario/Composer/Script/fixtures/leaves-a-matching-script)
 
@@ -88,6 +124,24 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/leaves-a-matching-script`](..
         "app-check-standards": [
             "vendor/bin/standards-sync sync --check"
         ]
+    }
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-check-standards": [
+                "vendor/bin/standards-sync sync --check"
+            ]
+        }
     }
 }
 ```
@@ -114,6 +168,24 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/replaces-a-string-script`](..
         "app-check-standards": [
             "vendor/bin/standards-sync sync --check"
         ]
+    }
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-check-standards": [
+                "vendor/bin/standards-sync sync --check"
+            ]
+        }
     }
 }
 ```
@@ -160,6 +232,25 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/adds-a-multi-command-script`]
 }
 ```
 
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-check-standards": [
+                "vendor/bin/standards-sync sync --check",
+                "vendor/bin/phpstan"
+            ]
+        }
+    }
+}
+```
+
 Declared as:
 
 ```php
@@ -200,6 +291,26 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/merges-a-second-declaration`]
             "@app-run-tests",
             "@app-lint"
         ]
+    }
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-run-tests",
+                "@app-lint"
+            ]
+        }
     }
 }
 ```

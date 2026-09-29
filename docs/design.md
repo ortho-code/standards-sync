@@ -44,7 +44,7 @@ interface Rule
 - **Drift is derived, never hand-written**: a rule drifts exactly when `apply(current) !== current`, so check and apply cannot disagree. Idempotency (`apply(apply(x)) === apply(x)`) is asserted generically over every rule's fixtures.
 - **The symmetric null**: `apply(null)` returning null is abstention — no file, no opinion. Only rules that mean to create do so; whole-file deletion (string in, null out) is refused until a delete branch exists.
 - **Rule identity is the class name** (FQCN in config and disable lists; short name plus target path in reports).
-- Opt-in seams beside the base contract: `ExplainsDrift` (a dynamic "why" for drift that is not self-evident from the diff), `AppliesAtPath` (the resolved candidate for rules whose behaviour varies per filename, e.g. differing grammars under one target) and `ContributesToList` (a rule contributing entries to a list, whose contributions to one list merge before the fold).
+- Opt-in seams beside the base contract: `ExplainsDrift` (a dynamic "why" for drift that is not self-evident from the diff), `AppliesAtPath` (the resolved candidate for rules whose behaviour varies per filename, e.g. differing grammars under one target) and `ContributesToList` (a rule contributing entries to a list, whose contributions to one list merge before the fold and are recorded in [the lock](#the-lock)).
 
 ## `FileTarget` and resolution
 
@@ -65,6 +65,13 @@ Before that, contributions to one list (same class, target and list key) merge i
 One `Change` per file; `Engine::apply` is the only writer; `--check` computes the same plan and writes nothing, exiting non-zero on drift.
 `ChangeKind` derives from the fold's endpoints (create, update, in sync).
 The report attributes drift per rule (description plus `explain()` where implemented) and carries two note kinds: a shadowing note (a local file the tool reads in preference to the synced dist file) and an abstention note (a resolved file whose rules all had no opinion).
+
+## The lock
+
+Each root's `standards-sync.lock` records, per file and list, the entries its list contributions declared at the last sync, and is committed beside `standards-sync.php`.
+The engine reads it before the root's files fold and plans it as one more file after them, so `Engine::apply` stays the only writer and a stale or missing lock is drift.
+A root without contributions gets no lock, and a file that is absent keeps whatever the lock recorded for it, since nothing was enforced there to supersede it.
+The engine owns the file end to end: files and list keys sort, so its rendering depends only on what was declared.
 
 ## Composition and layering
 

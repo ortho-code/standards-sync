@@ -15,6 +15,7 @@ use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
 use OrthoCode\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
 use OrthoCode\StandardsSync\Rules\Composer\Requirement\ComposerRequirement;
 use OrthoCode\StandardsSync\Rules\Composer\Requirement\VersionConstraint;
+use OrthoCode\StandardsSync\Rules\Composer\Script\ComposerScript;
 use OrthoCode\StandardsSync\Presentation\Cli\Output\DriftReport;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -106,6 +107,19 @@ final class DriftReportTest extends TestCase
         self::assertFalse($plan->hasDrift());
         self::assertSame([], $plan->changes());
         self::assertCount(1, $plan->abstentions());
+    }
+
+    public function testTheLockShowsAsItsFileLineAlone(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            './composer.json' => "{\"scripts\": {\"app-checks\": [\"@app-sync-check\"]}}\n",
+        ]);
+
+        $report = $this->renderFor($filesystem, new ComposerScript(name: 'app-checks', commands: ['@app-sync-check']));
+
+        self::assertStringContainsString(' CREATE ./standards-sync.lock', $report);
+        self::assertStringNotContainsString('   - ', $report);
+        self::assertStringContainsString('1 file(s) drift from the managed standard.', $report);
     }
 
     private function abstainingRule(string $package): ComposerRequirement

@@ -11,6 +11,7 @@ final readonly class ResolvedTarget
 {
     public function __construct(
         private Path $path,
+        private Path $candidate,
         private ?string $current,
         private ?Path $shadowedBy = null,
     ) {}
@@ -18,6 +19,12 @@ final readonly class ResolvedTarget
     public function path(): Path
     {
         return $this->path;
+    }
+
+    /** The candidate the target resolved to, relative to the root. */
+    public function candidate(): Path
+    {
+        return $this->candidate;
     }
 
     public function current(): ?string

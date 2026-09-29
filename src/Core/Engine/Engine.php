@@ -7,6 +7,7 @@ namespace OrthoCode\StandardsSync\Core\Engine;
 use OrthoCode\StandardsSync\Core\Config\SyncConfig;
 use OrthoCode\StandardsSync\Core\Filesystem\Filesystem;
 use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Lock\SyncLock;
 use OrthoCode\StandardsSync\Core\Plan\Abstention;
 use OrthoCode\StandardsSync\Core\Plan\Change;
 use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
@@ -20,6 +21,7 @@ use RuntimeException;
 /**
  * Computes a plan from config and applies it; the only writer in the pipeline.
  * Planning folds each file's rules in declaration order over the current content: one read and one Change per file, and rules never touch the filesystem.
+ * Each root's lock is read before its files fold and planned as one more file after them, so it records what this sync declared.
  */
 final readonly class Engine
 {
@@ -114,12 +116,57 @@ final readonly class Engine
             $rulesByPath[$key][] = $rule;
         }
 
+        $lockPath = $root->join(Path::fromString(SyncLock::FILE));
+        $currentLock = $this->filesystem->read($lockPath);
+        $lock = $currentLock === null ? SyncLock::create() : SyncLock::fromJson($currentLock, $lockPath);
+        $recorded = SyncLock::create();
+
         $outcomes = [];
         foreach ($rulesByPath as $key => $fileRules) {
-            $outcomes[] = $this->foldFile($targets[$key], $fileRules);
+            $outcome = $this->foldFile($targets[$key], $fileRules);
+            $recorded = $this->record($recorded, $lock, $targets[$key], $fileRules, $outcome);
+            $outcomes[] = $outcome;
+        }
+
+        $lockChange = $this->lockChange($lockPath, $currentLock, $recorded);
+        if ($lockChange instanceof Change) {
+            $outcomes[] = $lockChange;
         }
 
         return $outcomes;
+    }
+
+    /**
+     * A fold that reached the file records what its contributions declare; an abstention keeps whatever the lock held, since nothing was enforced there to supersede it.
+     *
+     * @param list<Rule> $rules
+     */
+    private function record(SyncLock $recorded, SyncLock $lock, ResolvedTarget $target, array $rules, Change|Abstention $outcome): SyncLock
+    {
+        foreach ($rules as $rule) {
+            if (!$rule instanceof ContributesToList) {
+                continue;
+            }
+
+            $entries = $outcome instanceof Change ? $rule->entries() : $lock->entries($target->candidate(), $rule->listKey());
+            if ($entries !== null) {
+                $recorded = $recorded->withEntries($target->candidate(), $rule->listKey(), $entries);
+            }
+        }
+
+        return $recorded;
+    }
+
+    /** The lock as one more file of the root; a root that records nothing and has no lock gets none. */
+    private function lockChange(Path $path, ?string $current, SyncLock $recorded): ?Change
+    {
+        if ($current === null && $recorded->isEmpty()) {
+            return null;
+        }
+
+        $desired = $recorded->toJson();
+
+        return new Change($path, self::kindOf($current, $desired), $current, $desired, []);
     }
 
     /**
@@ -148,12 +195,15 @@ final readonly class Engine
             throw new RuntimeException(sprintf('The rules for "%s" want the file deleted, but deletion is not supported.', $target->path()->value()));
         }
 
-        $kind = match (true) {
+        return new Change($target->path(), self::kindOf($current, $content), $current, $content, $applications, $target->shadowedBy());
+    }
+
+    private static function kindOf(?string $current, string $desired): ChangeKind
+    {
+        return match (true) {
             $current === null => ChangeKind::Create,
-            $current === $content => ChangeKind::InSync,
+            $current === $desired => ChangeKind::InSync,
             default => ChangeKind::Update,
         };
-
-        return new Change($target->path(), $kind, $current, $content, $applications, $target->shadowedBy());
     }
 }

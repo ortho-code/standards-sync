@@ -18,7 +18,7 @@ final class ComposerScriptTest extends ScenarioTestCase
         yield 'a manifest without the script gains it' => ['adds-the-script', $config];
         yield 'every command of a multi-command script gets its own line' => ['adds-a-multi-command-script', 'standards-sync-multiple.php'];
         yield 'a script running something else is rewritten, its neighbours untouched' => ['rewrites-a-drifted-script', $config];
-        yield 'a script already running the declared commands is never touched' => ['leaves-a-matching-script', $config];
+        yield 'a script already running the declared commands keeps its bytes; only the lock is written' => ['leaves-a-matching-script', $config];
         yield 'a script written as a single string becomes the list form' => ['replaces-a-string-script', $config];
         yield 'a second declaration of the script adds its commands after the first\'s, a shared one counting once' => ['merges-a-second-declaration', null];
     }

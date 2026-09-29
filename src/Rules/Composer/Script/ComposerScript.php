@@ -61,6 +61,12 @@ final readonly class ComposerScript implements Rule, ContributesToList
     }
 
     #[\Override]
+    public function entries(): array
+    {
+        return $this->commands;
+    }
+
+    #[\Override]
     public function withMerged(ContributesToList $later): static
     {
         if (!$later instanceof self || $later->name !== $this->name) {

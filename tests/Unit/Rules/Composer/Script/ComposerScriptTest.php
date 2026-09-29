@@ -64,6 +64,7 @@ final class ComposerScriptTest extends TestCase
                 JSON,
         );
 
+        self::assertSame(['@app-sync-check', '@app-run-tests', '@app-lint'], $merged->entries());
         self::assertSame($expected, $merged->apply(FileContent::fromString('{}')));
         self::assertSame('Runs "@app-sync-check", "@app-run-tests", "@app-lint" as the composer script "app-checks".', $merged->description());
     }

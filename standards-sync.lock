@@ -1,0 +1,45 @@
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-ecs",
+                "@app-phpstan",
+                "@app-psalm",
+                "@app-rector",
+                "@app-run-tests"
+            ],
+            "scripts.app-ecs": [
+                "ecs check"
+            ],
+            "scripts.app-ecs-fix": [
+                "ecs check --fix"
+            ],
+            "scripts.app-phpstan": [
+                "phpstan analyse"
+            ],
+            "scripts.app-psalm": [
+                "psalm"
+            ],
+            "scripts.app-rector": [
+                "rector process --dry-run"
+            ],
+            "scripts.app-rector-fix": [
+                "rector process"
+            ],
+            "scripts.app-run-tests": [
+                "phpunit"
+            ],
+            "scripts.app-sync": [
+                "standards-sync sync"
+            ],
+            "scripts.app-sync-check": [
+                "standards-sync sync --check"
+            ]
+        }
+    }
+}

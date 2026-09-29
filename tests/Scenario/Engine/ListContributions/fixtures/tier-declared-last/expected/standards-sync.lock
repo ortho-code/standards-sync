@@ -1,0 +1,15 @@
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-lint",
+                "@app-sync-check",
+                "@app-run-tests"
+            ]
+        }
+    }
+}

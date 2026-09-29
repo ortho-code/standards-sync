@@ -1,0 +1,11 @@
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-run-tests"
+        ],
+        "app-phpcs": [
+            "phpcs -p -s"
+        ]
+    }
+}

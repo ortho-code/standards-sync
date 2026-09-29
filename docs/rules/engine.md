@@ -56,6 +56,26 @@ Fixture: [`tests/Scenario/Engine/ListContributions/fixtures/tier-declared-first`
 }
 ```
 
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-run-tests",
+                "@app-lint"
+            ]
+        }
+    }
+}
+```
+
 Declared as:
 
 ```php
@@ -106,6 +126,203 @@ Fixture: [`tests/Scenario/Engine/ListContributions/fixtures/tier-declared-last`]
         ]
     }
 }
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-lint",
+                "@app-sync-check",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+Declared as:
+
+```php
+return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
+    public function __construct()
+    {
+        $this->addRule(new ComposerScript(name: 'app-checks', commands: ['@app-sync-check', '@app-run-tests']));
+    }
+});
+```
+
+…which reports as: *Runs "@app-sync-check", "@app-run-tests" as the composer script "app-checks".*
+
+### An in-sync manifest beside a stale lock drifts in the lock alone
+
+Fixture: [`tests/Scenario/Engine/ListContributions/fixtures/a-stale-lock-drifts-alone`](../../tests/Scenario/Engine/ListContributions/fixtures/a-stale-lock-drifts-alone)
+
+`composer.json` **stays byte-identical**:
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**Before** — `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-phpcs",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+**After:**
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+### A list no standard declares any more drops out of the lock and stays in the file
+
+Fixture: [`tests/Scenario/Engine/ListContributions/fixtures/a-list-no-standard-declares-stays`](../../tests/Scenario/Engine/ListContributions/fixtures/a-list-no-standard-declares-stays)
+
+`composer.json` **stays byte-identical**:
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-run-tests"
+        ],
+        "app-phpcs": [
+            "phpcs -p -s"
+        ]
+    }
+}
+```
+
+**Before** — `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-run-tests"
+            ],
+            "scripts.app-phpcs": [
+                "phpcs -p -s"
+            ]
+        }
+    }
+}
+```
+
+**After:**
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+### An absent manifest records nothing, so no lock is created
+
+Fixture: [`tests/Scenario/Engine/ListContributions/fixtures/an-absent-manifest-creates-no-lock`](../../tests/Scenario/Engine/ListContributions/fixtures/an-absent-manifest-creates-no-lock)
+
+`README.md` **stays byte-identical**:
+
+```
+# acme/project
+```
+
+Declared as:
+
+```php
+return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
+    public function __construct()
+    {
+        $this->addRule(new ManagedBlock(
+            target: FileTarget::fromString('.gitignore'),
+            label: Label::fromString('acme'),
+            content: '/vendor/',
+        ));
+    }
+});
+```
+
+…which reports as: *Places the managed "acme" block in .gitignore.*
+
+### A config without list-contributing rules creates no lock
+
+Fixture: [`tests/Scenario/Engine/ListContributions/fixtures/no-contributing-rule-creates-no-lock`](../../tests/Scenario/Engine/ListContributions/fixtures/no-contributing-rule-creates-no-lock)
+
+**Before** — `.gitignore`:
+
+```
+/.idea/
+```
+
+**After:**
+
+```
+/.idea/
+
+# >>> acme - managed >>>
+/vendor/
+# <<< acme <<<
 ```
 
 ## Target Resolution

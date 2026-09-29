@@ -19,6 +19,8 @@ vendor/bin/standards-sync sync --check    # report drift, exit non-zero, write n
 
 Every sync writes plain files into the working tree, so the result is reviewed like any other diff. `sync --check` in CI turns the standard from advisory into enforced: a repo that drifts fails its own pipeline.
 
+Where a standard contributes to a list — a composer script's commands — the sync also writes `standards-sync.lock` beside the config, recording what the standards declared; the consumer commits it with the rest.
+
 ## Authoring a standard
 
 An org package requires `ortho-code/standards-sync`, extends `Standard`, declares rules per file, and ships shared content under `templates/`, which rules reach through the self-locating `Package`. The rule library covers managed marker blocks (any comment-bearing file: `.editorconfig`, `.gitignore`, CI workflows) plus per-tool families for PHPStan, Rector, ECS, Psalm, composer.json, Deptrac, Renovate and PHPUnit. The full guide: [authoring-org-packages.md](docs/authoring-org-packages.md).

@@ -8,6 +8,8 @@ use OrthoCode\StandardsSync\Rules\General\ManagedBlock\Label;
 use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 use OrthoCode\StandardsSync\Core\Config\SyncConfig;
 use OrthoCode\StandardsSync\Core\Engine\Engine;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Lock\SyncLock;
 use OrthoCode\StandardsSync\Core\Plan\Change;
 use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
 use OrthoCode\StandardsSync\Core\Rule\FileTarget;
@@ -284,6 +286,77 @@ final class EngineTest extends TestCase
             'Runs "@app-sync-check", "@app-lint" as the composer script "app-checks".',
             $manifest->applications()[0]->rule()->description(),
         );
+    }
+
+    public function testTheLockIsPlannedAfterTheRootsFilesAndRecordsWhatWasDeclared(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/composer.json' => FileContent::fromString('{}'),
+        ]);
+
+        $changes = new Engine($filesystem)->plan($this->scriptConfig())->changes();
+
+        self::assertSame(['/a/composer.json', '/a/standards-sync.lock'], array_map(static fn(Change $change): string => $change->path()->value(), $changes));
+        self::assertSame(ChangeKind::Create, $changes[1]->kind());
+        self::assertSame([], $changes[1]->applications());
+        self::assertSame(
+            SyncLock::create()->withEntries(Path::fromString('composer.json'), 'scripts.app-checks', ['@app-sync-check'])->toJson(),
+            $changes[1]->desired(),
+        );
+    }
+
+    public function testAMissingLockIsDriftEvenWhenEveryFileIsInSync(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/composer.json' => FileContent::fromString('{"scripts": {"app-checks": ["@app-sync-check"]}}'),
+        ]);
+
+        $plan = new Engine($filesystem)->plan($this->scriptConfig());
+
+        self::assertCount(1, $plan->drift());
+        self::assertSame('/a/standards-sync.lock', $plan->drift()[0]->path()->value());
+    }
+
+    public function testApplyingWritesTheLockSoTheNextPlanIsInSync(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/composer.json' => FileContent::fromString('{}'),
+        ]);
+        $engine = new Engine($filesystem);
+
+        $engine->apply($engine->plan($this->scriptConfig()));
+
+        self::assertContains('/a/standards-sync.lock', $filesystem->written());
+        self::assertFalse($engine->plan($this->scriptConfig())->hasDrift());
+    }
+
+    public function testAnAbsentFileKeepsWhatTheLockRecordedForIt(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/standards-sync.lock' => SyncLock::create()->withEntries(Path::fromString('composer.json'), 'scripts.app-checks', ['@app-sync-check'])->toJson(),
+        ]);
+
+        $plan = new Engine($filesystem)->plan($this->scriptConfig());
+
+        self::assertFalse($plan->hasDrift());
+        self::assertCount(1, $plan->abstentions());
+    }
+
+    public function testARootWithoutContributionsGetsNoLock(): void
+    {
+        $plan = new Engine(new InMemoryFilesystem())->plan($this->config());
+
+        self::assertSame(
+            ['/a/.editorconfig', '/b/.editorconfig'],
+            array_map(static fn(Change $change): string => $change->path()->value(), $plan->changes()),
+        );
+    }
+
+    private function scriptConfig(): SyncConfig
+    {
+        return SyncConfig::create()
+            ->withRoots(['/a'])
+            ->withRuleSet($this->ruleSetWith(new ComposerScript(name: 'app-checks', commands: ['@app-sync-check'])));
     }
 
     private function config(): SyncConfig

@@ -33,9 +33,9 @@ final readonly class TargetResolver
             }
 
             if ($this->isDistVariant($candidate)) {
-                $dist[] = new ResolvedTarget($path, $current);
+                $dist[] = new ResolvedTarget($path, $candidate, $current);
             } else {
-                $nonDist[] = new ResolvedTarget($path, $current);
+                $nonDist[] = new ResolvedTarget($path, $candidate, $current);
             }
         }
 
@@ -48,7 +48,7 @@ final readonly class TargetResolver
         }
 
         if ($dist !== [] && $nonDist !== []) {
-            return new ResolvedTarget($dist[0]->path(), $dist[0]->current(), shadowedBy: $nonDist[0]->path());
+            return new ResolvedTarget($dist[0]->path(), $dist[0]->candidate(), $dist[0]->current(), shadowedBy: $nonDist[0]->path());
         }
 
         if ($dist !== []) {
@@ -59,7 +59,7 @@ final readonly class TargetResolver
             return $nonDist[0];
         }
 
-        return new ResolvedTarget($root->join($target->candidates()[0]), null);
+        return new ResolvedTarget($root->join($target->candidates()[0]), $target->candidates()[0], null);
     }
 
     /** A file name follows the dist convention when its final path component carries a dotted segment exactly "dist"; directories named dist do not count. */

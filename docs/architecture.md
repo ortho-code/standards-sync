@@ -4,18 +4,19 @@
 standards-sync.php (returns SyncConfig)
   → RuleSet::rules(): Rule[]              declaration order; composition = hierarchy
   → Engine::plan: merge contributions to one list (ContributesToList) into one rule; then
-    per root, resolve every rule's FileTarget (TargetResolver: a lone existing
+    per root, read standards-sync.lock, resolve every rule's FileTarget (TargetResolver: a lone existing
     candidate wins; a dist file beats a shadowing non-dist; same-side ambiguity refuses),
     group rules by resolved file, fold apply() in declaration order
   → Change (per FILE: kind from the fold's endpoints, plus per-rule attribution)
     or Abstention (the file is absent and no rule wanted it: reported, never written)
+    + the root's lock as one more Change, recording what its contributions declared
   → Plan{ Change[], Abstention[] }
   → Engine::apply(Plan)   the ONLY writer      |     --check → report Plan.drift(), exit 1 on drift
 ```
 
 Hexagonal-light (not full DDD; this is a transform pipeline, not a domain) — one I/O port, `Filesystem`, and the layers `deptrac` enforces:
 
-- **`Core/`** — the pure pipeline above: the `Rule` contract, the engine, ports (the `Filesystem` interface), value objects, and the text primitives (`Core/Text/`: `Lines` as the LF-convention seam, `Indent`). Imports no framework, only itself; `deptrac` forbids any `Core → Vendor` edge.
+- **`Core/`** — the pure pipeline above: the `Rule` contract, the engine, ports (the `Filesystem` interface), value objects, the lock (`Core/Lock/SyncLock`, the one file the engine owns end to end, so it renders it with `json_encode` rather than through `Formats/`), and the text primitives (`Core/Text/`: `Lines` as the LF-convention seam, `Indent`). Imports no framework, only itself; `deptrac` forbids any `Core → Vendor` edge.
 - **`Formats/`** — format-editing machinery shared across rule families (`Formats/Neon/`: `NeonScalarWriter`; `Formats/Php/`: `FluentChainWriter`; `Formats/Xml/`: `XmlElementWriter`; `Formats/Json/`: `JsonObjectWriter`; `Formats/Yaml/`: `YamlListWriter`). Depends on `Core` only; `deptrac` forbids `Core → Formats`, so the engine stays format-blind. Machinery used by a single family stays with that family (the block markers). A format's conventions live here too (`FluentChainWriter::INDENT`), and so do its canonical renderings with the validation that protects them (`DirAnchoredEntry` refusing expression text at construction); `Core/Text/` stays character-level.
 - **`Rules/`** — the shipped rule library (Rector's engine-vs-rules split): tool directories (`Rules/PhpStan/`, `Rules/Rector/`) plus `Rules/General/` for tool-agnostic mechanisms, each holding one folder per rule with the rule class and its supporting classes (`Rules/PhpStan/MinLevel/`: the rule + `PhpStanLevel`; `Rules/General/ManagedBlock/`: `ManagedBlock` + the marker machinery), and shared per-tool knowledge at the tool root (`PhpStanConfigFile`, `RectorConfigFile`). Depends on `Core` and `Formats`; `deptrac` forbids `Core → Rules`, so the engine provably never references a concrete rule. One scoped exception: `src/Rules/Composer` is its own `ComposerRules` layer, additionally allowed `Vendor`, because composer's own semver library is the authority on version constraints and composer is not an optional tool — every consumer installed this engine with it. The general `Rules` layer excludes that directory, so every other family stays provably vendor-free (see [composer-family.md](history/composer-family.md)).
 - **`Authoring/`** — config-build-time support for org packages, outside the pipeline: `Package` (the org package as installed in the consumer — locates itself through composer's install record, reads distributed `templates/` content, renders consumer-root-relative references) and `Standard` (the base rule set whose `enforce()` receives the located package). Depends on `Core` and vendor code (`Composer\InstalledVersions`, symfony path utilities).
@@ -29,7 +30,7 @@ Extension seams, open/closed:
 - **Rule** (`target(): FileTarget`, `apply(?string): ?string`, `description(): string`) — the unifying primitive; new rule types extend the set under `Rules/` without touching the pipeline.
   `ManagedBlock` (marker blocks), the PHPStan family (included ruleset, level floor, pins), and the Rector and ECS base sets ship today (see [rule-model.md](history/rule-model.md)).
 - **ExplainsDrift** — opt-in seam for rules whose drift is not self-evident from the diff; the drift report calls it per drifting rule.
-- **ContributesToList** — opt-in seam for rules contributing entries to a list; the engine merges contributions to one list through the rule's own `withMerged()` before the fold, so a standard declared beside another adds to what that one declares. `ComposerScript` is its first user.
+- **ContributesToList** — opt-in seam for rules contributing entries to a list; the engine merges contributions to one list through the rule's own `withMerged()` before the fold, so a standard declared beside another adds to what that one declares, and records their `entries()` in the root's lock. `ComposerScript` is its first user.
 
 ## Invariants (easy to violate — hold these)
 
