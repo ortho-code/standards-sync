@@ -125,6 +125,147 @@ final class FluentChainWriterTest extends TestCase
         );
     }
 
+    public function testASupersededEntryIsReplacedInPlaceKeepingItsLine(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'PHP'
+                    return RectorConfig::configure()
+                        ->withSets([
+                            'shared/a.php', // the org set
+                            'local.php',
+                        ]);
+                    PHP,
+            ),
+            FluentChainWriter::ensureArrayEntry(
+                FileContent::fromString(
+                    <<<'PHP'
+                        return RectorConfig::configure()
+                            ->withSets([
+                                'a.php', // the org set
+                                'local.php',
+                            ]);
+                        PHP,
+                ),
+                'withSets',
+                '\'shared/a.php\'',
+                ['\'a.php\''],
+            ),
+        );
+    }
+
+    public function testAPresentEntryIsKeptWhateverItSupersedes(): void
+    {
+        $content = FileContent::fromString(
+            <<<'PHP'
+                return RectorConfig::configure()
+                    ->withSets([
+                        'a.php',
+                        'shared/a.php',
+                    ]);
+                PHP,
+        );
+
+        self::assertSame($content, FluentChainWriter::ensureArrayEntry($content, 'withSets', '\'shared/a.php\'', ['\'a.php\'']));
+    }
+
+    public function testAnEntrySupersedingNothingPresentIsInserted(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'PHP'
+                    return RectorConfig::configure()
+                        ->withSets([
+                            'local.php',
+                            'shared/a.php',
+                        ]);
+                    PHP,
+            ),
+            FluentChainWriter::ensureArrayEntry(
+                FileContent::fromString(
+                    <<<'PHP'
+                        return RectorConfig::configure()
+                            ->withSets([
+                                'local.php',
+                            ]);
+                        PHP,
+                ),
+                'withSets',
+                '\'shared/a.php\'',
+                ['\'a.php\''],
+            ),
+        );
+    }
+
+    public function testRemovesEveryLineHoldingOneOfTheEntries(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'PHP'
+                    return RectorConfig::configure()
+                        ->withSets([
+                            // the project set
+                            'local.php',
+                        ])
+                        ->withRules([
+                            'a.php',
+                        ]);
+                    PHP,
+            ),
+            FluentChainWriter::removeArrayEntries(
+                FileContent::fromString(
+                    <<<'PHP'
+                        return RectorConfig::configure()
+                            ->withSets([
+                                'a.php',
+                                // the project set
+                                'local.php',
+                                'b.php' # again
+                            ])
+                            ->withRules([
+                                'a.php',
+                            ]);
+                        PHP,
+                ),
+                'withSets',
+                ['\'a.php\'', '\'b.php\''],
+            ),
+        );
+    }
+
+    public function testRemovingAbsentEntriesLeavesTheContentUntouched(): void
+    {
+        $content = FileContent::fromString(
+            <<<'PHP'
+                return RectorConfig::configure()
+                    ->withSets([
+                        'local.php',
+                    ]);
+                PHP,
+        );
+
+        self::assertSame($content, FluentChainWriter::removeArrayEntries($content, 'withSets', ['\'a.php\'']));
+        self::assertSame($content, FluentChainWriter::removeArrayEntries($content, 'withRules', ['\'local.php\'']));
+    }
+
+    public function testReadsTheArrayEntriesAsWritten(): void
+    {
+        $content = FileContent::fromString(
+            <<<'PHP'
+                return RectorConfig::configure()
+                    ->withSets([
+                        __DIR__ . '/a.php', // the org set
+
+                        // the project set
+                        'local.php',
+                    ]);
+                PHP,
+        );
+
+        self::assertSame(['__DIR__ . \'/a.php\'', '\'local.php\''], FluentChainWriter::readArrayEntries($content, 'withSets'));
+        self::assertNull(FluentChainWriter::readArrayEntries($content, 'withRules'));
+    }
+
     public function testBracketsInsideStringsDoNotDerailTheScan(): void
     {
         $content = FileContent::fromString(

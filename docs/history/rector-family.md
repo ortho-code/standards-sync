@@ -42,3 +42,10 @@ Raised during the ECS build and applied to both fluent base-set rules (`RectorBa
 - Narrowing, accepted: the rule can only manage `__DIR__ . '/<relative path>'` entries; a `SetList::…` constant in the consumer config is inexpressible. That matches the artifact — registering the org's shipped set file is the rule's whole job, and tool-set defaults belong in the imported set file itself (the org-author doctrine above), where org packages already declare them.
 - Unchanged: the already-present check matches the (now rendered) entry text verbatim with no quote-stripping — two spellings of one path are different expressions; a deviating hand-written spelling reads as absent and the canonical entry is added beside it, as before, now less likely since the org side no longer chooses a spelling.
 
+## Changed 2026-09-29 — the base set contributes to `withSets()`
+
+`RectorBaseSet` implements `ContributesToList` with the list key `withSets`, per [the cross-family decision](rule-model.md#decided-2026-09-29--the-import-tier-rules-contribute-to-their-lists-and-a-replacement-takes-its-predecessors-place).
+The lock records the rendered entry (`__DIR__ . '/…'`), so a moved set file is retracted and its successor takes its line, trailing comma and comment included; a set nobody declares any more is removed; declarations merge, a set declared twice counting once.
+`FluentChainWriter` gained `readArrayEntries()` and `removeArrayEntries()`, and `ensureArrayEntry()` takes the entries an entry replaces; its array scan is shared by all three.
+A spelling the lock never recorded is still the project's: a hand-written variant of the entry stays beside the canonical one, as before.
+

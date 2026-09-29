@@ -4,28 +4,36 @@ declare(strict_types=1);
 
 namespace OrthoCode\StandardsSync\Rules\Ecs\BaseSet;
 
+use OrthoCode\StandardsSync\Core\Rule\ContributesToList;
 use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
 use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
 use OrthoCode\StandardsSync\Formats\Php\DirAnchoredEntry;
 use OrthoCode\StandardsSync\Formats\Php\FluentChainWriter;
 use OrthoCode\StandardsSync\Rules\Ecs\EcsConfigFile;
+use LogicException;
 
 /**
  * Ensures the ECS config registers a given set file in withSets(), as a targeted edit that leaves the rest of the config untouched.
  * The set is a path relative to the consumer project root; the config entry (`__DIR__ . '/…'`) is rendered from it, so the org author passes data, not PHP.
  * The rendered entry is matched verbatim — no quote-stripping, because two spellings of one path are different expressions; a deviating hand-written spelling reads as absent.
- * A config without withSets() gains the call at the end of the chain; a project without an ECS config gets one created, holding just the import.
+ * A missing entry takes the place of one no standard declares any more, and goes after the last entry otherwise; a config without withSets() gains the call at the end of the chain; a project without an ECS config gets one created, holding just the imports.
+ * Declarations of base sets combine in declaration order, a set declared twice counting once; a set registered at an earlier sync and declared by nobody now is retracted, and every other set is the project's and stays.
  */
-final readonly class EcsBaseSet implements Rule, ExplainsDrift
+final readonly class EcsBaseSet implements Rule, ContributesToList, ExplainsDrift
 {
     private const string METHOD = 'withSets';
 
-    private DirAnchoredEntry $entry;
+    /** @var non-empty-list<DirAnchoredEntry> */
+    private array $sets;
+
+    /** @var list<string> */
+    private array $retired;
 
     public function __construct(string $set)
     {
-        $this->entry = DirAnchoredEntry::fromRelativeString($set);
+        $this->sets = [DirAnchoredEntry::fromRelativeString($set)];
+        $this->retired = [];
     }
 
     #[\Override]
@@ -35,31 +43,96 @@ final readonly class EcsBaseSet implements Rule, ExplainsDrift
     }
 
     #[\Override]
+    public function listKey(): string
+    {
+        return self::METHOD;
+    }
+
+    #[\Override]
+    public function entries(): array
+    {
+        return array_map(static fn(DirAnchoredEntry $set): string => $set->value(), $this->sets);
+    }
+
+    #[\Override]
+    public function withMerged(ContributesToList $later): static
+    {
+        if (!$later instanceof self) {
+            throw new LogicException('Only declarations of ECS base sets merge into one.');
+        }
+
+        $sets = $this->sets;
+        foreach ($later->sets as $set) {
+            if (!array_any($sets, static fn(DirAnchoredEntry $declared): bool => $declared->value() === $set->value())) {
+                $sets[] = $set;
+            }
+        }
+
+        /** @var static $merged psalm types clone-with as a plain object */
+        $merged = clone($this, [
+            'sets' => $sets,
+        ]);
+
+        return $merged;
+    }
+
+    #[\Override]
+    public function withRetired(array $retired): static
+    {
+        /** @var static $retiring psalm types clone-with as a plain object */
+        $retiring = clone($this, [
+            'retired' => $retired,
+        ]);
+
+        return $retiring;
+    }
+
+    #[\Override]
     public function apply(?string $content): ?string
     {
         // A project without an ECS config gets one: enforcing the standard is the point.
-        if ($content === null) {
-            return EcsConfigFile::createConfig(FluentChainWriter::createArrayCall(self::METHOD, $this->entry->value()));
-        }
+        $content ??= EcsConfigFile::createConfig(FluentChainWriter::createArrayCall(self::METHOD, $this->sets[0]->value()));
 
         EcsConfigFile::assertFluentChain($content);
+        foreach ($this->entries() as $entry) {
+            $content = FluentChainWriter::ensureArrayEntry($content, self::METHOD, $entry, replacing: $this->retired);
+        }
 
-        return FluentChainWriter::ensureArrayEntry($content, self::METHOD, $this->entry->value());
+        return FluentChainWriter::removeArrayEntries($content, self::METHOD, $this->retired);
     }
 
     #[\Override]
     public function description(): string
     {
-        return sprintf('Ensures the ECS config registers %s in withSets().', $this->entry->path()->value());
+        return sprintf('Ensures the ECS config registers %s in withSets().', self::paths($this->sets));
     }
 
     #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {
-            return sprintf('There is no ECS config yet; one is created registering %s.', $this->entry->path()->value());
+            return sprintf('There is no ECS config yet; one is created registering %s.', self::paths($this->sets));
         }
 
-        return sprintf('The ECS config does not register %s in withSets().', $this->entry->path()->value());
+        $registered = FluentChainWriter::readArrayEntries($content, self::METHOD) ?? [];
+
+        $sentences = [];
+        $missing = array_values(array_filter($this->sets, static fn(DirAnchoredEntry $set): bool => !in_array($set->value(), $registered, true)));
+        if ($missing !== []) {
+            $sentences[] = sprintf('The ECS config does not register %s in withSets().', self::paths($missing));
+        }
+
+        $retracted = array_values(array_intersect($this->retired, $registered));
+        if ($retracted !== []) {
+            $sentences[] = sprintf('It stops registering %s, which no standard declares any more.', implode(', ', $retracted));
+        }
+
+        return $sentences === [] ? 'The ECS config\'s withSets() differs from what the standards declare.' : implode(' ', $sentences);
+    }
+
+    /** @param list<DirAnchoredEntry> $sets */
+    private static function paths(array $sets): string
+    {
+        return implode(', ', array_map(static fn(DirAnchoredEntry $set): string => $set->path()->value(), $sets));
     }
 }

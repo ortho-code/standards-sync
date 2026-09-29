@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Tests\OrthoCode\StandardsSync\Unit\Rules\Ecs\BaseSet;
 
 use OrthoCode\StandardsSync\Rules\Ecs\BaseSet\EcsBaseSet;
+use OrthoCode\StandardsSync\Rules\Rector\BaseSet\RectorBaseSet;
 use OrthoCode\StandardsSync\Testing\FileContent;
 use InvalidArgumentException;
+use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -277,6 +279,73 @@ final class EcsBaseSetTest extends TestCase
         self::assertSame('Ensures the ECS config registers vendor/acme/standards/config/ecs.php in withSets().', $rule->description());
         self::assertSame('There is no ECS config yet; one is created registering vendor/acme/standards/config/ecs.php.', $rule->explain(null));
         self::assertSame('The ECS config does not register vendor/acme/standards/config/ecs.php in withSets().', $rule->explain(FileContent::fromString('return ECSConfig::configure();')));
+    }
+
+    public function testMergedDeclarationsRegisterEverySetOnceInDeclarationOrder(): void
+    {
+        $rule = $this->rule()
+            ->withMerged(new EcsBaseSet(set: 'vendor/acme/framework/config/ecs.php'))
+            ->withMerged($this->rule());
+
+        self::assertSame(['__DIR__ . \'/vendor/acme/standards/config/ecs.php\'', '__DIR__ . \'/vendor/acme/framework/config/ecs.php\''], $rule->entries());
+        self::assertSame('Ensures the ECS config registers vendor/acme/standards/config/ecs.php, vendor/acme/framework/config/ecs.php in withSets().', $rule->description());
+        self::assertSame(
+            FileContent::fromString(
+                <<<'PHP'
+                    <?php
+
+                    declare(strict_types=1);
+
+                    use Symplify\EasyCodingStandard\Config\ECSConfig;
+
+                    return ECSConfig::configure()
+                        ->withSets([
+                            __DIR__ . '/vendor/acme/standards/config/ecs.php',
+                            __DIR__ . '/vendor/acme/framework/config/ecs.php',
+                        ]);
+                    PHP,
+            ),
+            $rule->apply(null),
+        );
+    }
+
+    public function testRefusesToMergeAnotherRule(): void
+    {
+        $this->expectException(LogicException::class);
+
+        $this->rule()->withMerged(new RectorBaseSet(set: 'vendor/acme/standards/config/rector.php'));
+    }
+
+    public function testAMissingSetTakesTheFirstRetiredSetsPlaceAndTheOthersAreRetracted(): void
+    {
+        $rule = $this->rule()->withRetired(['__DIR__ . \'/vendor/acme/standards/ecs.php\'', '__DIR__ . \'/vendor/acme/standards/strict.php\'']);
+        $current = FileContent::fromString(
+            <<<'PHP'
+                return ECSConfig::configure()
+                    ->withSets([
+                        __DIR__ . '/vendor/acme/standards/ecs.php', // the org set
+                        __DIR__ . '/ecs-local.php',
+                        __DIR__ . '/vendor/acme/standards/strict.php',
+                    ]);
+                PHP,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'PHP'
+                    return ECSConfig::configure()
+                        ->withSets([
+                            __DIR__ . '/vendor/acme/standards/config/ecs.php', // the org set
+                            __DIR__ . '/ecs-local.php',
+                        ]);
+                    PHP,
+            ),
+            $rule->apply($current),
+        );
+        self::assertSame(
+            'The ECS config does not register vendor/acme/standards/config/ecs.php in withSets(). It stops registering __DIR__ . \'/vendor/acme/standards/ecs.php\', __DIR__ . \'/vendor/acme/standards/strict.php\', which no standard declares any more.',
+            $rule->explain($current),
+        );
     }
 
     private function rule(): EcsBaseSet

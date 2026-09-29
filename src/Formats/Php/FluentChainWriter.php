@@ -21,48 +21,78 @@ final readonly class FluentChainWriter
     private const string LINE_INDENT = '/^([ \t]*)/';
 
     /**
-     * Ensures the block-form array argument of ->method([...]) holds the entry, creating the whole call when absent.
-     * Entries are matched on trimmed text with the trailing comma stripped; a single-line array is refused because managing it would need a rewrite of the caller's formatting.
+     * The entries of the block-form array argument of ->method([...]) as written, or null when the chain has no such call.
+     *
+     * @return list<string>|null
      */
-    public static function ensureArrayEntry(string $content, string $method, string $entry): string
+    public static function readArrayEntries(string $content, string $method): ?array
     {
-        $call = self::findCall($content, $method);
-        if ($call === null) {
+        $array = self::arrayLines($content, $method);
+        if ($array === null) {
+            return null;
+        }
+
+        [$openLine, $closeLine] = $array;
+
+        return array_values(array_filter(self::entries(Lines::split($content), $openLine, $closeLine), static fn(string $text): bool => $text !== ''));
+    }
+
+    /**
+     * Ensures the block-form array argument of ->method([...]) holds the entry, creating the whole call when absent.
+     * An absent entry takes the place of the first entry of $replacing the array holds, keeping that line's indentation, trailing comma and comment, and is otherwise inserted after the last entry.
+     * Entries are matched on trimmed text with the trailing comma stripped; a single-line array is refused because managing it would need a rewrite of the caller's formatting.
+     *
+     * @param list<string> $replacing entries the entry supersedes, matched as the entry is
+     */
+    public static function ensureArrayEntry(string $content, string $method, string $entry, array $replacing = []): string
+    {
+        $array = self::arrayLines($content, $method);
+        if ($array === null) {
             return self::appendArrayCall($content, $method, $entry);
         }
 
-        [$openAt, $closeAt] = $call;
-        $argument = trim(substr($content, $openAt + 1, $closeAt - $openAt - 1));
-        if (!str_starts_with($argument, '[')) {
-            throw new RuntimeException(sprintf('The %s() argument is not an array; the entry cannot be managed.', $method));
-        }
-
-        $bracketAt = $openAt + (int) strpos(substr($content, $openAt), '[');
-        $closeBracketAt = self::matchingClose($content, $bracketAt, $method);
-        if (!str_contains(substr($content, $bracketAt, $closeBracketAt - $bracketAt), Lines::LINE_BREAK)) {
-            throw new RuntimeException(sprintf('The %s() array is on a single line; convert it to one entry per line so the entry can be managed.', $method));
-        }
-
+        [$openLine, $closeLine] = $array;
         $lines = Lines::split($content);
-        $openLine = self::lineIndexAt($content, $bracketAt);
-        $closeLine = self::lineIndexAt($content, $closeBracketAt);
-
-        $entryIndent = null;
-        for ($index = $openLine + 1; $index < $closeLine; $index++) {
-            if (trim($lines[$index]) === '') {
-                continue;
-            }
-            if (self::entryText($lines[$index]) === $entry) {
-                return $content;
-            }
-            preg_match(self::LINE_INDENT, $lines[$index], $match);
-            $entryIndent ??= $match[1];
+        $entries = self::entries($lines, $openLine, $closeLine);
+        if (in_array($entry, $entries, true)) {
+            return $content;
         }
 
-        preg_match(self::LINE_INDENT, $lines[$closeLine], $match);
-        array_splice($lines, $closeLine, 0, [($entryIndent ?? $match[1] . self::unit($lines)) . $entry . ',']);
+        $replacedIndex = array_find_key($entries, static fn(string $text): bool => in_array($text, $replacing, true));
+        if ($replacedIndex !== null) {
+            $lines[$replacedIndex] = self::withEntry($lines[$replacedIndex], $entries[$replacedIndex], $entry);
+
+            return Lines::join($lines);
+        }
+
+        $firstIndex = array_key_first($entries);
+        $indent = $firstIndex === null ? self::indentOf($lines[$closeLine]) . self::unit($lines) : self::indentOf($lines[$firstIndex]);
+        array_splice($lines, $closeLine, 0, [$indent . $entry . ',']);
 
         return Lines::join($lines);
+    }
+
+    /**
+     * Removes every line of the block-form array argument of ->method([...]) holding one of the entries, leaving everything else byte-identical; an absent call or entry leaves the content untouched.
+     * The array forms ensureArrayEntry() refuses are refused here too.
+     *
+     * @param list<string> $entries
+     */
+    public static function removeArrayEntries(string $content, string $method, array $entries): string
+    {
+        $array = self::arrayLines($content, $method);
+        if ($array === null) {
+            return $content;
+        }
+
+        [$openLine, $closeLine] = $array;
+        $lines = Lines::split($content);
+        $removed = array_filter(self::entries($lines, $openLine, $closeLine), static fn(string $text): bool => in_array($text, $entries, true));
+        if ($removed === []) {
+            return $content;
+        }
+
+        return Lines::join(array_values(array_diff_key($lines, $removed)));
     }
 
     /**
@@ -141,6 +171,67 @@ final readonly class FluentChainWriter
     private static function unit(array $lines): string
     {
         return Indent::detect($lines) ?? self::INDENT;
+    }
+
+    /**
+     * The line indices of the array argument's opening and closing brackets, or null when the chain has no ->method(...) call.
+     * A non-array argument and a single-line array are refused.
+     *
+     * @return array{int, int}|null
+     */
+    private static function arrayLines(string $content, string $method): ?array
+    {
+        $call = self::findCall($content, $method);
+        if ($call === null) {
+            return null;
+        }
+
+        [$openAt, $closeAt] = $call;
+        $argument = trim(substr($content, $openAt + 1, $closeAt - $openAt - 1));
+        if (!str_starts_with($argument, '[')) {
+            throw new RuntimeException(sprintf('The %s() argument is not an array; the entry cannot be managed.', $method));
+        }
+
+        $bracketAt = $openAt + (int) strpos(substr($content, $openAt), '[');
+        $closeBracketAt = self::matchingClose($content, $bracketAt, $method);
+        if (!str_contains(substr($content, $bracketAt, $closeBracketAt - $bracketAt), Lines::LINE_BREAK)) {
+            throw new RuntimeException(sprintf('The %s() array is on a single line; convert it to one entry per line so the entry can be managed.', $method));
+        }
+
+        return [self::lineIndexAt($content, $bracketAt), self::lineIndexAt($content, $closeBracketAt)];
+    }
+
+    /**
+     * Each non-blank line between the array's brackets mapped by index to its entry text; a comment-only line reads as an empty entry.
+     *
+     * @param list<string> $lines
+     * @return array<int, string>
+     */
+    private static function entries(array $lines, int $openLine, int $closeLine): array
+    {
+        $entries = [];
+        for ($index = $openLine + 1; $index < $closeLine; $index++) {
+            if (trim($lines[$index]) !== '') {
+                $entries[$index] = self::entryText($lines[$index]);
+            }
+        }
+
+        return $entries;
+    }
+
+    /** The array line holding another entry: its indentation, trailing comma and comment kept, since they belong to the slot rather than to the entry. */
+    private static function withEntry(string $line, string $current, string $entry): string
+    {
+        $indent = self::indentOf($line);
+
+        return $indent . $entry . substr($line, strlen($indent) + strlen($current));
+    }
+
+    private static function indentOf(string $line): string
+    {
+        preg_match(self::LINE_INDENT, $line, $match);
+
+        return $match[1] ?? '';
     }
 
     /**

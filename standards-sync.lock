@@ -41,9 +41,19 @@
                 "standards-sync sync --check"
             ]
         },
+        "ecs.php": {
+            "withSets": [
+                "__DIR__ . '/vendor/ortho-code/coding-standards/templates/package/ecs.php'"
+            ]
+        },
         "phpstan.neon": {
             "includes": [
                 "vendor/ortho-code/coding-standards/templates/package/phpstan.neon"
+            ]
+        },
+        "rector.php": {
+            "withSets": [
+                "__DIR__ . '/vendor/ortho-code/coding-standards/templates/package/rector.php'"
             ]
         }
     }

@@ -48,3 +48,22 @@ return ECSConfig::configure()
         __DIR__ . '/vendor/acme/platform-standards/config/ecs.php',
     ]);
 ```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "ecs.php": {
+            "withSets": [
+                "__DIR__ . '/vendor/acme/standards/config/ecs.php'",
+                "__DIR__ . '/vendor/acme/platform-standards/config/ecs.php'"
+            ]
+        }
+    }
+}
+```
