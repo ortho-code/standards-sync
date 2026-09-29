@@ -411,6 +411,7 @@ Dropping a project's trailing comment with the replaced value — the comment an
 `FluentChainWriter` matched brackets with awareness of quoted strings but not of comments, so an apostrophe in a comment inside the scanned call (`// the project's own`) opened a string that never closed and the writer refused the config, and a bracket in a comment counted as code.
 It now skips `//`, `#` and `/* */` comments, leaving `#[` as code, since it has opened an attribute since PHP 8.0; a block comment that never closes is refused.
 Found while building the `withSets()` contributions, and reproduced on the code before them.
+*(Extended the same date: the call search ignored comments and strings too, and that was a corruption rather than a refusal — with a commented-out `->withSets([` above the real call, a sync wrote the new entry as live code between the comment lines, breaking the config. The call is now looked for in code only, through the same string-and-comment skipping, so the entry lands in the real call and a commented-out call alone counts as absent.)*
 
 ## Open choices — settled at R0 (2026-07-15)
 

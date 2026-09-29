@@ -352,10 +352,93 @@ final class FluentChainWriterTest extends TestCase
         );
     }
 
+    public function testACommentedOutCallIsNotTheCall(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'PHP'
+                    return RectorConfig::configure()
+                        // ->withSets([
+                        //     'old.php',
+                        // ])
+                        /* ->withSets(['older.php']) */
+                        ->withSets([
+                            'local.php',
+                            'a.php',
+                        ]);
+                    PHP,
+            ),
+            FluentChainWriter::ensureArrayEntry(
+                FileContent::fromString(
+                    <<<'PHP'
+                        return RectorConfig::configure()
+                            // ->withSets([
+                            //     'old.php',
+                            // ])
+                            /* ->withSets(['older.php']) */
+                            ->withSets([
+                                'local.php',
+                            ]);
+                        PHP,
+                ),
+                'withSets',
+                '\'a.php\'',
+            ),
+        );
+    }
+
+    public function testACommentedOutCallAloneCountsAsAbsent(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'PHP'
+                    return RectorConfig::configure()
+                        // ->withSets(['old.php'])
+                        ->withPaths([
+                            __DIR__ . '/src',
+                        ])
+                        ->withSets([
+                            'a.php',
+                        ]);
+                    PHP,
+            ),
+            FluentChainWriter::ensureArrayEntry(
+                FileContent::fromString(
+                    <<<'PHP'
+                        return RectorConfig::configure()
+                            // ->withSets(['old.php'])
+                            ->withPaths([
+                                __DIR__ . '/src',
+                            ]);
+                        PHP,
+                ),
+                'withSets',
+                '\'a.php\'',
+            ),
+        );
+    }
+
+    public function testACallSpelledInsideAStringIsNotTheCall(): void
+    {
+        $content = FileContent::fromString(
+            <<<'PHP'
+                return RectorConfig::configure()
+                    ->withRules([
+                        '->withSets([',
+                    ])
+                    ->withSets([
+                        'a.php',
+                    ]);
+                PHP,
+        );
+
+        self::assertSame(['\'a.php\''], FluentChainWriter::readArrayEntries($content, 'withSets'));
+    }
+
     public function testRefusesABlockCommentThatNeverCloses(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A comment inside the withSets() call never closes');
+        $this->expectExceptionMessage('A block comment in the config never closes');
 
         FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets([ /* open', 'withSets', '\'a.php\'');
     }

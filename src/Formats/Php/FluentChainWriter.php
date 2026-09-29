@@ -11,7 +11,7 @@ use RuntimeException;
 /**
  * Edits a fluent builder chain (`return Builder::configure()->…->…;`) in PHP config text.
  * Targeted line edits only — everything around the touched call stays byte-identical; no parse, no reserialization.
- * Brackets are matched with awareness of quoted strings and comments, so neither an entry like `'/a(b)'` nor an apostrophe or bracket in a comment can derail the scan.
+ * Brackets are matched with awareness of quoted strings and comments, so neither an entry like `'/a(b)'` nor an apostrophe or bracket in a comment can derail the scan; a call is looked for in code only, so a commented-out one is not it.
  */
 final readonly class FluentChainWriter
 {
@@ -240,22 +240,24 @@ final readonly class FluentChainWriter
     }
 
     /**
-     * The extent of the first ->method(...) call: the offsets of its opening parenthesis and the matching close.
+     * The extent of the first ->method(...) call in code, one spelled inside a string or a comment not counting: the offsets of its opening parenthesis and the matching close.
      *
      * @return array{int, int}|null
      */
     private static function findCall(string $content, string $method): ?array
     {
-        if (preg_match('/->\s*' . preg_quote($method, '/') . '\s*\(/', $content, $match, \PREG_OFFSET_CAPTURE) !== 1) {
+        preg_match_all('/->\s*' . preg_quote($method, '/') . '\s*\(/', $content, $matches, \PREG_OFFSET_CAPTURE);
+        $match = array_find($matches[0], static fn(array $match): bool => self::isCode($content, $match[1]));
+        if ($match === null) {
             return null;
         }
 
-        $openAt = $match[0][1] + strlen($match[0][0]) - 1;
+        $openAt = $match[1] + strlen($match[0]) - 1;
 
         return [$openAt, self::matchingClose($content, $openAt, $method)];
     }
 
-    /** The offset of the close matching the bracket at $openAt, skipping quoted strings. */
+    /** The offset of the close matching the bracket at $openAt, skipping strings and comments. */
     private static function matchingClose(string $content, int $openAt, string $method): int
     {
         $open = $content[$openAt];
@@ -266,34 +268,18 @@ final readonly class FluentChainWriter
         };
 
         $depth = 0;
-        $quote = null;
         for ($offset = $openAt; $offset < strlen($content); $offset++) {
-            $character = $content[$offset];
-            if ($quote !== null) {
-                if ($character === '\\') {
-                    $offset++;
-                    continue;
-                }
-                if ($character === $quote) {
-                    $quote = null;
-                }
+            // A bracket in a string or a comment is not code, and neither is an apostrophe in a comment, which would otherwise open a string that never closes.
+            $nonCodeEnd = self::nonCodeEnd($content, $offset);
+            if ($nonCodeEnd !== null) {
+                $offset = $nonCodeEnd - 1;
                 continue;
             }
-            if ($character === '\'' || $character === '"') {
-                $quote = $character;
-                continue;
-            }
-            // A comment is prose: an apostrophe in it would otherwise open a string that never closes, and a bracket in it would count.
-            $commentEnd = self::commentEnd($content, $offset, $method);
-            if ($commentEnd !== null) {
-                $offset = $commentEnd - 1;
-                continue;
-            }
-            if ($character === $open) {
+            if ($content[$offset] === $open) {
                 $depth++;
                 continue;
             }
-            if ($character === $close && --$depth === 0) {
+            if ($content[$offset] === $close && --$depth === 0) {
                 return $offset;
             }
         }
@@ -301,17 +287,49 @@ final readonly class FluentChainWriter
         throw new RuntimeException(sprintf('The %s() call never closes its "%s"; the config cannot be edited.', $method, $open));
     }
 
-    /**
-     * The offset just past the comment starting at $offset, or null when none starts there; a line comment ends before its line break.
-     * `#[` opens an attribute rather than a comment, as it has since PHP 8.0.
-     */
-    private static function commentEnd(string $content, int $offset, string $method): ?int
+    /** Whether the offset lies in code rather than inside a string or a comment. */
+    private static function isCode(string $content, int $target): bool
     {
+        for ($offset = 0; $offset < $target; $offset++) {
+            $nonCodeEnd = self::nonCodeEnd($content, $offset);
+            if ($nonCodeEnd === null) {
+                continue;
+            }
+            if ($nonCodeEnd > $target) {
+                return false;
+            }
+            $offset = $nonCodeEnd - 1;
+        }
+
+        return true;
+    }
+
+    /**
+     * The offset just past the string or comment starting at $offset, or null when code starts there.
+     * An unterminated string runs to the end of the content; a line comment ends before its line break; `#[` opens an attribute rather than a comment, as it has since PHP 8.0.
+     */
+    private static function nonCodeEnd(string $content, int $offset): ?int
+    {
+        $quote = $content[$offset];
+        if ($quote === '\'' || $quote === '"') {
+            for ($cursor = $offset + 1; $cursor < strlen($content); $cursor++) {
+                if ($content[$cursor] === '\\') {
+                    $cursor++;
+                    continue;
+                }
+                if ($content[$cursor] === $quote) {
+                    return $cursor + 1;
+                }
+            }
+
+            return strlen($content);
+        }
+
         $opening = substr($content, $offset, 2);
         if ($opening === self::BLOCK_COMMENT_OPEN) {
             $close = strpos($content, self::BLOCK_COMMENT_CLOSE, $offset + strlen(self::BLOCK_COMMENT_OPEN));
             if ($close === false) {
-                throw new RuntimeException(sprintf('A comment inside the %s() call never closes; the config cannot be edited.', $method));
+                throw new RuntimeException('A block comment in the config never closes; the config cannot be edited.');
             }
 
             return $close + strlen(self::BLOCK_COMMENT_CLOSE);
