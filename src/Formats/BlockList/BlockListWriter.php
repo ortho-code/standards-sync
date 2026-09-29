@@ -1,0 +1,187 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OrthoCode\StandardsSync\Formats\BlockList;
+
+use OrthoCode\StandardsSync\Core\Text\Indent;
+use OrthoCode\StandardsSync\Core\Text\Lines;
+use OrthoCode\StandardsSync\Formats\Scalar\InlineScalar;
+use RuntimeException;
+
+/**
+ * Reads, ensures or removes entries of a top-level block-form list section — a `section:` header followed by one `- entry` per line — as neon and yaml both write it.
+ * Entries are matched on their unquoted value — two spellings of one path are the same value.
+ * Targeted line edits only — everything around the touched lines stays byte-identical; no parse, no reserialization.
+ */
+final readonly class BlockListWriter
+{
+    /** An entry line: whitespace after the dash, and entries allowed at the section's own indentation. */
+    private const string ENTRY_LINE = '/^([ \t]*)-[ \t]+(.*)$/';
+
+    private const string COMMENT_LINE = '/^[ \t]*#/';
+
+    private const string INDENTED_LINE = '/^[ \t]/';
+
+    private const string ENTRY_PREFIX = '- ';
+
+    /** @param string $defaultIndent the indentation unit written where the document shows none to copy */
+    public function __construct(private string $defaultIndent) {}
+
+    /**
+     * The section's entries as unquoted values, or null when the document has no such section.
+     *
+     * @return list<string>|null
+     */
+    public function readList(string $content, string $section): ?array
+    {
+        $lines = Lines::split($content);
+        $sectionIndex = $this->sectionIndex($lines, $section);
+
+        return $sectionIndex === null ? null : array_values($this->entries($lines, $sectionIndex, $section));
+    }
+
+    /**
+     * Ensures the entry in the section: a present entry is kept; an absent one takes the place of the first entry of $replacing the section holds, keeping that line's indentation and trailing comment, and is otherwise inserted after the section's last entry.
+     * A missing section is created at the top of the document holding just the entry; empty content becomes only that section.
+     * An inline-form section is refused: managing an entry needs the block form.
+     *
+     * @param list<string> $replacing entries the entry supersedes, matched as the entry is
+     */
+    public function ensureEntry(string $content, string $section, string $entry, array $replacing = []): string
+    {
+        if (trim($content) === '') {
+            return $this->createSection($section, $entry, $this->defaultIndent);
+        }
+
+        $lines = Lines::split($content);
+        $sectionIndex = $this->sectionIndex($lines, $section);
+
+        if ($sectionIndex === null) {
+            return $this->createSection($section, $entry, $this->indentUnit($lines)) . Lines::LINE_BREAK . $content;
+        }
+
+        $entries = $this->entries($lines, $sectionIndex, $section);
+        if (in_array(InlineScalar::unquote($entry), $entries, true)) {
+            return $content;
+        }
+
+        $superseded = array_map(InlineScalar::unquote(...), $replacing);
+        $replacedIndex = array_find_key($entries, static fn(string $value): bool => in_array($value, $superseded, true));
+        if ($replacedIndex !== null) {
+            $lines[$replacedIndex] = self::withValue($lines[$replacedIndex], $entry);
+
+            return Lines::join($lines);
+        }
+
+        $firstIndex = array_key_first($entries);
+        $indent = $firstIndex === null ? $this->indentUnit($lines) : self::entryIndent($lines[$firstIndex]);
+        array_splice($lines, (array_key_last($entries) ?? $sectionIndex) + 1, 0, [$indent . self::ENTRY_PREFIX . $entry]);
+
+        return Lines::join($lines);
+    }
+
+    /**
+     * Removes every line of the section holding one of the entries, leaving everything else byte-identical; an absent section or entry leaves the content untouched.
+     * An inline-form section is refused, as ensureEntry() refuses it.
+     *
+     * @param list<string> $entries
+     */
+    public function removeEntries(string $content, string $section, array $entries): string
+    {
+        $lines = Lines::split($content);
+        $sectionIndex = $this->sectionIndex($lines, $section);
+        if ($sectionIndex === null) {
+            return $content;
+        }
+
+        $unwanted = array_map(InlineScalar::unquote(...), $entries);
+        $removed = array_filter($this->entries($lines, $sectionIndex, $section), static fn(string $value): bool => in_array($value, $unwanted, true));
+        if ($removed === []) {
+            return $content;
+        }
+
+        return Lines::join(array_values(array_diff_key($lines, $removed)));
+    }
+
+    /** @param list<string> $lines */
+    private function indentUnit(array $lines): string
+    {
+        return Indent::detect($lines) ?? $this->defaultIndent;
+    }
+
+    private function createSection(string $section, string $entry, string $indent): string
+    {
+        return $section . ':' . Lines::LINE_BREAK . $indent . self::ENTRY_PREFIX . $entry . Lines::LINE_BREAK;
+    }
+
+    /**
+     * The section's entry lines, from its header to the first line that is neither an entry, a comment nor blank: each line's index mapped to its unquoted value.
+     * An indented line that is none of those belongs to the section, which then holds a value rather than a list, and is refused.
+     *
+     * @param list<string> $lines
+     * @return array<int, string>
+     */
+    private function entries(array $lines, int $sectionIndex, string $section): array
+    {
+        $entries = [];
+        $counter = count($lines);
+        for ($index = $sectionIndex + 1; $index < $counter; $index++) {
+            if (preg_match(self::ENTRY_LINE, $lines[$index], $match) === 1) {
+                // A consumer-annotated entry is still that entry: the trailing comment is not part of the value.
+                $entries[$index] = InlineScalar::unquote(InlineScalar::splitTrailingComment($match[2])[0]);
+                continue;
+            }
+            // A comment line neither ends the section nor holds an entry — the entries around it still count.
+            if (preg_match(self::COMMENT_LINE, $lines[$index]) === 1) {
+                continue;
+            }
+            if (trim($lines[$index]) === '') {
+                continue;
+            }
+            if (preg_match(self::INDENTED_LINE, $lines[$index]) === 1) {
+                throw new RuntimeException(sprintf('The "%s:" section holds a value rather than a block list; convert it to one "- entry" per line so the entry can be managed.', $section));
+            }
+            break;
+        }
+
+        return $entries;
+    }
+
+    private static function entryIndent(string $entryLine): string
+    {
+        preg_match(self::ENTRY_LINE, $entryLine, $match);
+
+        return $match[1] ?? '';
+    }
+
+    /** The entry line holding another value: its indentation, dash spacing and trailing comment kept, since they belong to the slot rather than to the value. */
+    private static function withValue(string $entryLine, string $entry): string
+    {
+        preg_match(self::ENTRY_LINE, $entryLine, $match);
+        $tail = $match[2] ?? '';
+        [, $comment] = InlineScalar::splitTrailingComment($tail);
+
+        return substr($entryLine, 0, strlen($entryLine) - strlen($tail)) . $entry . $comment;
+    }
+
+    /** @param list<string> $lines */
+    private function sectionIndex(array $lines, string $section): ?int
+    {
+        if (array_any($lines, static fn(string $line): bool => (self::headerValue($line, $section) ?? '') !== '')) {
+            throw new RuntimeException(sprintf('The "%s:" section is not a block list; convert it to one "- entry" per line so the entry can be managed.', $section));
+        }
+
+        return array_find_key($lines, static fn(string $line): bool => self::headerValue($line, $section) === '');
+    }
+
+    /** The value text on the section's header line, trailing comment stripped — or null when the line is not that header. */
+    private static function headerValue(string $line, string $section): ?string
+    {
+        if (!str_starts_with($line, $section . ':')) {
+            return null;
+        }
+
+        return trim(InlineScalar::splitTrailingComment(substr($line, strlen($section) + 1))[0]);
+    }
+}

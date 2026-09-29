@@ -61,3 +61,14 @@ The lock records the depfile path, so a moved depfile is retracted and its succe
 `YamlListWriter` gained `readList()` and `removeEntries()`, and `ensureEntry()` takes the entries an entry replaces, the same operations its neon sibling gained, including for entries at the section's own indentation.
 The union semantics recorded above still govern what the imports mean to deptrac; retraction changes only which imports the file carries.
 
+## Changed 2026-09-29 — the YAML and neon list writers are one writer
+
+The 2026-08-12 design made `YamlListWriter` a per-format sibling of `NeonListWriter`, with divergences owned by each grammar.
+Once the neon writer followed neon's grammar ([the fix](rule-model.md#fixed-2026-09-29--the-neon-writers-follow-neons-grammar-for-comments-and-list-entries)), none were left but the indentation default: both formats take the same entry lines, and `NeonValue` and `YamlValue` held the same unquoting and comment code, quoting behaving alike in both parsers (`'it''s'`, a backslash inside single quotes, `\t` inside double ones).
+The twins had been edited identically twice, in the 2026-08-12 alignment and when both gained `readList()`, `removeEntries()` and a replacing `ensureEntry()`.
+
+**What.** `Formats/BlockList/BlockListWriter` holds the entry pattern, the section scan and the three edits, and takes one argument, the indentation default; `Formats/Scalar/InlineScalar` holds the unquoting and comment rules both formats share.
+`NeonListWriter` and `YamlListWriter` stay as the rules' entry points, each passing its format's default; `NeonValue` keeps `render()` and passes its unquoting and comment splitting on to `InlineScalar`, so `NeonScalarWriter` and `PhpStanLevel` are unchanged; `YamlValue` and `YamlIndent::fromLines()` went with their last user.
+The list edits are tested once, in `BlockListWriterTest`; each format's suite keeps its default and its entry points.
+*Rejected*: a grammar interface each format implements — its implementations would have handed two of its three methods to identical code, a shape already obsolete when written; an abstract base with static hooks — inheritance in `Formats/` over all-static classes; and leaving the twins, since the next edit to either would have been the third identical one.
+

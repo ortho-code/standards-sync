@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OrthoCode\StandardsSync\Formats\Yaml;
+namespace OrthoCode\StandardsSync\Formats\Scalar;
 
 /**
- * Yaml's scalar value grammar: how a written value unquotes, and where a trailing comment starts.
- * Bare and quoted are two spellings of the same yaml value, so matching happens on the unquoted form.
+ * A scalar written on one line, as neon and yaml both write it: how the written value unquotes, and where its trailing comment starts.
+ * Bare and quoted are two spellings of the same value, so matching happens on the unquoted form.
  */
-final readonly class YamlValue
+final readonly class InlineScalar
 {
     /** The unquoted value: whitespace trimmed, one pair of surrounding quotes stripped. */
     public static function unquote(string $value): string
@@ -23,7 +23,7 @@ final readonly class YamlValue
 
     /**
      * Splits a written value from its trailing comment, quote-aware: a # inside a quoted value is content, not a comment boundary.
-     * A # opens a comment only at the start or after whitespace — in yaml, foo#bar is one scalar.
+     * A # opens a comment only at the start or after whitespace — foo#bar is one value.
      * The comment part carries its leading whitespace and is empty when there is no comment.
      *
      * @return array{string, string}
@@ -34,7 +34,7 @@ final readonly class YamlValue
         for ($offset = 0; $offset < strlen($text); $offset++) {
             $character = $text[$offset];
             if ($quote !== null) {
-                // Yaml's double-quoted strings escape with a backslash; single-quoted strings escape only the quote itself, by doubling it, which the scan reads as close-and-reopen.
+                // Double-quoted strings escape with a backslash; single-quoted strings escape only the quote itself, by doubling it, which the scan reads as close-and-reopen.
                 if ($quote === '"' && $character === '\\') {
                     $offset++;
                     continue;
