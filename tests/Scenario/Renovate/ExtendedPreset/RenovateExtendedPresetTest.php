@@ -22,5 +22,8 @@ final class RenovateExtendedPresetTest extends ScenarioTestCase
         yield 'a json5-only repo is synced in place, nothing is created' => ['json5-only-repo', $config];
         yield 'an org preferring json5 creates that format, annotated' => ['from-scratch-json5', null];
         yield 'a compliant entry gains the enforced comment' => ['json5-comment-enforced', null];
+        yield 'a renamed preset replaces its predecessor in place' => ['replaces-a-renamed-preset-in-place', $config];
+        yield 'a preset no standard declares any more is retracted with its line, and the project\'s entries stay' => ['retracts-a-preset-no-longer-declared', $config];
+        yield 'a second declaration adds its preset after the first' => ['merges-a-second-declaration', 'standards-sync-merged.php'];
     }
 }

@@ -454,6 +454,155 @@ final class Json5ListWriterTest extends TestCase
     }
 
     /** Applying a write twice is the engine's free property test; the writer owes the same guarantee on its own. */
+    public function testASupersededEntryIsReplacedInPlaceKeepingItsQuotesAndComment(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON5'
+                {
+                    extends: [
+                        'config:recommended',
+                        'local>acme/old-config', // ours
+                    ],
+                }
+                JSON5,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON5'
+                    {
+                        extends: [
+                            'config:recommended',
+                            'local>acme/renovate-config', // ours
+                        ],
+                    }
+                    JSON5,
+            ),
+            Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY, replacing: ['local>acme/old-config']),
+        );
+    }
+
+    public function testAReplacedEntryCarriesTheEnforcedComment(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON5'
+                {
+                    extends: [
+                        'local>acme/old-config', // ours
+                        'config:recommended',
+                    ],
+                }
+                JSON5,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON5'
+                    {
+                        extends: [
+                            'local>acme/renovate-config', // org standard
+                            'config:recommended',
+                        ],
+                    }
+                    JSON5,
+            ),
+            Json5ListWriter::ensureEntry($content, 'extends', self::ENTRY, 'org standard', ['local>acme/old-config']),
+        );
+    }
+
+    public function testRemovesAnEntryWithItsWholeLine(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON5'
+                {
+                    extends: [
+                        'local>acme/old-config', // org standard
+                        'config:recommended',
+                        'local>acme/strict-config'
+                    ],
+                }
+                JSON5,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON5'
+                    {
+                        extends: [
+                            'config:recommended',
+                        ],
+                    }
+                    JSON5,
+            ),
+            Json5ListWriter::removeEntries($content, 'extends', ['local>acme/old-config', 'local>acme/strict-config']),
+        );
+    }
+
+    public function testRemovingFromALeadingCommaListKeepsItValid(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON5'
+                {
+                    extends: [
+                        'local>acme/old-config'
+                      , 'config:recommended'
+                      , 'local>acme/strict-config'
+                    ],
+                }
+                JSON5,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON5'
+                    {
+                        extends: [
+                            'config:recommended'
+                        ],
+                    }
+                    JSON5,
+            ),
+            Json5ListWriter::removeEntries($content, 'extends', ['local>acme/old-config', 'local>acme/strict-config']),
+        );
+    }
+
+    public function testRemovesFromAOneLineList(): void
+    {
+        self::assertSame(
+            FileContent::fromString('{ extends: ["config:recommended"] }'),
+            Json5ListWriter::removeEntries(FileContent::fromString('{ extends: ["local>acme/old-config", "config:recommended", "local>acme/strict-config"] }'), 'extends', ['local>acme/old-config', 'local>acme/strict-config']),
+        );
+    }
+
+    public function testRemovingAbsentEntriesLeavesTheContentUntouched(): void
+    {
+        $content = FileContent::fromString('{ extends: ["config:recommended"] }');
+
+        self::assertSame($content, Json5ListWriter::removeEntries($content, 'extends', ['local>acme/old-config']));
+        self::assertSame($content, Json5ListWriter::removeEntries($content, 'labels', ['local>acme/old-config']));
+        self::assertSame($content, Json5ListWriter::removeEntries($content, 'extends', []));
+        self::assertSame('', Json5ListWriter::removeEntries('', 'extends', ['local>acme/old-config']));
+    }
+
+    public function testReadsTheStringEntriesUnquoted(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON5'
+                {
+                    extends: [
+                        'local>acme/renovate-config', // org standard
+                        "config:recommended",
+                        42,
+                    ],
+                }
+                JSON5,
+        );
+
+        self::assertSame([self::ENTRY, 'config:recommended'], Json5ListWriter::readList($content, 'extends'));
+        self::assertNull(Json5ListWriter::readList($content, 'labels'));
+        self::assertNull(Json5ListWriter::readList('', 'extends'));
+    }
+
     public function testEnsuringIsIdempotent(): void
     {
         $once = Json5ListWriter::ensureEntry("{\n  extends: [\n    'config:recommended',\n  ],\n}\n", 'extends', self::ENTRY, 'org standard');

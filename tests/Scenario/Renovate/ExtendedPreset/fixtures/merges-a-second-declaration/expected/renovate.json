@@ -1,0 +1,7 @@
+{
+  "extends": [
+    "config:recommended",
+    "local>acme/renovate-config",
+    "local>acme/framework-config"
+  ]
+}

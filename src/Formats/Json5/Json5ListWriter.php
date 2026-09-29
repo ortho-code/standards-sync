@@ -10,7 +10,7 @@ use OrthoCode\StandardsSync\Formats\Json\JsonObject;
 use RuntimeException;
 
 /**
- * Ensures one string entry in a top-level member's list in JSON5 text, with an optional enforced trailing comment on the entry's line.
+ * Reads, ensures or removes string entries of a top-level member's list in JSON5 text, an ensured entry with an optional enforced trailing comment on its line.
  * Entries and keys are matched on their unquoted value, so two spellings of one string are the same; insertion copies the sibling entries' quote and trailing-comma style.
  * Targeted span edits only — comments, key spellings and everything else around the touched span stay byte-identical; no parse, no reserialization.
  */
@@ -34,38 +34,131 @@ final readonly class Json5ListWriter
     private const string BLOCK_COMMENT_CLOSE = '*/';
 
     /**
-     * Ensures the entry in the key's list: a present entry is kept, an absent one is appended in the list's own layout, a missing key is appended to the object, and empty content becomes a document holding just the entry.
-     * With $comment the entry's line end is owned — a missing or deviating trailing comment is rewritten; without, a project's own trailing comment survives.
-     * The comment needs a line position that reads as the entry's own, so an entry that does not end its line carries none.
+     * The string entries of the key's list as unquoted values, or null when the document or the key is absent.
+     *
+     * @return list<string>|null
      */
-    public static function ensureEntry(string $content, string $key, string $entry, ?string $comment = null): string
+    public static function readList(string $content, string $key): ?array
+    {
+        if (trim($content) === '') {
+            return null;
+        }
+
+        $member = self::rootObject($content)->member($key);
+        if (!$member instanceof JsonMember) {
+            return null;
+        }
+
+        $strings = array_filter(self::listSpans($content, $member, $key), static fn(array $span): bool => $content[$span[0]] === '"' || $content[$span[0]] === '\'');
+
+        return array_values(array_map(static fn(array $span): string => self::unquote(substr($content, $span[0], $span[1] - $span[0])), $strings));
+    }
+
+    /**
+     * Ensures the entry in the key's list: a present entry is kept; an absent one takes the place of the first entry of $replacing the list holds, in that entry's quote style, and is otherwise appended in the list's own layout; a missing key is appended to the object, and empty content becomes a document holding just the entry.
+     * With $comment the entry's line end is owned — a missing or deviating trailing comment is rewritten; without, a project's own trailing comment survives, a replaced entry's included.
+     * The comment needs a line position that reads as the entry's own, so an entry that does not end its line carries none.
+     *
+     * @param list<string> $replacing entries the entry supersedes, matched as the entry is
+     */
+    public static function ensureEntry(string $content, string $key, string $entry, ?string $comment = null, array $replacing = []): string
     {
         if (trim($content) === '') {
             return self::createDocument($key, $entry, $comment);
         }
 
-        $objectStart = self::skipInsignificant($content, 0);
-        if (self::characterAt($content, $objectStart) !== '{') {
-            throw new RuntimeException('The file does not hold a JSON5 object; it cannot be managed.');
-        }
-
-        $object = self::scanObject($content, $objectStart);
+        $object = self::rootObject($content);
         $member = $object->member($key);
         if (!$member instanceof JsonMember) {
             return self::appendMember($content, $object, $key, $entry, $comment);
         }
 
-        if (self::characterAt($content, $member->valueStart()) !== '[') {
-            throw new RuntimeException(sprintf('"%s" does not hold a list; "%s" cannot be ensured in it.', $key, $entry));
-        }
-
-        $spans = self::scanList($content, $member->valueStart());
+        $spans = self::listSpans($content, $member, $key);
         $present = array_find($spans, static fn(array $span): bool => self::isEntry($content, $span, $entry));
         if ($present !== null) {
             return $comment === null ? $content : self::ensureTrailingComment($content, $present, $comment);
         }
 
+        $replaced = array_find($spans, static fn(array $span): bool => array_any($replacing, static fn(string $retired): bool => self::isEntry($content, $span, $retired)));
+        if ($replaced !== null) {
+            $rendered = self::renderLike($content, $replaced[0], $entry);
+            $replacedContent = substr($content, 0, $replaced[0]) . $rendered . substr($content, $replaced[1]);
+
+            return $comment === null ? $replacedContent : self::ensureTrailingComment($replacedContent, [$replaced[0], $replaced[0] + strlen($rendered)], $comment);
+        }
+
         return self::insertEntry($content, $member, $spans, $entry, $comment);
+    }
+
+    /**
+     * Removes every one of the entries from the key's list, leaving everything else byte-identical; an absent document, key or entry leaves the content untouched.
+     * An entry alone on its line takes the line with it, its comma and trailing comment included, where that line holds its separating comma or it is the last entry; otherwise it takes the comma that separates it from a neighbour, so a leading-comma list stays valid.
+     *
+     * @param list<string> $entries
+     */
+    public static function removeEntries(string $content, string $key, array $entries): string
+    {
+        if (trim($content) === '' || $entries === []) {
+            return $content;
+        }
+
+        $member = self::rootObject($content)->member($key);
+        if (!$member instanceof JsonMember) {
+            return $content;
+        }
+
+        // The list starts where it did before any removal, so each pass rescans it rather than tracking shifted offsets.
+        do {
+            $spans = self::listSpans($content, $member, $key);
+            $index = array_find_key($spans, static fn(array $span): bool => array_any($entries, static fn(string $entry): bool => self::isEntry($content, $span, $entry)));
+            if ($index !== null) {
+                $content = self::withoutEntry($content, $spans, $index);
+            }
+        } while ($index !== null);
+
+        return $content;
+    }
+
+    private static function rootObject(string $content): JsonObject
+    {
+        $objectStart = self::skipInsignificant($content, 0);
+        if (self::characterAt($content, $objectStart) !== '{') {
+            throw new RuntimeException('The file does not hold a JSON5 object; it cannot be managed.');
+        }
+
+        return self::scanObject($content, $objectStart);
+    }
+
+    /** @return list<array{int, int}> */
+    private static function listSpans(string $content, JsonMember $member, string $key): array
+    {
+        if (self::characterAt($content, $member->valueStart()) !== '[') {
+            throw new RuntimeException(sprintf('"%s" does not hold a list; its entries cannot be managed.', $key));
+        }
+
+        return self::scanList($content, $member->valueStart());
+    }
+
+    /** @param list<array{int, int}> $spans */
+    private static function withoutEntry(string $content, array $spans, int $index): string
+    {
+        [$start, $end] = $spans[$index];
+        $next = $spans[$index + 1] ?? null;
+        $previous = $spans[$index - 1] ?? null;
+
+        $lineStart = self::lineStart($content, $start);
+        $lineEnd = self::lineEnd($content, $end);
+        $endsItsLine = preg_match('~^(?<comma>[ \t]*,)?[ \t]*(?://.*)?$~', substr($content, $end, $lineEnd - $end), $tail) === 1;
+        $ownsLine = $endsItsLine && trim(substr($content, $lineStart, $start - $lineStart)) === '';
+        if ($ownsLine && (($tail['comma'] ?? '') !== '' || $next === null)) {
+            return substr($content, 0, $lineStart) . substr($content, min($lineEnd + 1, strlen($content)));
+        }
+
+        if ($next !== null) {
+            return substr($content, 0, $start) . substr($content, $next[0]);
+        }
+
+        return substr($content, 0, $previous === null ? $start : $previous[1]) . substr($content, $end);
     }
 
     private static function createDocument(string $key, string $entry, ?string $comment): string

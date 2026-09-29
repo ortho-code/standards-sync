@@ -23,5 +23,6 @@ final class ListContributionsTest extends ScenarioTestCase
         yield 'a list no standard declares any more drops out of the lock and stays in the file' => ['a-list-no-standard-declares-stays', $config];
         yield 'an absent manifest records nothing, so no lock is created' => ['an-absent-manifest-creates-no-lock', $config];
         yield 'a config without list-contributing rules creates no lock' => ['no-contributing-rule-creates-no-lock', null];
+        yield 'declarations naming different candidates merge in the file they resolve to' => ['merges-across-declared-candidates', 'standards-sync-candidates.php'];
     }
 }

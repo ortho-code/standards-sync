@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Tests\OrthoCode\StandardsSync\Unit\Rules\Renovate\ExtendedPreset;
 
 use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Rules\PhpStan\IncludedRuleset\PhpStanIncludedRuleset;
 use OrthoCode\StandardsSync\Rules\Renovate\ExtendedPreset\RenovateExtendedPreset;
 use OrthoCode\StandardsSync\Rules\Renovate\RenovateConfigFormat;
 use OrthoCode\StandardsSync\Testing\FileContent;
 use InvalidArgumentException;
+use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -222,7 +224,80 @@ final class RenovateExtendedPresetTest extends TestCase
         self::assertSame(
             'The "local>acme/renovate-config" entry is not annotated with the enforced comment.',
             new RenovateExtendedPreset(preset: self::PRESET, comment: 'org standard')
-                ->explain("{ \"extends\": [\"local>acme/renovate-config\"] }\n"),
+                ->explain(FileContent::fromString(
+                    <<<'JSON5'
+                        {
+                            extends: [
+                                'local>acme/renovate-config',
+                            ],
+                        }
+                        JSON5,
+                )),
+        );
+    }
+
+    public function testMergedDeclarationsExtendEveryPresetOnceWithItsFirstComment(): void
+    {
+        $rule = new RenovateExtendedPreset(preset: self::PRESET, createAs: RenovateConfigFormat::Json5, comment: 'org standard')
+            ->withMerged(new RenovateExtendedPreset(preset: 'local>acme/framework-config', comment: 'framework'))
+            ->withMerged(new RenovateExtendedPreset(preset: self::PRESET, comment: 'overridden'));
+
+        self::assertSame([self::PRESET, 'local>acme/framework-config'], $rule->entries());
+        self::assertSame('renovate.json5', $rule->target()->candidates()[0]->value());
+        self::assertSame('Ensures the renovate config extends "local>acme/renovate-config", "local>acme/framework-config".', $rule->description());
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON5'
+                    {
+                        "extends": [
+                            "local>acme/renovate-config", // org standard
+                            "local>acme/framework-config" // framework
+                        ]
+                    }
+                    JSON5,
+            ),
+            $rule->apply(null),
+        );
+    }
+
+    public function testRefusesToMergeAnotherRule(): void
+    {
+        $this->expectException(LogicException::class);
+
+        new RenovateExtendedPreset(preset: self::PRESET)->withMerged(new PhpStanIncludedRuleset(ruleset: 'vendor/acme/standards/phpstan.neon'));
+    }
+
+    public function testAMissingPresetTakesTheFirstRetiredEntrysPlaceAndTheOthersAreRetracted(): void
+    {
+        $rule = new RenovateExtendedPreset(preset: self::PRESET)->withRetired(['local>acme/old-config', 'local>acme/strict-config']);
+        $current = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "extends": [
+                        "local>acme/old-config",
+                        "config:recommended",
+                        "local>acme/strict-config"
+                    ]
+                }
+                JSON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                        "extends": [
+                            "local>acme/renovate-config",
+                            "config:recommended"
+                        ]
+                    }
+                    JSON,
+            ),
+            $rule->apply($current),
+        );
+        self::assertSame(
+            'The renovate config does not extend "local>acme/renovate-config". It stops extending "local>acme/old-config", "local>acme/strict-config", which no standard declares any more.',
+            $rule->explain($current),
         );
     }
 }

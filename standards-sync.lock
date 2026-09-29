@@ -55,6 +55,11 @@
             "withSets": [
                 "__DIR__ . '/vendor/ortho-code/coding-standards/templates/package/rector.php'"
             ]
+        },
+        "renovate.json5": {
+            "extends": [
+                "local>ortho-code/coding-standards:renovate-package-preset"
+            ]
         }
     }
 }

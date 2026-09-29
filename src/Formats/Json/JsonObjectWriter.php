@@ -10,7 +10,7 @@ use RuntimeException;
 use stdClass;
 
 /**
- * Reads, sets or removes one member at a nested key path in JSON object text, creating missing objects along the way when writing.
+ * Reads, sets or removes one member at a nested key path in JSON object text, or string entries of the list held there, creating missing objects along the way when writing.
  * Targeted span edits only — everything around the touched member stays byte-identical; no parse, no reserialization.
  * Keys are compared decoded, so two spellings of one key are the same member; values are compared decoded too, so a differently laid out but equal value is left alone.
  * The document is validated before any scan, so every refusal below names a real problem rather than a parser limit.
@@ -93,24 +93,26 @@ final readonly class JsonObjectWriter
     }
 
     /**
-     * Ensures one string entry in the list at a nested key path: a present entry is kept byte-identical, an absent one is appended in the list's own layout, and a missing member is created holding just the entry.
+     * Ensures one string entry in the list at a nested key path: a present entry is kept byte-identical; an absent one takes the place of the first entry of $replacing the list holds, and is otherwise appended in the list's own layout; a missing member is created holding just the entry.
      *
      * @param non-empty-list<string> $path
+     * @param list<string> $replacing entries the entry supersedes, matched as the entry is
      */
-    public static function ensureListEntry(string $content, array $path, string $entry): string
+    public static function ensureListEntry(string $content, array $path, string $entry, array $replacing = []): string
     {
         [, $member] = self::walk($content, $path);
         if (!$member instanceof JsonMember) {
             return self::set($content, $path, [$entry]);
         }
 
-        if ($content[$member->valueStart()] !== '[') {
-            throw new RuntimeException(sprintf('"%s" does not hold a list; "%s" cannot be ensured in it.', implode('.', $path), $entry));
+        $entries = self::listSpans($content, $member, $path);
+        if (array_any($entries, static fn(array $span): bool => self::isEntry($content, $span, $entry))) {
+            return $content;
         }
 
-        $entries = self::scanList($content, $member->valueStart());
-        if (array_any($entries, static fn(array $span): bool => $content[$span[0]] === '"' && self::decode(substr($content, $span[0], $span[1] - $span[0])) === $entry)) {
-            return $content;
+        $replaced = array_find($entries, static fn(array $span): bool => array_any($replacing, static fn(string $retired): bool => self::isEntry($content, $span, $retired)));
+        if ($replaced !== null) {
+            return substr($content, 0, $replaced[0]) . self::encode($entry) . substr($content, $replaced[1]);
         }
 
         if ($entries === []) {
@@ -126,6 +128,31 @@ final readonly class JsonObjectWriter
         return substr($content, 0, $lastEnd)
             . ',' . Lines::LINE_BREAK . self::lineIndent($content, $lastStart) . self::encode($entry)
             . substr($content, $lastEnd);
+    }
+
+    /**
+     * Removes every one of the string entries from the list at a nested key path, each with the comma that separates it from a neighbour, leaving an absent path or entry untouched; a list losing its last entry collapses to "[]".
+     *
+     * @param non-empty-list<string> $path
+     * @param list<string> $entries
+     */
+    public static function removeListEntries(string $content, array $path, array $entries): string
+    {
+        [, $member] = self::walk($content, $path);
+        if (!$member instanceof JsonMember || $entries === []) {
+            return $content;
+        }
+
+        // The list starts where it did before any removal, so each pass rescans it rather than tracking shifted offsets.
+        do {
+            $spans = self::listSpans($content, $member, $path);
+            $index = array_find_key($spans, static fn(array $span): bool => array_any($entries, static fn(string $entry): bool => self::isEntry($content, $span, $entry)));
+            if ($index !== null) {
+                $content = self::withoutEntry($content, $member, $spans, $index);
+            }
+        } while ($index !== null);
+
+        return $content;
     }
 
     /**
@@ -243,6 +270,48 @@ final readonly class JsonObjectWriter
         }
 
         return [$object, null, count($path)];
+    }
+
+    /**
+     * @param non-empty-list<string> $path
+     * @return list<array{int, int}>
+     */
+    private static function listSpans(string $content, JsonMember $member, array $path): array
+    {
+        if ($content[$member->valueStart()] !== '[') {
+            throw new RuntimeException(sprintf('"%s" does not hold a list; its entries cannot be managed.', implode('.', $path)));
+        }
+
+        return self::scanList($content, $member->valueStart());
+    }
+
+    /** @param array{int, int} $span */
+    private static function isEntry(string $content, array $span, string $entry): bool
+    {
+        return $content[$span[0]] === '"' && self::decode(substr($content, $span[0], $span[1] - $span[0])) === $entry;
+    }
+
+    /**
+     * The content without the list entry at $index: it takes the comma before its successor, or, as the last entry, the comma after its predecessor; a lone entry leaves "[]".
+     *
+     * @param list<array{int, int}> $spans
+     */
+    private static function withoutEntry(string $content, JsonMember $member, array $spans, int $index): string
+    {
+        [$start, $end] = $spans[$index];
+        $next = $spans[$index + 1] ?? null;
+        if ($next !== null) {
+            return substr($content, 0, $start) . substr($content, $next[0]);
+        }
+
+        $previous = $spans[$index - 1] ?? null;
+        if ($previous !== null) {
+            return substr($content, 0, $previous[1]) . substr($content, $end);
+        }
+
+        $listEnd = self::skipBracketed($content, $member->valueStart());
+
+        return substr($content, 0, $member->valueStart()) . '[]' . substr($content, $listEnd);
     }
 
     /**

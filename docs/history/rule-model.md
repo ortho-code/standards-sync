@@ -403,6 +403,7 @@ Pairing cannot tell a rename from a drop plus an add, so an added entry may land
 *Rejected*: appending the replacement as any addition is appended — the same input would become `[phpstan-baseline.neon, phpstan.neon]`, reversing which file overrides which, visible in the diff only as a moved line.
 Leading with the standard's entries, as `ComposerScript` places commands — it reverses the append decision, which makes the org entry the strongest where the later entry wins, and would move where adoption lands the entry in every family's fixtures.
 Dropping a project's trailing comment with the replaced value — the comment annotated the standard's slot, not the old path.
+That composer scripts and imports now place a missing entry differently is recorded on the [roadmap](../roadmap.md), with one rule that would cover both.
 
 **Built one family at a time**, `PhpStanIncludedRuleset` first: list key `includes`, over `NeonListWriter`'s new `readList()` and `removeEntries()` and an `ensureEntry()` that takes the entries it replaces.
 
@@ -474,3 +475,4 @@ Carry the fixture discipline forward from the block engine: each rule ships a **
 - **Built 2026-09-29: the PHPStan import contributes to `includes`** — retraction through the lock and in-place replacement; see [the decision](#decided-2026-09-29--the-import-tier-rules-contribute-to-their-lists-and-a-replacement-takes-its-predecessors-place).
 - **Built 2026-09-29: the Rector and ECS base sets contribute to `withSets()`** — see the [Rector](rector-family.md#changed-2026-09-29--the-base-set-contributes-to-withsets) and [ECS](ecs-family.md#changed-2026-09-29--the-base-set-contributes-to-withsets) entries.
 - **Built 2026-09-29: the deptrac imports entry contributes to `imports`** — see [the deptrac entry](deptrac-family.md#changed-2026-09-29--the-imports-entry-contributes-to-imports).
+- **Built 2026-09-29: the renovate preset contributes to `extends`**, the last import-tier rule, which closes the roadmap entry — see [the renovate entry](renovate-family.md#changed-2026-09-29--the-extended-preset-contributes-to-extends).

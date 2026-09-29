@@ -1,0 +1,6 @@
+{
+  "extends": [
+    "local>acme/old-config",
+    "config:recommended"
+  ]
+}

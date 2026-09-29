@@ -621,6 +621,111 @@ final class JsonObjectWriterTest extends TestCase
         JsonObjectWriter::ensureListEntry("{ \"extends\": true }\n", ['extends'], 'a');
     }
 
+    public function testEnsureListEntryReplacesTheFirstSupersededEntryInPlace(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "extends": [
+                        "config:recommended",
+                        "local>acme/old-config",
+                        "local>acme/older-config"
+                    ]
+                }
+                JSON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                        "extends": [
+                            "config:recommended",
+                            "local>acme/renovate-config",
+                            "local>acme/older-config"
+                        ]
+                    }
+                    JSON,
+            ),
+            JsonObjectWriter::ensureListEntry($content, ['extends'], 'local>acme/renovate-config', ['local>acme/older-config', 'local>acme/old-config']),
+        );
+    }
+
+    public function testRemovesListEntriesWithTheirSeparatingCommas(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "extends": [
+                        "local>acme/old-config",
+                        "config:recommended",
+                        "local>acme/strict-config"
+                    ],
+                    "labels": ["local>acme/old-config", "dependencies", "local>acme/strict-config"]
+                }
+                JSON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                        "extends": [
+                            "config:recommended"
+                        ],
+                        "labels": ["dependencies"]
+                    }
+                    JSON,
+            ),
+            JsonObjectWriter::removeListEntries(
+                JsonObjectWriter::removeListEntries($content, ['extends'], ['local>acme/old-config', 'local>acme/strict-config']),
+                ['labels'],
+                ['local>acme/old-config', 'local>acme/strict-config'],
+            ),
+        );
+    }
+
+    public function testRemovingTheOnlyListEntryLeavesAnEmptyList(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "extends": [
+                        "local>acme/old-config"
+                    ]
+                }
+                JSON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'JSON'
+                    {
+                        "extends": []
+                    }
+                    JSON,
+            ),
+            JsonObjectWriter::removeListEntries($content, ['extends'], ['local>acme/old-config']),
+        );
+    }
+
+    public function testRemovingAbsentListEntriesLeavesTheContentUntouched(): void
+    {
+        $content = FileContent::fromString('{ "extends": ["config:recommended"] }');
+
+        self::assertSame($content, JsonObjectWriter::removeListEntries($content, ['extends'], ['local>acme/old-config']));
+        self::assertSame($content, JsonObjectWriter::removeListEntries($content, ['labels'], ['local>acme/old-config']));
+        self::assertSame($content, JsonObjectWriter::removeListEntries($content, ['extends'], []));
+    }
+
+    public function testRemoveListEntriesRefusesANonListMember(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('"extends" does not hold a list');
+
+        JsonObjectWriter::removeListEntries("{ \"extends\": true }\n", ['extends'], ['a']);
+    }
+
     public function testEnsureListEntryIsIdempotent(): void
     {
         $once = JsonObjectWriter::ensureListEntry("{ \"extends\": [\"a\"] }\n", ['extends'], 'b');

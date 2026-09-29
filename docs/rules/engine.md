@@ -362,6 +362,75 @@ Fixture: [`tests/Scenario/Engine/ListContributions/fixtures/no-contributing-rule
 # <<< acme <<<
 ```
 
+Declared as:
+
+```php
+// Renovate stands in for any rule whose declared candidates vary with its configuration: the two creation formats order the candidates differently, yet both resolve to the one config the repository has.
+return SyncConfig::create()
+    ->withRuleSet(new class extends ComposableRuleSet {
+        public function __construct()
+        {
+            $this->addRule(new RenovateExtendedPreset(preset: 'local>acme/renovate-config'));
+        }
+    })
+    ->withRuleSet(new class extends ComposableRuleSet {
+        public function __construct()
+        {
+            $this->addRule(new RenovateExtendedPreset(preset: 'local>acme/framework-config', createAs: RenovateConfigFormat::Json5));
+        }
+    });
+```
+
+…which report as:
+
+- *Ensures the renovate config extends "local>acme/renovate-config".*
+- *Ensures the renovate config extends "local>acme/framework-config".*
+
+### Declarations naming different candidates merge in the file they resolve to
+
+Fixture: [`tests/Scenario/Engine/ListContributions/fixtures/merges-across-declared-candidates`](../../tests/Scenario/Engine/ListContributions/fixtures/merges-across-declared-candidates)
+
+**Before** — `renovate.json5`:
+
+```json5
+{
+  extends: [
+    'config:recommended',
+  ],
+}
+```
+
+**After:**
+
+```json5
+{
+  extends: [
+    'config:recommended',
+    'local>acme/renovate-config',
+    'local>acme/framework-config',
+  ],
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "renovate.json5": {
+            "extends": [
+                "local>acme/renovate-config",
+                "local>acme/framework-config"
+            ]
+        }
+    }
+}
+```
+
 ## Target Resolution
 
 Declared as:
