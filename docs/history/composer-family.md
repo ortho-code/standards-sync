@@ -130,3 +130,19 @@ A strict mode restoring it where a standard needs a script to run nothing it did
 `JsonObjectWriter::readList()` reads a lone string as a one-entry list, the one-or-many shorthand composer's `scripts` accept.
 
 **Fixtures**: two existing scenarios changed meaning and were renamed — a script running something else keeps it (`keeps-the-projects-commands`) and a string script running something else becomes a list holding both (`extends-a-string-script`) — and eight were added: a matching string script left as written, a project's command kept in place, a missing leading and a missing middle command inserted, a retired command retracted with and without arguments, a changed declaration replacing what it retires, and a declared command inserted beside the project's variant of it; the engine-level `without-a-lock-retracts-nothing` joins them.
+
+## Changed 2026-09-29 — a declared command may accept the project's arguments
+
+The roadmap entry "an owned composer script cannot be varied" is closed by the first of the routes it listed: prefix instead of equality, opt-in per declaration.
+
+**What it does.** `new ComposerScript(name:, commands:, acceptsArguments: true)` lets each of the declaration's commands match when the actual command is the declared one or continues with a space and more arguments, so a project's `phpstan analyse --memory-limit=1G` counts as the declared command and keeps its flag, and the aggregate's `@` reference carries it into CI.
+The space is mandatory, so `analyse` never matches `analyse-nothing`, and the tolerance is suffix-only: a wrapping prefix (`php -d memory_limit=1G vendor/bin/…`) still needs a script of the project's own.
+The matching moved into a `ScriptCommand` value object, which also recognises a retired command with the project's arguments after it, the rule the previous entry recorded.
+Declarations of one script keep each command's own tolerance; a command declared twice keeps the first declaration's.
+`description()` names the commands that accept arguments, so the catalog and every drift line say what is tolerated rather than leaving it silent.
+
+**Why opt-in.** Tolerance cannot tell an environmental flag from a weakening one.
+Verified 2026-09-28: `phpstan analyse --level=0` on the command line overrides a config at level 9 — a real error went from "Found 1 error" to "No errors" — so a tolerant analyser command would let a flag silently defeat `PhpStanMinLevel`.
+The default therefore stays exact, and a standard turns tolerance on only where it has decided the arguments are the project's to add.
+
+**Fixtures**: a declaration accepting arguments keeps the project's arguments; the existing variant scenario is retitled for the strict default it demonstrates.

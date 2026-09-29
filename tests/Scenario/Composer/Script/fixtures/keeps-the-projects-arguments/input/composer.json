@@ -1,0 +1,7 @@
+{
+    "scripts": {
+        "app-phpstan": [
+            "phpstan analyse --memory-limit=1G"
+        ]
+    }
+}

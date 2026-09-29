@@ -674,6 +674,53 @@ Declared as:
 return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
     public function __construct()
     {
+        $this->addRule(new ComposerScript(name: 'app-phpstan', commands: ['phpstan analyse'], acceptsArguments: true));
+    }
+});
+```
+
+…which reports as: *Runs "phpstan analyse" in the composer script "app-phpstan", beside any commands the project adds. "phpstan analyse" accepts extra arguments.*
+
+## A declaration accepting arguments keeps the project's arguments
+
+Fixture: [`tests/Scenario/Composer/Script/fixtures/keeps-the-projects-arguments`](../../../tests/Scenario/Composer/Script/fixtures/keeps-the-projects-arguments)
+
+`composer.json` **stays byte-identical**:
+
+```json
+{
+    "scripts": {
+        "app-phpstan": [
+            "phpstan analyse --memory-limit=1G"
+        ]
+    }
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-phpstan": [
+                "phpstan analyse"
+            ]
+        }
+    }
+}
+```
+
+Declared as:
+
+```php
+return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
+    public function __construct()
+    {
         $this->addRule(new ComposerScript(name: 'app-phpstan', commands: ['phpstan analyse']));
     }
 });
@@ -681,7 +728,7 @@ return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
 
 …which reports as: *Runs "phpstan analyse" in the composer script "app-phpstan", beside any commands the project adds.*
 
-## A declared command is inserted beside the project's variant of it
+## A declaration not accepting arguments is inserted beside the project's variant
 
 Fixture: [`tests/Scenario/Composer/Script/fixtures/inserts-the-declared-command-beside-a-variant`](../../../tests/Scenario/Composer/Script/fixtures/inserts-the-declared-command-beside-a-variant)
 

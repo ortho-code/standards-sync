@@ -40,6 +40,13 @@ final class ComposerScriptTest extends TestCase
         self::assertSame('Runs "vendor/bin/standards-sync sync --check" in the composer script "app-check-standards", beside any commands the project adds.', self::rule()->description());
     }
 
+    public function testTheDescriptionNamesTheCommandsThatAcceptArguments(): void
+    {
+        $rule = new ComposerScript(name: 'app-phpstan', commands: ['phpstan analyse'], acceptsArguments: true);
+
+        self::assertSame('Runs "phpstan analyse" in the composer script "app-phpstan", beside any commands the project adds. "phpstan analyse" accepts extra arguments.', $rule->description());
+    }
+
     public function testTheListIsTheScriptInTheScriptsSection(): void
     {
         self::assertSame('scripts.app-check-standards', self::rule()->listKey());

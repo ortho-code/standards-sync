@@ -21,10 +21,7 @@ use LogicException;
  */
 final readonly class ComposerScript implements Rule, ContributesToList, ExplainsDrift
 {
-    /** What separates a command from the arguments after it; without it, "analyse" would match "analyse-nothing". */
-    private const string ARGUMENT_SEPARATOR = ' ';
-
-    /** @var non-empty-list<string> */
+    /** @var non-empty-list<ScriptCommand> */
     private array $commands;
 
     /** @var list<string> */
@@ -34,10 +31,12 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
      * The commands are validated rather than only typed: an org package is plain PHP, so the docblock is a promise the caller can break.
      *
      * @param list<string> $commands
+     * @param bool $acceptsArguments whether a project may add arguments after each command and still run it
      */
     public function __construct(
         private string $name,
         array $commands,
+        bool $acceptsArguments = false,
     ) {
         if (trim($name) === '') {
             throw new InvalidArgumentException('A composer script needs a name.');
@@ -46,7 +45,7 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
             throw new InvalidArgumentException(sprintf('The composer script "%s" needs at least one command.', $name));
         }
 
-        $this->commands = $commands;
+        $this->commands = array_map(static fn(string $command): ScriptCommand => ScriptCommand::fromString($command, $acceptsArguments), $commands);
         $this->retired = [];
     }
 
@@ -71,7 +70,7 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
     #[\Override]
     public function entries(): array
     {
-        return $this->commands;
+        return array_map(static fn(ScriptCommand $command): string => $command->value(), $this->commands);
     }
 
     #[\Override]
@@ -83,7 +82,7 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
 
         $commands = $this->commands;
         foreach ($later->commands as $command) {
-            if (!in_array($command, $commands, true)) {
+            if (!array_any($commands, static fn(ScriptCommand $declared): bool => $declared->value() === $command->value())) {
                 $commands[] = $command;
             }
         }
@@ -127,9 +126,12 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
         $current = $content === null ? [] : JsonObjectWriter::readList($content, $this->path()) ?? [];
 
         $sentences = [];
-        $missing = array_values(array_diff($this->commands, $current));
+        $missing = array_values(array_filter(
+            $this->commands,
+            static fn(ScriptCommand $declared): bool => !array_any($current, static fn(string $actual): bool => $declared->matches($actual)),
+        ));
         if ($missing !== []) {
-            $sentences[] = sprintf('It does not run %s yet.', self::quoted($missing));
+            $sentences[] = sprintf('It does not run %s yet.', self::quoted(self::values($missing)));
         }
 
         $retracted = array_values(array_filter($current, fn(string $actual): bool => !$this->declares($actual) && $this->retires($actual)));
@@ -148,7 +150,14 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
     #[\Override]
     public function description(): string
     {
-        return sprintf('Runs %s in the composer script "%s", beside any commands the project adds.', self::quoted($this->commands), $this->name);
+        $description = sprintf('Runs %s in the composer script "%s", beside any commands the project adds.', self::quoted(self::values($this->commands)), $this->name);
+
+        $accepting = array_values(array_filter($this->commands, static fn(ScriptCommand $command): bool => $command->acceptsArguments()));
+        if ($accepting !== []) {
+            $description .= sprintf(' %s %s extra arguments.', self::quoted(self::values($accepting)), count($accepting) === 1 ? 'accepts' : 'accept');
+        }
+
+        return $description;
     }
 
     /** @return non-empty-list<string> */
@@ -170,9 +179,9 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
         $cursor = 0;
         foreach ($this->commands as $declared) {
             /** @var int|null $position a list's keys are its positions */
-            $position = array_find_key($commands, static fn(string $actual): bool => $actual === $declared);
+            $position = array_find_key($commands, static fn(string $actual): bool => $declared->matches($actual));
             if ($position === null) {
-                array_splice($commands, $cursor, 0, [$declared]);
+                array_splice($commands, $cursor, 0, [$declared->value()]);
                 $position = $cursor;
             }
             $cursor = $position + 1;
@@ -184,19 +193,22 @@ final readonly class ComposerScript implements Rule, ContributesToList, Explains
 
     private function declares(string $actual): bool
     {
-        return in_array($actual, $this->commands, true);
+        return array_any($this->commands, static fn(ScriptCommand $declared): bool => $declared->matches($actual));
     }
 
     /** A retired command is recognised with arguments after it too: the project's arguments do not make a command the standard stopped declaring the project's own. */
     private function retires(string $actual): bool
     {
-        return array_any($this->retired, static fn(string $retired): bool => self::matchesWithArguments($actual, $retired));
+        return array_any($this->retired, static fn(string $retired): bool => ScriptCommand::fromString($retired, acceptsArguments: true)->matches($actual));
     }
 
-    /** True when the actual command is the given one, or the given one followed by a space and more. */
-    private static function matchesWithArguments(string $actual, string $command): bool
+    /**
+     * @param list<ScriptCommand> $commands
+     * @return list<string>
+     */
+    private static function values(array $commands): array
     {
-        return $actual === $command || str_starts_with($actual, $command . self::ARGUMENT_SEPARATOR);
+        return array_map(static fn(ScriptCommand $command): string => $command->value(), $commands);
     }
 
     /** @param list<string> $commands */

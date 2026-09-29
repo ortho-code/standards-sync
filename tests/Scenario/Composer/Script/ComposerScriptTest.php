@@ -28,7 +28,8 @@ final class ComposerScriptTest extends ScenarioTestCase
         yield 'a command the lock records and nobody declares now is retracted' => ['retracts-a-command-no-longer-declared', $aggregate];
         yield 'a retired command is retracted with the arguments the project added to it' => ['retracts-a-retired-command-with-arguments', $aggregate];
         yield 'a changed declaration replaces the command it retires' => ['replaces-a-changed-declaration', null];
-        yield 'a declared command is inserted beside the project\'s variant of it' => ['inserts-the-declared-command-beside-a-variant', null];
+        yield 'a declaration accepting arguments keeps the project\'s arguments' => ['keeps-the-projects-arguments', null];
+        yield 'a declaration not accepting arguments is inserted beside the project\'s variant' => ['inserts-the-declared-command-beside-a-variant', null];
         yield 'a second declaration of the script adds its commands after the first\'s, a shared one counting once' => ['merges-a-second-declaration', null];
     }
 }
