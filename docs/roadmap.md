@@ -34,6 +34,11 @@ Each of these is designed as far as its entry records and waits for its trigger;
   Composer scripts left this entry on 2026-09-29: their declarations merge, so a standard declared beside another adds to what that one declares instead of replacing it.
   Direction: report cross-rule-set overlap in the plan the way drift is reported, which needs no semantic change and makes the accident visible.
   Trigger: the first pair of separately declared standards found to declare one label.
+- **Rules that share a file but not its creation candidate create two files.** Each rule resolves its own target, so where no candidate exists yet each takes its own first one.
+  Two `RenovateExtendedPreset`s declared with different `createAs:` in a repository without a renovate config therefore create both `renovate.json` and `renovate.json5`, and the next sync refuses, because both now exist for one target (verified 2026-09-29).
+  Renovate's is the only target that varies with a rule's configuration today, so only two standards that both extend a renovate preset can meet it.
+  Directions: resolve creation once for every rule whose candidates overlap, taking the first declaration's creation candidate; or refuse at plan time when overlapping targets would create different files.
+  Trigger: the first pair of standards declared together that both extend a renovate preset with different creation formats.
 - **A strict composer script** — an optional `strict:` on `ComposerScript`, defaulting to `false`, so adding it is non-breaking.
   Strict means the script runs exactly the commands its declarations list together and the project's own commands are removed — the behaviour before 2026-09-29, with other standards' contributions still merged in.
   If any declaration of a script is strict, the merged script is; it combines with `acceptsArguments`, a declared command carrying the project's arguments still counting as declared, and it needs no lock, since anything undeclared is removed anyway.
