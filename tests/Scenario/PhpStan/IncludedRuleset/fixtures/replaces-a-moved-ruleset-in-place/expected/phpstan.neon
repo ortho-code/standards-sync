@@ -1,0 +1,6 @@
+includes:
+	- vendor/acme/standards/phpstan.neon # the org ruleset
+	- phpstan-baseline.neon
+
+parameters:
+	level: 6

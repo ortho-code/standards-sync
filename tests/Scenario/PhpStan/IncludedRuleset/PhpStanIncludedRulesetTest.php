@@ -19,5 +19,8 @@ final class PhpStanIncludedRulesetTest extends ScenarioTestCase
         yield 'an existing includes section gains the import' => ['insert-into-section', $config];
         yield 'a config without includes gains the section at the top' => ['creates-section', $config];
         yield 'an already-imported config stays put' => ['already-included', $config];
+        yield 'a moved ruleset replaces its predecessor in place, keeping the line\'s comment' => ['replaces-a-moved-ruleset-in-place', $config];
+        yield 'a ruleset no standard declares any more is retracted, and the project\'s include stays' => ['retracts-a-ruleset-no-longer-declared', $config];
+        yield 'a second declaration adds its ruleset after the first' => ['merges-a-second-declaration', 'standards-sync-merged.php'];
     }
 }

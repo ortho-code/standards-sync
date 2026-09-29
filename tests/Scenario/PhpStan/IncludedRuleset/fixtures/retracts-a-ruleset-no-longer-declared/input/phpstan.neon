@@ -1,0 +1,7 @@
+includes:
+	- vendor/acme/standards/phpstan.neon
+	- vendor/acme/standards/strict.neon
+	- phpstan-baseline.neon
+
+parameters:
+	level: 6

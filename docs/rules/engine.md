@@ -413,6 +413,24 @@ parameters:
 	level: 7
 ```
 
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "phpstan.neon.dist": {
+            "includes": [
+                "vendor/acme/standards/phpstan.neon"
+            ]
+        }
+    }
+}
+```
+
 ### A lone dist file is synced normally
 
 Fixture: [`tests/Scenario/Engine/TargetResolution/fixtures/lone-dist-file`](../../tests/Scenario/Engine/TargetResolution/fixtures/lone-dist-file)
@@ -432,4 +450,22 @@ includes:
 
 parameters:
 	level: 7
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "phpstan.neon.dist": {
+            "includes": [
+                "vendor/acme/standards/phpstan.neon"
+            ]
+        }
+    }
+}
 ```

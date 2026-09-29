@@ -37,3 +37,21 @@ includes:
 parameters:
 	level: 7
 ```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "phpstan.neon": {
+            "includes": [
+                "vendor/acme/standards/phpstan.neon"
+            ]
+        }
+    }
+}
+```

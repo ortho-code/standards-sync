@@ -40,6 +40,11 @@
             "scripts.app-sync-check": [
                 "standards-sync sync --check"
             ]
+        },
+        "phpstan.neon": {
+            "includes": [
+                "vendor/ortho-code/coding-standards/templates/package/phpstan.neon"
+            ]
         }
     }
 }

@@ -8,7 +8,7 @@ use OrthoCode\StandardsSync\Core\Text\Lines;
 use RuntimeException;
 
 /**
- * Ensures one entry in a top-level block-form list section in neon text.
+ * Reads, ensures or removes entries of a top-level block-form list section in neon text.
  * Entries are matched on their unquoted value — two spellings of one path are the same neon value.
  * Targeted line edits only — everything around the touched lines stays byte-identical; no parse, no reserialization.
  */
@@ -21,11 +21,26 @@ final readonly class NeonListWriter
     private const string ENTRY_PREFIX = '- ';
 
     /**
-     * Ensures the entry in the section: a present entry is kept, an absent one is inserted after the section's last entry.
+     * The section's entries as unquoted values, or null when the document has no such section.
+     *
+     * @return list<string>|null
+     */
+    public static function readList(string $content, string $section): ?array
+    {
+        $lines = Lines::split($content);
+        $sectionIndex = self::sectionIndex($lines, $section);
+
+        return $sectionIndex === null ? null : array_values(self::entries($lines, $sectionIndex));
+    }
+
+    /**
+     * Ensures the entry in the section: a present entry is kept; an absent one takes the place of the first entry of $replacing the section holds, keeping that line's indentation and trailing comment, and is otherwise inserted after the section's last entry.
      * A missing section is created at the top of the document holding just the entry; empty content becomes only that section.
      * An inline-form section is refused: managing an entry needs the block form.
+     *
+     * @param list<string> $replacing entries the entry supersedes, matched as the entry is
      */
-    public static function ensureEntry(string $content, string $section, string $entry): string
+    public static function ensureEntry(string $content, string $section, string $entry, array $replacing = []): string
     {
         if (trim($content) === '') {
             return self::createSection($section, $entry, NeonIndent::DEFAULT);
@@ -38,18 +53,68 @@ final readonly class NeonListWriter
             return self::createSection($section, $entry, NeonIndent::fromLines($lines)) . Lines::LINE_BREAK . $content;
         }
 
-        // Scan the section's entries: done when the entry is already there, otherwise remember where the section ends.
-        $lastEntryIndex = $sectionIndex;
-        $entryIndent = null;
+        $entries = self::entries($lines, $sectionIndex);
+        if (in_array(NeonValue::unquote($entry), $entries, true)) {
+            return $content;
+        }
+
+        $superseded = array_map(NeonValue::unquote(...), $replacing);
+        $replacedIndex = array_find_key($entries, static fn(string $value): bool => in_array($value, $superseded, true));
+        if ($replacedIndex !== null) {
+            $lines[$replacedIndex] = self::withValue($lines[$replacedIndex], $entry);
+
+            return Lines::join($lines);
+        }
+
+        $firstIndex = array_key_first($entries);
+        $indent = $firstIndex === null ? NeonIndent::fromLines($lines) : self::indentOf($lines[$firstIndex]);
+        array_splice($lines, (array_key_last($entries) ?? $sectionIndex) + 1, 0, [$indent . self::ENTRY_PREFIX . $entry]);
+
+        return Lines::join($lines);
+    }
+
+    /**
+     * Removes every line of the section holding one of the entries, leaving everything else byte-identical; an absent section or entry leaves the content untouched.
+     * An inline-form section is refused, as ensureEntry() refuses it.
+     *
+     * @param list<string> $entries
+     */
+    public static function removeEntries(string $content, string $section, array $entries): string
+    {
+        $lines = Lines::split($content);
+        $sectionIndex = self::sectionIndex($lines, $section);
+        if ($sectionIndex === null) {
+            return $content;
+        }
+
+        $unwanted = array_map(NeonValue::unquote(...), $entries);
+        $removed = array_filter(self::entries($lines, $sectionIndex), static fn(string $value): bool => in_array($value, $unwanted, true));
+        if ($removed === []) {
+            return $content;
+        }
+
+        return Lines::join(array_values(array_diff_key($lines, $removed)));
+    }
+
+    private static function createSection(string $section, string $entry, string $indent): string
+    {
+        return $section . ':' . Lines::LINE_BREAK . $indent . self::ENTRY_PREFIX . $entry . Lines::LINE_BREAK;
+    }
+
+    /**
+     * The section's entry lines, from its header to the first line that is neither an entry, a comment nor blank: each line's index mapped to its unquoted value.
+     *
+     * @param list<string> $lines
+     * @return array<int, string>
+     */
+    private static function entries(array $lines, int $sectionIndex): array
+    {
+        $entries = [];
         $counter = count($lines);
         for ($index = $sectionIndex + 1; $index < $counter; $index++) {
             if (preg_match(self::ENTRY_LINE, $lines[$index], $match) === 1) {
                 // A consumer-annotated entry is still that entry: the trailing comment is not part of the value.
-                if (NeonValue::unquote(NeonValue::splitTrailingComment($match[2])[0]) === NeonValue::unquote($entry)) {
-                    return $content;
-                }
-                $entryIndent ??= $match[1];
-                $lastEntryIndex = $index;
+                $entries[$index] = NeonValue::unquote(NeonValue::splitTrailingComment($match[2])[0]);
                 continue;
             }
             // A comment line neither ends the section nor holds an entry — the entries around it still count.
@@ -61,14 +126,24 @@ final readonly class NeonListWriter
             }
         }
 
-        array_splice($lines, $lastEntryIndex + 1, 0, [($entryIndent ?? NeonIndent::fromLines($lines)) . self::ENTRY_PREFIX . $entry]);
-
-        return Lines::join($lines);
+        return $entries;
     }
 
-    private static function createSection(string $section, string $entry, string $indent): string
+    private static function indentOf(string $entryLine): string
     {
-        return $section . ':' . Lines::LINE_BREAK . $indent . self::ENTRY_PREFIX . $entry . Lines::LINE_BREAK;
+        preg_match(self::ENTRY_LINE, $entryLine, $match);
+
+        return $match[1] ?? '';
+    }
+
+    /** The entry line holding another value: its indentation, dash spacing and trailing comment kept, since they belong to the slot rather than to the value. */
+    private static function withValue(string $entryLine, string $entry): string
+    {
+        preg_match(self::ENTRY_LINE, $entryLine, $match);
+        $tail = $match[2] ?? '';
+        [, $comment] = NeonValue::splitTrailingComment($tail);
+
+        return substr($entryLine, 0, strlen($entryLine) - strlen($tail)) . $entry . $comment;
     }
 
     /** @param list<string> $lines */

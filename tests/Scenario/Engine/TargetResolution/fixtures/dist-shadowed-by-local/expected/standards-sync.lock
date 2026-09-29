@@ -1,0 +1,13 @@
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "phpstan.neon.dist": {
+            "includes": [
+                "vendor/acme/standards/phpstan.neon"
+            ]
+        }
+    }
+}

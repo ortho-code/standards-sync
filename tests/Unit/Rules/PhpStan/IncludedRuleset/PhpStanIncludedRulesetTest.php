@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\OrthoCode\StandardsSync\Unit\Rules\PhpStan\IncludedRuleset;
 
+use OrthoCode\StandardsSync\Rules\Composer\Script\ComposerScript;
 use OrthoCode\StandardsSync\Rules\PhpStan\IncludedRuleset\PhpStanIncludedRuleset;
 use InvalidArgumentException;
+use LogicException;
 use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -194,6 +196,61 @@ final class PhpStanIncludedRulesetTest extends TestCase
         self::assertSame('Ensures the PHPStan config includes "vendor/acme/standards/phpstan.neon".', $rule->description());
         self::assertSame('There is no PHPStan config yet; one is created including "vendor/acme/standards/phpstan.neon".', $rule->explain(null));
         self::assertSame('The PHPStan config does not include "vendor/acme/standards/phpstan.neon".', $rule->explain(FileContent::fromString('parameters:')));
+    }
+
+    public function testMergedDeclarationsIncludeEveryRulesetOnceInDeclarationOrder(): void
+    {
+        $rule = $this->rule()
+            ->withMerged(new PhpStanIncludedRuleset(ruleset: 'vendor/acme/framework/phpstan.neon'))
+            ->withMerged($this->rule());
+
+        self::assertSame([self::IMPORT, 'vendor/acme/framework/phpstan.neon'], $rule->entries());
+        self::assertSame('Ensures the PHPStan config includes "vendor/acme/standards/phpstan.neon", "vendor/acme/framework/phpstan.neon".', $rule->description());
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
+                    	- vendor/acme/framework/phpstan.neon
+                    NEON,
+            ),
+            $rule->apply(null),
+        );
+    }
+
+    public function testRefusesToMergeAnotherRule(): void
+    {
+        $this->expectException(LogicException::class);
+
+        $this->rule()->withMerged(new ComposerScript(name: 'app-phpstan', commands: ['phpstan analyse']));
+    }
+
+    public function testAMissingRulesetTakesTheFirstRetiredIncludesPlaceAndTheOthersAreRetracted(): void
+    {
+        $rule = $this->rule()->withRetired(['vendor/acme/standards/rules.neon', 'vendor/acme/standards/strict.neon']);
+        $current = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                	- vendor/acme/standards/rules.neon # the org ruleset
+                	- phpstan-baseline.neon
+                	- vendor/acme/standards/strict.neon
+                NEON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon # the org ruleset
+                    	- phpstan-baseline.neon
+                    NEON,
+            ),
+            $rule->apply($current),
+        );
+        self::assertSame(
+            'The PHPStan config does not include "vendor/acme/standards/phpstan.neon". It stops including "vendor/acme/standards/rules.neon", "vendor/acme/standards/strict.neon", which no standard declares any more.',
+            $rule->explain($current),
+        );
     }
 
     private function rule(): PhpStanIncludedRuleset

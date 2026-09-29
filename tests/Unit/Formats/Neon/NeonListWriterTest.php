@@ -176,6 +176,146 @@ final class NeonListWriterTest extends TestCase
         NeonListWriter::ensureEntry($content, 'includes', 'vendor/other/phpstan.neon');
     }
 
+    public function testASupersededEntryIsReplacedInPlaceKeepingItsLine(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                    -  'vendor/acme/standards/rules.neon' # the org ruleset
+                    - phpstan-baseline.neon
+                NEON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+                    includes:
+                        -  vendor/acme/standards/phpstan.neon # the org ruleset
+                        - phpstan-baseline.neon
+                    NEON,
+            ),
+            NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon', ['vendor/acme/standards/rules.neon']),
+        );
+    }
+
+    public function testOnlyTheFirstSupersededEntryIsReplaced(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                	- vendor/acme/standards/rules.neon
+                	- vendor/acme/standards/strict.neon
+                NEON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+                    includes:
+                    	- vendor/acme/standards/phpstan.neon
+                    	- vendor/acme/standards/strict.neon
+                    NEON,
+            ),
+            NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon', ['vendor/acme/standards/strict.neon', 'vendor/acme/standards/rules.neon']),
+        );
+    }
+
+    public function testAPresentEntryIsKeptWhateverItSupersedes(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                	- vendor/acme/standards/rules.neon
+                	- vendor/acme/standards/phpstan.neon
+                NEON,
+        );
+
+        self::assertSame($content, NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon', ['vendor/acme/standards/rules.neon']));
+    }
+
+    public function testAnEntrySupersedingNothingPresentIsInserted(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                	- phpstan-baseline.neon
+                NEON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+                    includes:
+                    	- phpstan-baseline.neon
+                    	- vendor/acme/standards/phpstan.neon
+                    NEON,
+            ),
+            NeonListWriter::ensureEntry($content, 'includes', 'vendor/acme/standards/phpstan.neon', ['vendor/acme/standards/rules.neon']),
+        );
+    }
+
+    public function testRemovesEveryLineHoldingOneOfTheEntries(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                	- vendor/acme/standards/strict.neon
+                	# the baseline
+                	- phpstan-baseline.neon
+                	- 'vendor/acme/standards/strict.neon' # again
+                	- vendor/acme/standards/rules.neon
+
+                parameters:
+                	level: 6
+                NEON,
+        );
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'NEON'
+                    includes:
+                    	# the baseline
+                    	- phpstan-baseline.neon
+
+                    parameters:
+                    	level: 6
+                    NEON,
+            ),
+            NeonListWriter::removeEntries($content, 'includes', ['vendor/acme/standards/strict.neon', 'vendor/acme/standards/rules.neon']),
+        );
+    }
+
+    public function testRemovingAbsentEntriesLeavesTheContentUntouched(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                services:
+                	- vendor/acme/standards/strict.neon
+
+                includes:
+                	- phpstan-baseline.neon
+                NEON,
+        );
+
+        self::assertSame($content, NeonListWriter::removeEntries($content, 'includes', ['vendor/acme/standards/strict.neon']));
+        self::assertSame($content, NeonListWriter::removeEntries($content, 'excludes', ['vendor/acme/standards/strict.neon']));
+        self::assertSame($content, NeonListWriter::removeEntries($content, 'includes', []));
+    }
+
+    public function testReadsTheSectionsEntriesUnquoted(): void
+    {
+        $content = FileContent::fromString(
+            <<<'NEON'
+                includes:
+                	- 'vendor/acme/standards/phpstan.neon' # the org ruleset
+                	- phpstan-baseline.neon
+                NEON,
+        );
+
+        self::assertSame(['vendor/acme/standards/phpstan.neon', 'phpstan-baseline.neon'], NeonListWriter::readList($content, 'includes'));
+        self::assertNull(NeonListWriter::readList($content, 'excludes'));
+    }
+
     public function testOnlyTouchesTheNamedSection(): void
     {
         $content = FileContent::fromString(
