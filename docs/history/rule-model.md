@@ -428,6 +428,7 @@ First adopted by `PhpStanIncludedRuleset` and `DeptracImportedDepfile`, whose en
 **Rejected.**
 An abstract base for the import rules, owning `apply()` and `explain()` behind per-format hooks — about 200 lines fewer, but the first inheritance in the rule library, hooks that grow as formats diverge (renovate chooses its grammar per resolved path and carries a comment per entry; the fluent twins create and guard their config), and it would reverse the [ECS rider](ecs-family.md)'s conclusion that per-tool classes stay until a third fluent tool.
 Leaving the duplication until the next change to contribution semantics — the roadmap's placement rule, an entry that must be absent — would have touched all six, which is when the duplication costs most.
+Moving the rules' ensure-then-remove loop into the value object as well (considered 2026-09-30) — the order is what lands a replacement in place, but each rule's in-place unit test and scenario already fail when it is swapped (probed on the PHPStan rule), the call sites would trade a four-line loop for two closures, and the value object would take on directing writer calls rather than holding what was declared.
 
 ## Fixed 2026-09-29 — the neon writers follow neon's grammar for comments and list entries
 
