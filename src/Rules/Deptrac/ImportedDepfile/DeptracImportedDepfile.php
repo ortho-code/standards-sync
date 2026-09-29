@@ -11,6 +11,7 @@ use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
 use OrthoCode\StandardsSync\Formats\Yaml\YamlListWriter;
 use OrthoCode\StandardsSync\Rules\Deptrac\DeptracConfigFile;
+use OrthoCode\StandardsSync\Rules\General\ListContribution\DeclaredEntries;
 use LogicException;
 
 /**
@@ -22,16 +23,12 @@ final readonly class DeptracImportedDepfile implements Rule, ContributesToList, 
 {
     private const string SECTION = 'imports';
 
-    /** @var non-empty-list<string> */
-    private array $depfiles;
-
-    /** @var list<string> */
-    private array $retired;
+    /** @var DeclaredEntries<string> */
+    private DeclaredEntries $depfiles;
 
     public function __construct(string $depfile)
     {
-        $this->depfiles = [Path::fromRelativeString($depfile)->value()];
-        $this->retired = [];
+        $this->depfiles = DeclaredEntries::fromString(Path::fromRelativeString($depfile)->value());
     }
 
     #[\Override]
@@ -49,7 +46,7 @@ final readonly class DeptracImportedDepfile implements Rule, ContributesToList, 
     #[\Override]
     public function entries(): array
     {
-        return $this->depfiles;
+        return $this->depfiles->keys();
     }
 
     #[\Override]
@@ -61,7 +58,7 @@ final readonly class DeptracImportedDepfile implements Rule, ContributesToList, 
 
         /** @var static $merged psalm types clone-with as a plain object */
         $merged = clone($this, [
-            'depfiles' => array_values(array_unique([...$this->depfiles, ...$later->depfiles])),
+            'depfiles' => $this->depfiles->withMerged($later->depfiles),
         ]);
 
         return $merged;
@@ -72,7 +69,7 @@ final readonly class DeptracImportedDepfile implements Rule, ContributesToList, 
     {
         /** @var static $retiring psalm types clone-with as a plain object */
         $retiring = clone($this, [
-            'retired' => $retired,
+            'depfiles' => $this->depfiles->withRetired($retired),
         ]);
 
         return $retiring;
@@ -83,35 +80,35 @@ final readonly class DeptracImportedDepfile implements Rule, ContributesToList, 
     {
         // A project without a deptrac config gets one: enforcing the standard is the point.
         $content ??= '';
-        foreach ($this->depfiles as $depfile) {
-            $content = YamlListWriter::ensureEntry($content, self::SECTION, $depfile, replacing: $this->retired);
+        foreach ($this->depfiles->keys() as $depfile) {
+            $content = YamlListWriter::ensureEntry($content, self::SECTION, $depfile, replacing: $this->depfiles->retired());
         }
 
-        return YamlListWriter::removeEntries($content, self::SECTION, $this->retired);
+        return YamlListWriter::removeEntries($content, self::SECTION, $this->depfiles->retired());
     }
 
     #[\Override]
     public function description(): string
     {
-        return sprintf('Ensures the deptrac config imports %s.', self::quoted($this->depfiles));
+        return sprintf('Ensures the deptrac config imports %s.', self::quoted($this->depfiles->keys()));
     }
 
     #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {
-            return sprintf('There is no deptrac config yet; one is created importing %s.', self::quoted($this->depfiles));
+            return sprintf('There is no deptrac config yet; one is created importing %s.', self::quoted($this->depfiles->keys()));
         }
 
         $imported = YamlListWriter::readList($content, self::SECTION) ?? [];
 
         $sentences = [];
-        $missing = array_values(array_diff($this->depfiles, $imported));
+        $missing = $this->depfiles->missingFrom($imported);
         if ($missing !== []) {
             $sentences[] = sprintf('The deptrac config does not import %s.', self::quoted($missing));
         }
 
-        $retracted = array_values(array_intersect($this->retired, $imported));
+        $retracted = $this->depfiles->retractedFrom($imported);
         if ($retracted !== []) {
             $sentences[] = sprintf('It stops importing %s, which no standard declares any more.', self::quoted($retracted));
         }

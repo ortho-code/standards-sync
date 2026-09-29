@@ -10,6 +10,7 @@ use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
 use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
 use OrthoCode\StandardsSync\Formats\Neon\NeonListWriter;
+use OrthoCode\StandardsSync\Rules\General\ListContribution\DeclaredEntries;
 use OrthoCode\StandardsSync\Rules\PhpStan\PhpStanConfigFile;
 use LogicException;
 
@@ -22,16 +23,12 @@ final readonly class PhpStanIncludedRuleset implements Rule, ContributesToList, 
 {
     private const string SECTION = 'includes';
 
-    /** @var non-empty-list<string> */
-    private array $rulesets;
-
-    /** @var list<string> */
-    private array $retired;
+    /** @var DeclaredEntries<string> */
+    private DeclaredEntries $rulesets;
 
     public function __construct(string $ruleset)
     {
-        $this->rulesets = [Path::fromRelativeString($ruleset)->value()];
-        $this->retired = [];
+        $this->rulesets = DeclaredEntries::fromString(Path::fromRelativeString($ruleset)->value());
     }
 
     #[\Override]
@@ -49,7 +46,7 @@ final readonly class PhpStanIncludedRuleset implements Rule, ContributesToList, 
     #[\Override]
     public function entries(): array
     {
-        return $this->rulesets;
+        return $this->rulesets->keys();
     }
 
     #[\Override]
@@ -61,7 +58,7 @@ final readonly class PhpStanIncludedRuleset implements Rule, ContributesToList, 
 
         /** @var static $merged psalm types clone-with as a plain object */
         $merged = clone($this, [
-            'rulesets' => array_values(array_unique([...$this->rulesets, ...$later->rulesets])),
+            'rulesets' => $this->rulesets->withMerged($later->rulesets),
         ]);
 
         return $merged;
@@ -72,7 +69,7 @@ final readonly class PhpStanIncludedRuleset implements Rule, ContributesToList, 
     {
         /** @var static $retiring psalm types clone-with as a plain object */
         $retiring = clone($this, [
-            'retired' => $retired,
+            'rulesets' => $this->rulesets->withRetired($retired),
         ]);
 
         return $retiring;
@@ -83,35 +80,35 @@ final readonly class PhpStanIncludedRuleset implements Rule, ContributesToList, 
     {
         // A project without a PHPStan config gets one: enforcing the standard is the point.
         $content ??= '';
-        foreach ($this->rulesets as $ruleset) {
-            $content = NeonListWriter::ensureEntry($content, self::SECTION, $ruleset, replacing: $this->retired);
+        foreach ($this->rulesets->keys() as $ruleset) {
+            $content = NeonListWriter::ensureEntry($content, self::SECTION, $ruleset, replacing: $this->rulesets->retired());
         }
 
-        return NeonListWriter::removeEntries($content, self::SECTION, $this->retired);
+        return NeonListWriter::removeEntries($content, self::SECTION, $this->rulesets->retired());
     }
 
     #[\Override]
     public function description(): string
     {
-        return sprintf('Ensures the PHPStan config includes %s.', self::quoted($this->rulesets));
+        return sprintf('Ensures the PHPStan config includes %s.', self::quoted($this->rulesets->keys()));
     }
 
     #[\Override]
     public function explain(?string $content): string
     {
         if ($content === null) {
-            return sprintf('There is no PHPStan config yet; one is created including %s.', self::quoted($this->rulesets));
+            return sprintf('There is no PHPStan config yet; one is created including %s.', self::quoted($this->rulesets->keys()));
         }
 
         $included = NeonListWriter::readList($content, self::SECTION) ?? [];
 
         $sentences = [];
-        $missing = array_values(array_diff($this->rulesets, $included));
+        $missing = $this->rulesets->missingFrom($included);
         if ($missing !== []) {
             $sentences[] = sprintf('The PHPStan config does not include %s.', self::quoted($missing));
         }
 
-        $retracted = array_values(array_intersect($this->retired, $included));
+        $retracted = $this->rulesets->retractedFrom($included);
         if ($retracted !== []) {
             $sentences[] = sprintf('It stops including %s, which no standard declares any more.', self::quoted($retracted));
         }

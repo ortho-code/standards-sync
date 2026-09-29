@@ -414,6 +414,20 @@ It now skips `//`, `#` and `/* */` comments, leaving `#[` as code, since it has 
 Found while building the `withSets()` contributions, and reproduced on the code before them.
 *(Extended the same date: the call search ignored comments and strings too, and that was a corruption rather than a refusal — with a commented-out `->withSets([` above the real call, a sync wrote the new entry as live code between the comment lines, breaking the config. The call is now looked for in code only, through the same string-and-comment skipping, so the entry lands in the real call and a commented-out call alone counts as absent.)*
 
+## Decided 2026-09-29 — list contributions share their declared entries through a value object
+
+**Why.** The six rules implementing `ContributesToList` each carried the same contribution state and semantics by hand: the retired entries and an identical `withRetired()`, a `withMerged()` keeping each entry's first declaration spelled five different ways, and the same arithmetic in `explain()` — declared entries the file lacks, retired entries it still holds.
+Making the five import-tier rules contributions edited all of them almost identically, which is the cost a shared home removes.
+
+**What.** `Rules/General/ListContribution/DeclaredEntries`, a value object each rule holds: generic over the entry type, each entry keyed by the text it is written into the list as, and owning first-wins merging, the retired keys, and `missingFrom()`/`retractedFrom()`.
+The rules keep their writer calls and their tool-worded sentences, and still implement the seam's methods themselves as short delegations; the per-tool classes the R2 decision settled stay as they are.
+`ComposerScript` recognises a retired command with arguments after it, so it keeps its own matching and uses the value object for its state and merging only.
+First adopted by `PhpStanIncludedRuleset` and `DeptracImportedDepfile`, whose entries are plain strings; the rules with richer entries follow.
+
+**Rejected.**
+An abstract base for the import rules, owning `apply()` and `explain()` behind per-format hooks — about 200 lines fewer, but the first inheritance in the rule library, hooks that grow as formats diverge (renovate chooses its grammar per resolved path and carries a comment per entry; the fluent twins create and guard their config), and it would reverse the [ECS rider](ecs-family.md)'s conclusion that per-tool classes stay until a third fluent tool.
+Leaving the duplication until the next change to contribution semantics — the roadmap's placement rule, an entry that must be absent — would have touched all six, which is when the duplication costs most.
+
 ## Open choices — settled at R0 (2026-07-15)
 
 1. **Split "what" from "how", or self-contained per-format rules?** The cleaner answer: instead of one generic `ManagedBlockRule` plus a separate apply-strategy, have **per-format rule classes** — `EditorConfigRule`, `GitignoreRule`, … — each self-contained, baking its format knowledge in (sharing a common `AbstractBlockRule` for the marker mechanics). The format-specific class *is* the "how", so no separate strategy layer or `applicable()` pairing is needed, and it grows well — a contributor adds a `FooRule` for a new format. Caveat: for format-*generic* families (an `ImportRule` that varies only by a small syntax detail across `phpstan.neon` / `rector.php`), N per-format classes are overkill — there a single rule with a tiny format-applier is lighter. **Decided:** per rule *family* — per-format classes for the block family (resolves the split cleanly); a single rule + small applier only where a family is genuinely format-generic. Note `.editorconfig` and `.gitignore` currently do identical block-placement, so they can start on one shared base and split when real format-specifics appear (editorconfig key-merge, gitignore line-union).
@@ -476,3 +490,4 @@ Carry the fixture discipline forward from the block engine: each rule ships a **
 - **Built 2026-09-29: the Rector and ECS base sets contribute to `withSets()`** — see the [Rector](rector-family.md#changed-2026-09-29--the-base-set-contributes-to-withsets) and [ECS](ecs-family.md#changed-2026-09-29--the-base-set-contributes-to-withsets) entries.
 - **Built 2026-09-29: the deptrac imports entry contributes to `imports`** — see [the deptrac entry](deptrac-family.md#changed-2026-09-29--the-imports-entry-contributes-to-imports).
 - **Built 2026-09-29: the renovate preset contributes to `extends`**, the last import-tier rule, which closes the roadmap entry — see [the renovate entry](renovate-family.md#changed-2026-09-29--the-extended-preset-contributes-to-extends).
+- **Built 2026-09-29: `DeclaredEntries`**, adopted by the PHPStan and deptrac imports — see [the decision](#decided-2026-09-29--list-contributions-share-their-declared-entries-through-a-value-object).
