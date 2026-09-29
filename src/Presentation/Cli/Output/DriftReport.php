@@ -8,6 +8,7 @@ use OrthoCode\StandardsSync\Core\Filesystem\Path;
 use OrthoCode\StandardsSync\Core\Plan\Abstention;
 use OrthoCode\StandardsSync\Core\Plan\Change;
 use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
+use OrthoCode\StandardsSync\Core\Plan\ForgottenList;
 use OrthoCode\StandardsSync\Core\Plan\Plan;
 use OrthoCode\StandardsSync\Core\Plan\RuleApplication;
 use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
@@ -63,6 +64,10 @@ final readonly class DriftReport
             $notes[] = $this->abstentionNote($abstention);
         }
 
+        foreach ($plan->forgottenLists() as $forgotten) {
+            $notes[] = $this->forgottenListNote($forgotten);
+        }
+
         return $notes;
     }
 
@@ -79,6 +84,11 @@ final readonly class DriftReport
     private function abstentionNote(Abstention $abstention): string
     {
         return sprintf(self::NOTE_LEAD . '%s does not exist; nothing was enforced there (%s).', $abstention->path()->value(), implode(', ', $this->ruleNames($abstention->rules())));
+    }
+
+    private function forgottenListNote(ForgottenList $forgotten): string
+    {
+        return sprintf(self::NOTE_LEAD . '%s › %s is no longer declared by any standard; it stays as the project\'s own.', $forgotten->file()->value(), $forgotten->listKey());
     }
 
     /**

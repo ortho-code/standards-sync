@@ -10,8 +10,9 @@ standards-sync.php (returns SyncConfig)
     fold apply() in declaration order
   → Change (per FILE: kind from the fold's endpoints, plus per-rule attribution)
     or Abstention (the file is absent and no rule wanted it: reported, never written)
-    + the root's lock as one more Change, recording what its contributions declared
-  → Plan{ Change[], Abstention[] }
+    + the root's lock as one more Change, recording what its contributions declared,
+      and a ForgottenList per list it recorded that nothing contributes to now
+  → Plan{ Change[], Abstention[], ForgottenList[] }
   → Engine::apply(Plan)   the ONLY writer      |     --check → report Plan.drift(), exit 1 on drift
 ```
 

@@ -9,10 +9,12 @@ final readonly class Plan
     /**
      * @param list<Change> $changes
      * @param list<Abstention> $abstentions
+     * @param list<ForgottenList> $forgottenLists
      */
     public function __construct(
         private array $changes,
         private array $abstentions = [],
+        private array $forgottenLists = [],
     ) {}
 
     /** @return list<Change> */
@@ -29,6 +31,16 @@ final readonly class Plan
     public function abstentions(): array
     {
         return $this->abstentions;
+    }
+
+    /**
+     * The lists the lock recorded that no rule contributes to any more; they are reported, and whatever is left of them stays.
+     *
+     * @return list<ForgottenList>
+     */
+    public function forgottenLists(): array
+    {
+        return $this->forgottenLists;
     }
 
     /** @return list<Change> */

@@ -369,6 +369,15 @@ The lock is the shape the prior-art study pointed at (`symfony.lock`, see [prior
 
 **Known limit, accepted.** Once the project's entries are kept, an entry a project added that a standard later starts declaring becomes the standard's, and is retracted if the standard later retires it.
 
+## Decided 2026-09-28 — a list nothing contributes to any more is reported once
+
+A list the lock recorded that no rule contributes to any more — a script the standards stopped declaring altogether — cannot be retracted: retraction happens inside a rule, and no rule is left that knows how to edit that list.
+So whatever is left of it in the file is the project's own, and the report says so as the third note kind: ` NOTE composer.json › scripts.app-phpcs is no longer declared by any standard; it stays as the project's own.`
+The note derives from the two locks — the lists the one on disk records and the one this sync writes does not (`SyncLock::forgottenBy()`) — so it shows during the `--check` before the sync and the sync itself, and never after, because the written lock no longer records the list.
+A file that is absent keeps its lists in the lock, so a manifest missing for one run is never reported as forgotten.
+*Rejected*: the lock's own diff as the only trace — it shows that the record changed, not that a script was left behind for the project to delete.
+Removing the list itself stays deferred on the [roadmap](../roadmap.md).
+
 ## Open choices — settled at R0 (2026-07-15)
 
 1. **Split "what" from "how", or self-contained per-format rules?** The cleaner answer: instead of one generic `ManagedBlockRule` plus a separate apply-strategy, have **per-format rule classes** — `EditorConfigRule`, `GitignoreRule`, … — each self-contained, baking its format knowledge in (sharing a common `AbstractBlockRule` for the marker mechanics). The format-specific class *is* the "how", so no separate strategy layer or `applicable()` pairing is needed, and it grows well — a contributor adds a `FooRule` for a new format. Caveat: for format-*generic* families (an `ImportRule` that varies only by a small syntax detail across `phpstan.neon` / `rector.php`), N per-format classes are overkill — there a single rule with a tiny format-applier is lighter. **Decided:** per rule *family* — per-format classes for the block family (resolves the split cleanly); a single rule + small applier only where a family is genuinely format-generic. Note `.editorconfig` and `.gitignore` currently do identical block-placement, so they can start on one shared base and split when real format-specifics appear (editorconfig key-merge, gitignore line-union).
@@ -424,3 +433,4 @@ Carry the fixture discipline forward from the block engine: each rule ships a **
 - **Built 2026-09-29: contributions to one list merge** — the `ContributesToList` seam and the engine's pre-fold merge, with `ComposerScript` as the first user; see [the decision](#decided-2026-09-28--contributions-to-one-list-merge-before-the-fold). The lock that remembers declared entries, the project's own entries kept, and argument tolerance follow as separate steps.
 - **Built 2026-09-29: the lock records what was declared** — `standards-sync.lock` per root, planned as one more file, with `ContributesToList::entries()`; see [the decision](#decided-2026-09-28--a-lock-records-what-list-contributions-declared). Nothing is retracted through it yet; that is the next step.
 - **Built 2026-09-29: retraction through the lock** — `ContributesToList::withRetired()`, through which the engine hands each contribution the entries it declared at the last sync and declares no longer, and `ComposerScript` keeping the project's commands; see the [composer-family entry](composer-family.md#changed-2026-09-29--the-projects-commands-stay-and-commands-the-standards-stop-declaring-are-retracted).
+- **Built 2026-09-29: the forgotten-list note** — `ForgottenList`, `Plan::forgottenLists()` and the report's third note kind; see [the decision](#decided-2026-09-28--a-list-nothing-contributes-to-any-more-is-reported-once).

@@ -12,6 +12,7 @@ use OrthoCode\StandardsSync\Core\Filesystem\Path;
 use OrthoCode\StandardsSync\Core\Lock\SyncLock;
 use OrthoCode\StandardsSync\Core\Plan\Change;
 use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
+use OrthoCode\StandardsSync\Core\Plan\ForgottenList;
 use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use OrthoCode\StandardsSync\Rules\Composer\Script\ComposerScript;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
@@ -351,7 +352,23 @@ final class EngineTest extends TestCase
         $plan = new Engine($filesystem)->plan($this->scriptConfig());
 
         self::assertFalse($plan->hasDrift());
+        self::assertSame([], $plan->forgottenLists());
         self::assertCount(1, $plan->abstentions());
+    }
+
+    public function testAListNoRuleContributesToAnyMoreIsForgotten(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/composer.json' => FileContent::fromString('{"scripts": {"app-checks": ["@app-sync-check"], "app-phpcs": ["phpcs"]}}'),
+            '/a/standards-sync.lock' => SyncLock::create()
+                ->withEntries(Path::fromString('composer.json'), 'scripts.app-checks', ['@app-sync-check'])
+                ->withEntries(Path::fromString('composer.json'), 'scripts.app-phpcs', ['phpcs'])
+                ->toJson(),
+        ]);
+
+        $plan = new Engine($filesystem)->plan($this->scriptConfig());
+
+        self::assertEquals([new ForgottenList(Path::fromString('/a/composer.json'), 'scripts.app-phpcs')], $plan->forgottenLists());
     }
 
     public function testARootWithoutContributionsGetsNoLock(): void

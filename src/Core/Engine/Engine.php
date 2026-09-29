@@ -11,6 +11,7 @@ use OrthoCode\StandardsSync\Core\Lock\SyncLock;
 use OrthoCode\StandardsSync\Core\Plan\Abstention;
 use OrthoCode\StandardsSync\Core\Plan\Change;
 use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
+use OrthoCode\StandardsSync\Core\Plan\ForgottenList;
 use OrthoCode\StandardsSync\Core\Plan\Plan;
 use OrthoCode\StandardsSync\Core\Plan\RuleApplication;
 use OrthoCode\StandardsSync\Core\Rule\AppliesAtPath;
@@ -42,8 +43,9 @@ final readonly class Engine
         }
 
         return new Plan(
-            array_values(array_filter($outcomes, static fn(Change|Abstention $outcome): bool => $outcome instanceof Change)),
-            array_values(array_filter($outcomes, static fn(Change|Abstention $outcome): bool => $outcome instanceof Abstention)),
+            array_values(array_filter($outcomes, static fn(Change|Abstention|ForgottenList $outcome): bool => $outcome instanceof Change)),
+            array_values(array_filter($outcomes, static fn(Change|Abstention|ForgottenList $outcome): bool => $outcome instanceof Abstention)),
+            array_values(array_filter($outcomes, static fn(Change|Abstention|ForgottenList $outcome): bool => $outcome instanceof ForgottenList)),
         );
     }
 
@@ -100,7 +102,7 @@ final readonly class Engine
 
     /**
      * @param list<Rule> $rules
-     * @return list<Change|Abstention>
+     * @return list<Change|Abstention|ForgottenList>
      */
     private function outcomesFor(Path $root, array $rules): array
     {
@@ -135,6 +137,8 @@ final readonly class Engine
             $recorded = $this->record($recorded, $lock, $target, $fileRules, $outcome);
             $outcomes[] = $outcome;
         }
+
+        array_push($outcomes, ...$lock->forgottenBy($recorded, $root));
 
         $lockChange = $this->lockChange($lockPath, $currentLock, $recorded);
         if ($lockChange instanceof Change) {

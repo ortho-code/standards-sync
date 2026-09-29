@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OrthoCode\StandardsSync\Core\Lock;
 
 use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Plan\ForgottenList;
 use OrthoCode\StandardsSync\Core\Text\Lines;
 use JsonException;
 use RuntimeException;
@@ -74,6 +75,25 @@ final readonly class SyncLock
         $files[$file->value()][$listKey] = $entries;
 
         return new self($files);
+    }
+
+    /**
+     * The lists this lock records that the next one does not, located under the root the lock belongs to.
+     *
+     * @return list<ForgottenList>
+     */
+    public function forgottenBy(self $next, Path $root): array
+    {
+        $forgotten = [];
+        foreach ($this->files as $file => $lists) {
+            foreach (array_keys($lists) as $listKey) {
+                if (!isset($next->files[$file][$listKey])) {
+                    $forgotten[] = new ForgottenList($root->join(Path::fromString($file)), $listKey);
+                }
+            }
+        }
+
+        return $forgotten;
     }
 
     public function isEmpty(): bool

@@ -64,7 +64,7 @@ The engine groups rules by resolved target and folds each file's rules in declar
 Before that, contributions to one list (same class, target and list key) merge into one rule, standing at the first declaration's position.
 One `Change` per file; `Engine::apply` is the only writer; `--check` computes the same plan and writes nothing, exiting non-zero on drift.
 `ChangeKind` derives from the fold's endpoints (create, update, in sync).
-The report attributes drift per rule (description plus `explain()` where implemented) and carries two note kinds: a shadowing note (a local file the tool reads in preference to the synced dist file) and an abstention note (a resolved file whose rules all had no opinion).
+The report attributes drift per rule (description plus `explain()` where implemented) and carries three note kinds: a shadowing note (a local file the tool reads in preference to the synced dist file), an abstention note (a resolved file whose rules all had no opinion) and a forgotten-list note (a list the lock recorded that no rule contributes to any more).
 
 ## The lock
 
@@ -72,6 +72,7 @@ Each root's `standards-sync.lock` records, per file and list, the entries its li
 The engine reads it before the root's files fold and plans it as one more file after them, so `Engine::apply` stays the only writer and a stale or missing lock is drift.
 Before the fold, each contribution is handed the entries it declared at the last sync and declares no longer, and retracts them from the file; every entry the lock never recorded is the project's and stays, and without a lock nothing is retracted.
 A root without contributions gets no lock, and a file that is absent keeps whatever the lock recorded for it, since nothing was enforced there to supersede it.
+A list the lock recorded that nothing contributes to any more cannot be retracted — no rule is left that knows how — so it stays as the project's own and is reported once, while the lock still records it.
 The engine owns the file end to end: files and list keys sort, so its rendering depends only on what was declared.
 
 ## Composition and layering

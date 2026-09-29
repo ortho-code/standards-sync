@@ -8,6 +8,8 @@ use OrthoCode\StandardsSync\Rules\General\ManagedBlock\Label;
 use OrthoCode\StandardsSync\Rules\General\ManagedBlock\ManagedBlock;
 use OrthoCode\StandardsSync\Core\Config\SyncConfig;
 use OrthoCode\StandardsSync\Core\Engine\Engine;
+use OrthoCode\StandardsSync\Core\Filesystem\Path;
+use OrthoCode\StandardsSync\Core\Lock\SyncLock;
 use OrthoCode\StandardsSync\Core\Plan\Plan;
 use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
@@ -120,6 +122,22 @@ final class DriftReportTest extends TestCase
         self::assertStringContainsString(' CREATE ./standards-sync.lock', $report);
         self::assertStringNotContainsString('   - ', $report);
         self::assertStringContainsString('1 file(s) drift from the managed standard.', $report);
+    }
+
+    public function testNotesAListNoStandardDeclaresAnyMore(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            './composer.json' => "{\"scripts\": {\"app-checks\": [\"@app-sync-check\"], \"app-phpcs\": [\"phpcs\"]}}\n",
+            './standards-sync.lock' => SyncLock::create()
+                ->withEntries(Path::fromString('composer.json'), 'scripts.app-checks', ['@app-sync-check'])
+                ->withEntries(Path::fromString('composer.json'), 'scripts.app-phpcs', ['phpcs'])
+                ->toJson(),
+        ]);
+
+        $report = $this->renderFor($filesystem, new ComposerScript(name: 'app-checks', commands: ['@app-sync-check']));
+
+        self::assertStringContainsString(' NOTE ./composer.json › scripts.app-phpcs is no longer declared by any standard; it stays as the project\'s own.', $report);
+        self::assertStringContainsString(' UPDATE ./standards-sync.lock', $report);
     }
 
     private function abstainingRule(string $package): ComposerRequirement

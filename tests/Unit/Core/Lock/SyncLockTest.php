@@ -6,6 +6,7 @@ namespace Tests\OrthoCode\StandardsSync\Unit\Core\Lock;
 
 use OrthoCode\StandardsSync\Core\Filesystem\Path;
 use OrthoCode\StandardsSync\Core\Lock\SyncLock;
+use OrthoCode\StandardsSync\Core\Plan\ForgottenList;
 use OrthoCode\StandardsSync\Testing\FileContent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -82,6 +83,20 @@ final class SyncLockTest extends TestCase
     public function testAnUnrecordedListRetiresNothing(): void
     {
         self::assertSame([], SyncLock::create()->retired(Path::fromString('composer.json'), 'scripts.app-checks', ['@app-sync-check']));
+    }
+
+    public function testAListTheNextLockDoesNotRecordIsForgotten(): void
+    {
+        $file = Path::fromString('composer.json');
+        $current = SyncLock::create()
+            ->withEntries($file, 'scripts.app-checks', ['@app-sync-check'])
+            ->withEntries($file, 'scripts.app-phpcs', ['phpcs']);
+        $next = SyncLock::create()->withEntries($file, 'scripts.app-checks', ['@app-sync-check']);
+
+        self::assertEquals(
+            [new ForgottenList(Path::fromString('./composer.json'), 'scripts.app-phpcs')],
+            $current->forgottenBy($next, Path::fromString('.')),
+        );
     }
 
     /** @return iterable<string, array{string}> */
