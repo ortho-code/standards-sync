@@ -21,7 +21,7 @@ return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
 …which report as:
 
 - *Requires phpstan/phpstan in the composer manifest (require-dev), no lower than "^2.5".*
-- *Runs "vendor/bin/standards-sync sync --check" as the composer script "app-check-standards".*
+- *Runs "vendor/bin/standards-sync sync --check" in the composer script "app-check-standards", beside any commands the project adds.*
 
 ### Both rules fold into one manifest
 

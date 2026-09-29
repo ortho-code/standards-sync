@@ -26,8 +26,8 @@ return SyncConfig::create()->withRuleSet($tier)->withRuleSet($framework);
 
 …which report as:
 
-- *Runs "@app-sync-check", "@app-run-tests" as the composer script "app-checks".*
-- *Runs "@app-lint" as the composer script "app-checks".*
+- *Runs "@app-sync-check", "@app-run-tests" in the composer script "app-checks", beside any commands the project adds.*
+- *Runs "@app-lint" in the composer script "app-checks", beside any commands the project adds.*
 
 ### A standard declared after the tier adds its commands after the tier's
 
@@ -98,8 +98,8 @@ return SyncConfig::create()->withRuleSet($framework)->withRuleSet($tier);
 
 …which report as:
 
-- *Runs "@app-lint" as the composer script "app-checks".*
-- *Runs "@app-sync-check", "@app-run-tests" as the composer script "app-checks".*
+- *Runs "@app-lint" in the composer script "app-checks", beside any commands the project adds.*
+- *Runs "@app-sync-check", "@app-run-tests" in the composer script "app-checks", beside any commands the project adds.*
 
 ### A standard declared before the tier puts its commands first
 
@@ -159,7 +159,44 @@ return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
 });
 ```
 
-…which reports as: *Runs "@app-sync-check", "@app-run-tests" as the composer script "app-checks".*
+…which reports as: *Runs "@app-sync-check", "@app-run-tests" in the composer script "app-checks", beside any commands the project adds.*
+
+### Without a lock nothing is retracted, and the first sync writes one
+
+Fixture: [`tests/Scenario/Engine/ListContributions/fixtures/without-a-lock-retracts-nothing`](../../tests/Scenario/Engine/ListContributions/fixtures/without-a-lock-retracts-nothing)
+
+`composer.json` **stays byte-identical**:
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-phpcs",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
 
 ### An in-sync manifest beside a stale lock drifts in the lock alone
 

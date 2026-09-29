@@ -37,7 +37,7 @@ final class ComposerScriptTest extends TestCase
 
     public function testTheDescriptionNamesTheScriptAndWhatItRuns(): void
     {
-        self::assertSame('Runs "vendor/bin/standards-sync sync --check" as the composer script "app-check-standards".', self::rule()->description());
+        self::assertSame('Runs "vendor/bin/standards-sync sync --check" in the composer script "app-check-standards", beside any commands the project adds.', self::rule()->description());
     }
 
     public function testTheListIsTheScriptInTheScriptsSection(): void
@@ -66,7 +66,51 @@ final class ComposerScriptTest extends TestCase
 
         self::assertSame(['@app-sync-check', '@app-run-tests', '@app-lint'], $merged->entries());
         self::assertSame($expected, $merged->apply(FileContent::fromString('{}')));
-        self::assertSame('Runs "@app-sync-check", "@app-run-tests", "@app-lint" as the composer script "app-checks".', $merged->description());
+        self::assertSame('Runs "@app-sync-check", "@app-run-tests", "@app-lint" in the composer script "app-checks", beside any commands the project adds.', $merged->description());
+    }
+
+    /** A new declaration that extends a retired one must never be taken for it, or the rule would retract what it has just declared. */
+    public function testADeclaredCommandIsNeverRetractedByARetiredOneItExtends(): void
+    {
+        $manifest = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "scripts": {
+                        "app-phpstan": [
+                            "phpstan analyse --no-progress"
+                        ]
+                    }
+                }
+                JSON,
+        );
+
+        $rule = new ComposerScript(name: 'app-phpstan', commands: ['phpstan analyse --no-progress'])->withRetired(['phpstan analyse']);
+
+        self::assertSame($manifest, $rule->apply($manifest));
+    }
+
+    public function testTheExplanationNamesWhatIsMissingWhatIsRetractedAndWhatStays(): void
+    {
+        $manifest = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "scripts": {
+                        "app-checks": [
+                            "@app-sync-check",
+                            "@app-phpcs",
+                            "@app-psalm"
+                        ]
+                    }
+                }
+                JSON,
+        );
+
+        $rule = new ComposerScript(name: 'app-checks', commands: ['@app-sync-check', '@app-run-tests'])->withRetired(['@app-phpcs']);
+
+        self::assertSame(
+            'It does not run "@app-run-tests" yet. It stops running "@app-phpcs", which no standard declares any more. The project\'s own "@app-psalm" stays.',
+            $rule->explain($manifest),
+        );
     }
 
     public function testRefusesToMergeADeclarationOfAnotherScript(): void

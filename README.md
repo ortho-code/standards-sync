@@ -19,7 +19,7 @@ vendor/bin/standards-sync sync --check    # report drift, exit non-zero, write n
 
 Every sync writes plain files into the working tree, so the result is reviewed like any other diff. `sync --check` in CI turns the standard from advisory into enforced: a repo that drifts fails its own pipeline.
 
-Where a standard contributes to a list — a composer script's commands — the sync also writes `standards-sync.lock` beside the config, recording what the standards declared; the consumer commits it with the rest.
+Where a standard contributes to a list the project shares — a composer script's commands — the sync also writes `standards-sync.lock` beside the config, and the consumer commits it: it records what the standards declared, so a later sync can retract what they stop declaring while leaving the project's own entries alone.
 
 ## Authoring a standard
 

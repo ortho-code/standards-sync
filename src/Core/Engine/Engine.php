@@ -21,7 +21,7 @@ use RuntimeException;
 /**
  * Computes a plan from config and applies it; the only writer in the pipeline.
  * Planning folds each file's rules in declaration order over the current content: one read and one Change per file, and rules never touch the filesystem.
- * Each root's lock is read before its files fold and planned as one more file after them, so it records what this sync declared.
+ * Each root's lock is read before its files fold, telling each contribution what it declared then and declares no longer, and is planned as one more file after them, so it records what this sync declared.
  */
 final readonly class Engine
 {
@@ -123,8 +123,16 @@ final readonly class Engine
 
         $outcomes = [];
         foreach ($rulesByPath as $key => $fileRules) {
-            $outcome = $this->foldFile($targets[$key], $fileRules);
-            $recorded = $this->record($recorded, $lock, $targets[$key], $fileRules, $outcome);
+            $target = $targets[$key];
+            $fileRules = array_map(
+                static fn(Rule $rule): Rule => $rule instanceof ContributesToList
+                    ? $rule->withRetired($lock->retired($target->candidate(), $rule->listKey(), $rule->entries()))
+                    : $rule,
+                $fileRules,
+            );
+
+            $outcome = $this->foldFile($target, $fileRules);
+            $recorded = $this->record($recorded, $lock, $target, $fileRules, $outcome);
             $outcomes[] = $outcome;
         }
 

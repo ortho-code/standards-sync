@@ -1,0 +1,10 @@
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-phpstan",
+            "@app-psalm",
+            "@app-run-tests"
+        ]
+    }
+}

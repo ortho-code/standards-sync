@@ -58,6 +58,15 @@ final readonly class SyncLock
         return $this->files[$file->value()][$listKey] ?? null;
     }
 
+    /**
+     * @param list<string> $declared
+     * @return list<string> the entries recorded for the list and not declared now
+     */
+    public function retired(Path $file, string $listKey, array $declared): array
+    {
+        return array_values(array_diff($this->entries($file, $listKey) ?? [], $declared));
+    }
+
     /** @param non-empty-list<string> $entries */
     public function withEntries(Path $file, string $listKey, array $entries): self
     {

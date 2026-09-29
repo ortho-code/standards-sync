@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-psalm",
+            "@app-run-tests"
+        ]
+    }
+}

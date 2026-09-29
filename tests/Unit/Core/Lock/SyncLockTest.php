@@ -72,6 +72,18 @@ final class SyncLockTest extends TestCase
         self::assertNull(SyncLock::create()->entries(Path::fromString('composer.json'), 'scripts.app-checks'));
     }
 
+    public function testRetiredEntriesAreTheRecordedOnesNoLongerDeclared(): void
+    {
+        $lock = SyncLock::create()->withEntries(Path::fromString('composer.json'), 'scripts.app-checks', ['@app-sync-check', '@app-phpcs', '@app-run-tests']);
+
+        self::assertSame(['@app-phpcs'], $lock->retired(Path::fromString('composer.json'), 'scripts.app-checks', ['@app-sync-check', '@app-run-tests', '@app-lint']));
+    }
+
+    public function testAnUnrecordedListRetiresNothing(): void
+    {
+        self::assertSame([], SyncLock::create()->retired(Path::fromString('composer.json'), 'scripts.app-checks', ['@app-sync-check']));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function foreignLocks(): iterable
     {

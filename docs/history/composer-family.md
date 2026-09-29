@@ -102,3 +102,31 @@ A slot script the tier references and the framework owns — it rests on the com
 So an aggregate calling a script nobody declares any more skips that check silently rather than failing.
 
 **Fixtures**: one script scenario (a second declaration adds its commands after the first's, a shared one counting once) and two engine-level scenarios under `tests/Scenario/Engine/ListContributions/` (the order of two rule sets decides where each standard's commands go); no existing fixture changed.
+
+## Changed 2026-09-29 — the project's commands stay, and commands the standards stop declaring are retracted
+
+The 2026-08-11 decision "`ComposerScript` owns its named script" is superseded: the rule now declares commands a script runs rather than the script's whole content.
+
+**Why.** Ownership removed every command a project added to a declared script, and the merged exact list of the previous entry still did, so a consumer could not add a step of its own to an aggregate at all.
+Keeping those commands needed the lock ([rule-model.md](rule-model.md#decided-2026-09-28--a-lock-records-what-list-contributions-declared)), because without it a command the standards stop declaring would look exactly like one the project added and stay forever.
+
+**What it does.** Each declared command is enforced present, and a missing one is inserted after the command declared before it, so a project that deleted `@app-sync-check` gets it back first.
+Every other command in the script is the project's and stays where the project put it; only presence is enforced, so a project may reorder.
+A command declared at the last sync and declared by nobody now is retracted, and it is recognised with arguments after it too, since a project's arguments do not make a command the standards stopped declaring the project's own.
+A declared command always takes precedence over a retired one it extends, so a changed declaration never retracts its own replacement.
+Without a lock nothing is retracted, which makes a deleted lock cost one sync's retractions and nothing else.
+`explain()` names what is missing, what is retracted and which of the project's commands stay.
+
+**Accepted cost, at adoption.** A project adopting a standard over a same-name script it already had keeps its old commands beside the declared ones: `["phpstan analyse", "php vendor/bin/phpstan --memory-limit=256M"]` runs the analyser twice until the project deletes its line.
+That follows directly from never removing what a project wrote and retracting only what the lock records; the drift explanation names the commands that stay, and the diff shows them.
+*Rejected*: taking the script over wholesale when no lock exists — a lock deleted later, or lost in a merge conflict, would wipe the project's additions the same way.
+
+**Rejected alternatives.**
+Tolerant ownership without memory, the owner enforcing a leading prefix and keeping the rest — it cannot retract, so a tier dropping `@app-phpcs` would leave it running in every consumer.
+The merged exact list, which the previous entry built — order-independent and accurate in the report, but it removes what a project added, which was the requirement it failed.
+A strict mode restoring it where a standard needs a script to run nothing it did not declare is on the [roadmap](../roadmap.md), deferred with its trigger.
+
+**Also changed.** A string-valued script whose one command is the declared one is left as written instead of being rewritten into the list form: the value is compliant, so its bytes stay.
+`JsonObjectWriter::readList()` reads a lone string as a one-entry list, the one-or-many shorthand composer's `scripts` accept.
+
+**Fixtures**: two existing scenarios changed meaning and were renamed — a script running something else keeps it (`keeps-the-projects-commands`) and a string script running something else becomes a list holding both (`extends-a-string-script`) — and eight were added: a matching string script left as written, a project's command kept in place, a missing leading and a missing middle command inserted, a retired command retracted with and without arguments, a changed declaration replacing what it retires, and a declared command inserted beside the project's variant of it; the engine-level `without-a-lock-retracts-nothing` joins them.

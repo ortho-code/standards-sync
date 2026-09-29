@@ -1,7 +1,0 @@
-{
-    "scripts": {
-        "app-check-standards": [
-            "vendor/bin/standards-sync sync --check"
-        ]
-    }
-}

@@ -2,7 +2,7 @@
 
 # ComposerScript
 
-Owns a named composer script: the declared commands are what the script runs, and a deviating or missing script is rewritten. Declarations of one script combine in declaration order, each adding its commands after the earlier ones'; a command declared twice counts once. A project needing extra steps declares a script of its own and calls this one through composer's "@name" reference, so the owned entry point stays exactly what the standards say. A root without a manifest is not a composer project, so the rule abstains rather than creating one.
+Declares commands a named composer script runs: each is enforced present, a missing one inserted after the command declared before it, and every other command in the script is the project's and stays. Declarations of one script combine in declaration order, each adding its commands after the earlier ones'; a command declared twice counts once. A command declared at an earlier sync and declared by nobody now is retracted, with or without arguments after it. A root without a manifest is not a composer project, so the rule abstains rather than creating one.
 
 Declared as:
 
@@ -15,7 +15,7 @@ return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
 });
 ```
 
-…which reports as: *Runs "vendor/bin/standards-sync sync --check" as the composer script "app-check-standards".*
+…which reports as: *Runs "vendor/bin/standards-sync sync --check" in the composer script "app-check-standards", beside any commands the project adds.*
 
 ## A manifest without the script gains it
 
@@ -60,9 +60,9 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/adds-the-script`](../../../te
 }
 ```
 
-## A script running something else is rewritten, its neighbours untouched
+## A script running other commands keeps them, the declared one inserted first
 
-Fixture: [`tests/Scenario/Composer/Script/fixtures/rewrites-a-drifted-script`](../../../tests/Scenario/Composer/Script/fixtures/rewrites-a-drifted-script)
+Fixture: [`tests/Scenario/Composer/Script/fixtures/keeps-the-projects-commands`](../../../tests/Scenario/Composer/Script/fixtures/keeps-the-projects-commands)
 
 **Before** — `composer.json`:
 
@@ -85,7 +85,8 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/rewrites-a-drifted-script`](.
 {
     "scripts": {
         "app-check-standards": [
-            "vendor/bin/standards-sync sync --check"
+            "vendor/bin/standards-sync sync --check",
+            "vendor/bin/standards-sync sync"
         ],
         "app-run-tests": [
             "vendor/bin/phpunit"
@@ -146,9 +147,9 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/leaves-a-matching-script`](..
 }
 ```
 
-## A script written as a single string becomes the list form
+## A string script running something else becomes a list holding both
 
-Fixture: [`tests/Scenario/Composer/Script/fixtures/replaces-a-string-script`](../../../tests/Scenario/Composer/Script/fixtures/replaces-a-string-script)
+Fixture: [`tests/Scenario/Composer/Script/fixtures/extends-a-string-script`](../../../tests/Scenario/Composer/Script/fixtures/extends-a-string-script)
 
 **Before** — `composer.json`:
 
@@ -166,8 +167,41 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/replaces-a-string-script`](..
 {
     "scripts": {
         "app-check-standards": [
-            "vendor/bin/standards-sync sync --check"
+            "vendor/bin/standards-sync sync --check",
+            "vendor/bin/standards-sync sync"
         ]
+    }
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-check-standards": [
+                "vendor/bin/standards-sync sync --check"
+            ]
+        }
+    }
+}
+```
+
+## A string script running the declared command is left as written
+
+Fixture: [`tests/Scenario/Composer/Script/fixtures/leaves-a-matching-string-script`](../../../tests/Scenario/Composer/Script/fixtures/leaves-a-matching-string-script)
+
+`composer.json` **stays byte-identical**:
+
+```json
+{
+    "scripts": {
+        "app-check-standards": "vendor/bin/standards-sync sync --check"
     }
 }
 ```
@@ -204,7 +238,7 @@ return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
 });
 ```
 
-…which reports as: *Runs "vendor/bin/standards-sync sync --check", "vendor/bin/phpstan" as the composer script "app-check-standards".*
+…which reports as: *Runs "vendor/bin/standards-sync sync --check", "vendor/bin/phpstan" in the composer script "app-check-standards", beside any commands the project adds.*
 
 ## Every command of a multi-command script gets its own line
 
@@ -257,6 +291,449 @@ Declared as:
 return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
     public function __construct()
     {
+        $this->addRule(new ComposerScript(name: 'app-checks', commands: ['@app-sync-check', '@app-phpstan', '@app-run-tests']));
+    }
+});
+```
+
+…which reports as: *Runs "@app-sync-check", "@app-phpstan", "@app-run-tests" in the composer script "app-checks", beside any commands the project adds.*
+
+## A command the project added is kept where the project put it
+
+Fixture: [`tests/Scenario/Composer/Script/fixtures/keeps-a-command-the-project-added`](../../../tests/Scenario/Composer/Script/fixtures/keeps-a-command-the-project-added)
+
+`composer.json` **stays byte-identical**:
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-phpstan",
+            "@app-psalm",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-phpstan",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+## A missing leading command is inserted first
+
+Fixture: [`tests/Scenario/Composer/Script/fixtures/inserts-a-missing-leading-command`](../../../tests/Scenario/Composer/Script/fixtures/inserts-a-missing-leading-command)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-phpstan",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**After:**
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-phpstan",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-phpstan",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+## A missing command is inserted after the one declared before it
+
+Fixture: [`tests/Scenario/Composer/Script/fixtures/inserts-a-missing-command-after-its-predecessor`](../../../tests/Scenario/Composer/Script/fixtures/inserts-a-missing-command-after-its-predecessor)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-psalm",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**After:**
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-phpstan",
+            "@app-psalm",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-phpstan",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+## A command the lock records and nobody declares now is retracted
+
+Fixture: [`tests/Scenario/Composer/Script/fixtures/retracts-a-command-no-longer-declared`](../../../tests/Scenario/Composer/Script/fixtures/retracts-a-command-no-longer-declared)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-phpcs",
+            "@app-phpstan",
+            "@app-psalm",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**After:**
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-phpstan",
+            "@app-psalm",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**Before** — `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-phpcs",
+                "@app-phpstan",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+**After:**
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-phpstan",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+## A retired command is retracted with the arguments the project added to it
+
+Fixture: [`tests/Scenario/Composer/Script/fixtures/retracts-a-retired-command-with-arguments`](../../../tests/Scenario/Composer/Script/fixtures/retracts-a-retired-command-with-arguments)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-phpcs --report=summary",
+            "@app-phpstan",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**After:**
+
+```json
+{
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-phpstan",
+            "@app-run-tests"
+        ]
+    }
+}
+```
+
+**Before** — `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-phpcs",
+                "@app-phpstan",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+**After:**
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-checks": [
+                "@app-sync-check",
+                "@app-phpstan",
+                "@app-run-tests"
+            ]
+        }
+    }
+}
+```
+
+Declared as:
+
+```php
+return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
+    public function __construct()
+    {
+        $this->addRule(new ComposerScript(name: 'app-phpstan', commands: ['phpstan analyse --no-progress']));
+    }
+});
+```
+
+…which reports as: *Runs "phpstan analyse --no-progress" in the composer script "app-phpstan", beside any commands the project adds.*
+
+## A changed declaration replaces the command it retires
+
+Fixture: [`tests/Scenario/Composer/Script/fixtures/replaces-a-changed-declaration`](../../../tests/Scenario/Composer/Script/fixtures/replaces-a-changed-declaration)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "scripts": {
+        "app-phpstan": [
+            "phpstan analyse"
+        ]
+    }
+}
+```
+
+**After:**
+
+```json
+{
+    "scripts": {
+        "app-phpstan": [
+            "phpstan analyse --no-progress"
+        ]
+    }
+}
+```
+
+**Before** — `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-phpstan": [
+                "phpstan analyse"
+            ]
+        }
+    }
+}
+```
+
+**After:**
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-phpstan": [
+                "phpstan analyse --no-progress"
+            ]
+        }
+    }
+}
+```
+
+Declared as:
+
+```php
+return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
+    public function __construct()
+    {
+        $this->addRule(new ComposerScript(name: 'app-phpstan', commands: ['phpstan analyse']));
+    }
+});
+```
+
+…which reports as: *Runs "phpstan analyse" in the composer script "app-phpstan", beside any commands the project adds.*
+
+## A declared command is inserted beside the project's variant of it
+
+Fixture: [`tests/Scenario/Composer/Script/fixtures/inserts-the-declared-command-beside-a-variant`](../../../tests/Scenario/Composer/Script/fixtures/inserts-the-declared-command-beside-a-variant)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "scripts": {
+        "app-phpstan": [
+            "phpstan analyse --memory-limit=1G"
+        ]
+    }
+}
+```
+
+**After:**
+
+```json
+{
+    "scripts": {
+        "app-phpstan": [
+            "phpstan analyse",
+            "phpstan analyse --memory-limit=1G"
+        ]
+    }
+}
+```
+
+**Creates** `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        "composer.json": {
+            "scripts.app-phpstan": [
+                "phpstan analyse"
+            ]
+        }
+    }
+}
+```
+
+Declared as:
+
+```php
+return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
+    public function __construct()
+    {
         $this->addRule(new ComposerScript(name: 'app-checks', commands: ['@app-sync-check', '@app-run-tests']));
         $this->addRule(new ComposerScript(name: 'app-checks', commands: ['@app-run-tests', '@app-lint']));
     }
@@ -265,8 +742,8 @@ return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
 
 …which report as:
 
-- *Runs "@app-sync-check", "@app-run-tests" as the composer script "app-checks".*
-- *Runs "@app-run-tests", "@app-lint" as the composer script "app-checks".*
+- *Runs "@app-sync-check", "@app-run-tests" in the composer script "app-checks", beside any commands the project adds.*
+- *Runs "@app-run-tests", "@app-lint" in the composer script "app-checks", beside any commands the project adds.*
 
 ## A second declaration of the script adds its commands after the first's, a shared one counting once
 

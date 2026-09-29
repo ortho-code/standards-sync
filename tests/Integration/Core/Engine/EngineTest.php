@@ -283,7 +283,7 @@ final class EngineTest extends TestCase
 
         self::assertCount(2, $manifest->applications());
         self::assertSame(
-            'Runs "@app-sync-check", "@app-lint" as the composer script "app-checks".',
+            'Runs "@app-sync-check", "@app-lint" in the composer script "app-checks", beside any commands the project adds.',
             $manifest->applications()[0]->rule()->description(),
         );
     }
@@ -328,6 +328,18 @@ final class EngineTest extends TestCase
 
         self::assertContains('/a/standards-sync.lock', $filesystem->written());
         self::assertFalse($engine->plan($this->scriptConfig())->hasDrift());
+    }
+
+    public function testRetiredEntriesReachTheRuleFromTheLock(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/composer.json' => FileContent::fromString('{"scripts": {"app-checks": ["@app-sync-check", "@app-phpcs"]}}'),
+            '/a/standards-sync.lock' => SyncLock::create()->withEntries(Path::fromString('composer.json'), 'scripts.app-checks', ['@app-sync-check', '@app-phpcs'])->toJson(),
+        ]);
+
+        $manifest = new Engine($filesystem)->plan($this->scriptConfig())->changes()[0];
+
+        self::assertStringNotContainsString('@app-phpcs', $manifest->desired());
     }
 
     public function testAnAbsentFileKeepsWhatTheLockRecordedForIt(): void

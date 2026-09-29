@@ -53,6 +53,52 @@ final class JsonObjectWriterTest extends TestCase
         JsonObjectWriter::read(self::manifest(), ['config', 'sort-packages']);
     }
 
+    public function testReadsAListOfStrings(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "scripts": {
+                        "app-checks": [
+                            "@app-sync-check",
+                            "@app-run-tests"
+                        ]
+                    }
+                }
+                JSON,
+        );
+
+        self::assertSame(['@app-sync-check', '@app-run-tests'], JsonObjectWriter::readList($content, ['scripts', 'app-checks']));
+    }
+
+    public function testReadsALoneStringAsAOneEntryList(): void
+    {
+        $content = FileContent::fromString(
+            <<<'JSON'
+                {
+                    "scripts": {
+                        "app-checks": "@app-sync-check"
+                    }
+                }
+                JSON,
+        );
+
+        self::assertSame(['@app-sync-check'], JsonObjectWriter::readList($content, ['scripts', 'app-checks']));
+    }
+
+    public function testReadsNullForAnAbsentList(): void
+    {
+        self::assertNull(JsonObjectWriter::readList(self::manifest(), ['scripts', 'app-checks']));
+    }
+
+    public function testRefusesToReadANonListAsAList(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('"config.sort-packages" does not hold a string or a list of strings');
+
+        JsonObjectWriter::readList(self::manifest(), ['config', 'sort-packages']);
+    }
+
     public function testReplacesAnExistingValueLeavingEverythingElseByteIdentical(): void
     {
         $expected = FileContent::fromString(

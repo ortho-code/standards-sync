@@ -46,6 +46,32 @@ final readonly class JsonObjectWriter
     }
 
     /**
+     * The strings at a nested key path as a list, or null when the path is not written; a lone string reads as a one-entry list, the one-or-many shorthand JSON configs commonly accept.
+     *
+     * @param non-empty-list<string> $path
+     * @return list<string>|null
+     */
+    public static function readList(string $content, array $path): ?array
+    {
+        [, $member] = self::walk($content, $path);
+        if (!$member instanceof JsonMember) {
+            return null;
+        }
+
+        $value = $member->valueIn($content);
+        if (is_string($value)) {
+            return [$value];
+        }
+
+        if (!is_array($value) || !array_is_list($value) || !array_all($value, static fn(mixed $entry): bool => is_string($entry))) {
+            throw new RuntimeException(sprintf('"%s" does not hold a string or a list of strings; it cannot be read as a list.', implode('.', $path)));
+        }
+
+        /** @var list<string> $value */
+        return $value;
+    }
+
+    /**
      * Sets a scalar at a nested key path: an existing member's value is replaced, a missing one is inserted, and an equal value leaves the content untouched.
      *
      * @param non-empty-list<string> $path

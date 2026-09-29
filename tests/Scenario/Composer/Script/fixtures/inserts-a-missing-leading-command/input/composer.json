@@ -1,0 +1,8 @@
+{
+    "scripts": {
+        "app-checks": [
+            "@app-phpstan",
+            "@app-run-tests"
+        ]
+    }
+}
