@@ -44,7 +44,7 @@ interface Rule
 - **Drift is derived, never hand-written**: a rule drifts exactly when `apply(current) !== current`, so check and apply cannot disagree. Idempotency (`apply(apply(x)) === apply(x)`) is asserted generically over every rule's fixtures.
 - **The symmetric null**: `apply(null)` returning null is abstention — no file, no opinion. Only rules that mean to create do so; whole-file deletion (string in, null out) is refused until a delete branch exists.
 - **Rule identity is the class name** (FQCN in config and disable lists; short name plus target path in reports).
-- Opt-in seams beside the base contract: `ExplainsDrift` (a dynamic "why" for drift that is not self-evident from the diff) and `AppliesAtPath` (the resolved candidate for rules whose behaviour varies per filename, e.g. differing grammars under one target).
+- Opt-in seams beside the base contract: `ExplainsDrift` (a dynamic "why" for drift that is not self-evident from the diff), `AppliesAtPath` (the resolved candidate for rules whose behaviour varies per filename, e.g. differing grammars under one target) and `ContributesToList` (a rule contributing entries to a list, whose contributions to one list merge before the fold).
 
 ## `FileTarget` and resolution
 
@@ -61,6 +61,7 @@ Dist-ness derives from the filename (a dotted segment exactly `dist`), owned by 
 ## How the engine runs rules
 
 The engine groups rules by resolved target and folds each file's rules in declaration order over the content; rules never touch the filesystem.
+Before that, contributions to one list (same class, target and list key) merge into one rule, standing at the first declaration's position.
 One `Change` per file; `Engine::apply` is the only writer; `--check` computes the same plan and writes nothing, exiting non-zero on drift.
 `ChangeKind` derives from the fold's endpoints (create, update, in sync).
 The report attributes drift per rule (description plus `explain()` where implemented) and carries two note kinds: a shadowing note (a local file the tool reads in preference to the synced dist file) and an abstention note (a resolved file whose rules all had no opinion).
@@ -68,6 +69,7 @@ The report attributes drift per rule (description plus `explain()` where impleme
 ## Composition and layering
 
 - Rules compose by declaration order; a later same-label block rule replaces an earlier one (last-wins), which is also how a child tier overrides a parent wholesale.
+- Contributions to one list are the exception: they merge rather than replace, in declaration order, so a standard declared beside another adds to what that one declares.
 - An org hierarchy composes with `include()`: the second tier's standard includes the base and adds or overrides rules. Tool imports layer additively — each tier registers its own entry, and the tools' own later-wins semantics deliver the override.
 - Consumer-side disabling follows a ladder: an FQCN list (`withoutRule(X::class)`), then a predicate for full precision; overriding is `withoutRule()` plus `addRule(new X(...))` — rules stay immutable.
 

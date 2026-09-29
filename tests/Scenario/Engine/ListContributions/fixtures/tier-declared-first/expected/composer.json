@@ -1,0 +1,10 @@
+{
+    "name": "acme/project",
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-run-tests",
+            "@app-lint"
+        ]
+    }
+}

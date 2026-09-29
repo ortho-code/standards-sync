@@ -13,6 +13,7 @@ use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
 use OrthoCode\StandardsSync\Core\Plan\Plan;
 use OrthoCode\StandardsSync\Core\Plan\RuleApplication;
 use OrthoCode\StandardsSync\Core\Rule\AppliesAtPath;
+use OrthoCode\StandardsSync\Core\Rule\ContributesToList;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
 use RuntimeException;
 
@@ -31,7 +32,7 @@ final readonly class Engine
 
     public function plan(SyncConfig $config): Plan
     {
-        $rules = $this->collectRules($config);
+        $rules = $this->mergeContributions($this->collectRules($config));
 
         $outcomes = [];
         foreach ($config->roots() as $root) {
@@ -62,6 +63,37 @@ final readonly class Engine
         }
 
         return $rules;
+    }
+
+    /**
+     * Contributions to one list in one target merge into the first of them through the rule's own withMerged(), so the fold sees one rule per list.
+     *
+     * @param list<Rule> $rules
+     * @return list<Rule>
+     */
+    private function mergeContributions(array $rules): array
+    {
+        $merged = [];
+        /** @var array<string, array<string, array<string, int>>> $positions */
+        $positions = [];
+        foreach ($rules as $rule) {
+            if ($rule instanceof ContributesToList) {
+                $position = $positions[$rule::class][$rule->target()->toString()][$rule->listKey()] ?? null;
+                $earlier = $position === null ? null : $merged[$position];
+                if ($position !== null && $earlier instanceof ContributesToList) {
+                    /** @var Rule&ContributesToList $combined psalm does not bind static to the intersection it was called on */
+                    $combined = $earlier->withMerged($rule);
+                    $merged[$position] = $combined;
+                    continue;
+                }
+
+                $positions[$rule::class][$rule->target()->toString()][$rule->listKey()] = count($merged);
+            }
+
+            $merged[] = $rule;
+        }
+
+        return array_values($merged);
     }
 
     /**

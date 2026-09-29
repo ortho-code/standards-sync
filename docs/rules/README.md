@@ -29,4 +29,4 @@ Every example is generated from the scenario suite (`tests/Scenario`): the fixtu
 - **Renovate**
   - [RenovateExtendedPreset](renovate/RenovateExtendedPreset.md)
 
-Engine behaviours, not any rule's own: [Target Resolution](engine.md)
+Engine behaviours, not any rule's own: [List Contributions](engine.md), [Target Resolution](engine.md)

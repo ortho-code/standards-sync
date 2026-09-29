@@ -71,15 +71,22 @@ This is the same composition `include()` performs, moved to the consumer's own c
 
 Each standard declared this way locates its own package, so the pass-down trap above does not apply — that one belongs to `include()`, where a standard constructs another.
 
-**Two separately declared rule sets that target the same thing do not merge.** Folding is by resolved path in declaration order, and the same-target semantics are exactly the ones below: a same-label block is replaced by the later one, and `ComposerScript` rewrites the named script's command list wholesale. The later declaration wins and the earlier one's content is gone, with nothing reported. Within one standard that is the documented override mechanism and one author sees both declarations; across two, neither author can see the other. Keep separately declared standards on disjoint concerns, and pin anywhere one names something another declares — a CI block calling a script name, say — in the package's own suite, because the engine will not.
+**Two separately declared rule sets that target the same thing do not merge, except in a shared list.**
+Folding is by resolved path in declaration order, and a same-label block is replaced by the later one: the later declaration wins and the earlier one's content is gone, with nothing reported.
+Within one standard that is the documented override mechanism and one author sees both declarations; across two, neither author can see the other.
+Keep separately declared standards on disjoint concerns, and pin anywhere one names something another declares — a CI block calling a script name, say — in the package's own suite, because the engine will not.
+
+A rule that contributes to a list is the exception, and it is how one standard adds to what another declares.
+Declarations of one composer script merge, so a framework standard declared beside a tier adds a step to the tier's aggregate by declaring the same script with only that step — see [Installing and running the tools](#installing-and-running-the-tools).
 
 ## Declaration order
 
-Rules that target the same file fold in declaration order — each rule receives the previous rule's output. Order never breaks correctness (every rule is idempotent and the fold is deterministic), but it *is* semantics in three places:
+Rules that target the same file fold in declaration order — each rule receives the previous rule's output. Order never breaks correctness (every rule is idempotent and the fold is deterministic), but it *is* semantics in four places:
 
 1. **Same-label managed blocks: later wins.** A block declared after another with the same label replaces it — that is the override mechanism, e.g. a second tier replacing a base block wholesale.
 2. **Hierarchy: the included standard folds first.** `include()` runs the base tier's rules before the including tier's, which is what lets the second tier layer on top: its tool-set entries register after the base's, its same-label blocks override the base's.
 3. **Creation: the first rule to meet an absent file decides the created base**; every later rule edits that content. A tool's import rule therefore decides the created file's shape when it is declared before that tool's value rules (level floor, pins).
+4. **Contributions to one list: order places, it never replaces.** Declarations of one composer script merge before the fold, each adding its commands after the earlier ones', so a consumer that declares the tier first keeps the tier's commands first.
 
 The same ordering governs a tool with no import tier (psalm, phpunit): its base-config rule (`PsalmBaseConfig`, `PhpUnitBaseConfig`) declared before its value rules makes an absent config grow from the org template instead of the engine skeleton. And because nothing rides `composer update` for such a tool, **the template is one-shot** — it fires only into nothingness and never edits an existing config, so only values that also have their own rule stay enforced.
 
@@ -96,6 +103,7 @@ These facts govern how they behave in a consumer:
 - Composer puts its bin-dir on PATH when running scripts, so a script entry names the bare binary with no `vendor/bin/` prefix.
 - That bin-dir holds the binaries of a project's *dependencies*, never the root package's own. A package that ships a tool and also adopts a standard that runs it therefore cannot invoke it by bare name — the script fails with `<tool>: not found` while every other script works. Linking the package's own binary into the bin-dir from a `post-install-cmd` resolves it, and is the only case where a consumer needs anything beyond the three rules above.
 - A consumer wraps an owned script rather than editing it: composer passes arguments through an `@name` reference, so `"app-phpstan-local": ["@app-phpstan --memory-limit=1G"]` runs the owned command with the argument added, and keeps working when the standard changes what that command is. The standard's own aggregate still calls the owned name, so a wrapper serves a person at a terminal, not CI.
+- To add a step to another standard's aggregate, declare the same script with only your own commands. `new ComposerScript(name: 'app-checks', commands: ['@app-lint'])` beside a tier's `app-checks` adds `@app-lint` after the tier's commands when it is declared after the tier, and before them when declared before; a command both declare counts once.
 - Nothing in the engine ties a CI config's call to the name `ComposerScript` declares. The two are matched only by the text of the call, so a renamed script leaves the CI file calling a script that no longer exists.
 
 ## What the mechanism does not do

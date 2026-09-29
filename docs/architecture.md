@@ -3,7 +3,8 @@
 ```
 standards-sync.php (returns SyncConfig)
   → RuleSet::rules(): Rule[]              declaration order; composition = hierarchy
-  → Engine::plan: per root, resolve every rule's FileTarget (TargetResolver: a lone existing
+  → Engine::plan: merge contributions to one list (ContributesToList) into one rule; then
+    per root, resolve every rule's FileTarget (TargetResolver: a lone existing
     candidate wins; a dist file beats a shadowing non-dist; same-side ambiguity refuses),
     group rules by resolved file, fold apply() in declaration order
   → Change (per FILE: kind from the fold's endpoints, plus per-rule attribution)
@@ -28,6 +29,7 @@ Extension seams, open/closed:
 - **Rule** (`target(): FileTarget`, `apply(?string): ?string`, `description(): string`) — the unifying primitive; new rule types extend the set under `Rules/` without touching the pipeline.
   `ManagedBlock` (marker blocks), the PHPStan family (included ruleset, level floor, pins), and the Rector and ECS base sets ship today (see [rule-model.md](history/rule-model.md)).
 - **ExplainsDrift** — opt-in seam for rules whose drift is not self-evident from the diff; the drift report calls it per drifting rule.
+- **ContributesToList** — opt-in seam for rules contributing entries to a list; the engine merges contributions to one list through the rule's own `withMerged()` before the fold, so a standard declared beside another adds to what that one declares. `ComposerScript` is its first user.
 
 ## Invariants (easy to violate — hold these)
 

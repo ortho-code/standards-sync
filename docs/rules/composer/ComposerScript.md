@@ -2,7 +2,7 @@
 
 # ComposerScript
 
-Owns a named composer script: the declared commands are what the script runs, and a deviating or missing script is rewritten. A project needing extra steps declares a script of its own and calls this one through composer's "@name" reference, so the owned entry point stays exactly what the standard says. A root without a manifest is not a composer project, so the rule abstains rather than creating one.
+Owns a named composer script: the declared commands are what the script runs, and a deviating or missing script is rewritten. Declarations of one script combine in declaration order, each adding its commands after the earlier ones'; a command declared twice counts once. A project needing extra steps declares a script of its own and calls this one through composer's "@name" reference, so the owned entry point stays exactly what the standards say. A root without a manifest is not a composer project, so the rule abstains rather than creating one.
 
 Declared as:
 
@@ -155,6 +155,50 @@ Fixture: [`tests/Scenario/Composer/Script/fixtures/adds-a-multi-command-script`]
         "app-check-standards": [
             "vendor/bin/standards-sync sync --check",
             "vendor/bin/phpstan"
+        ]
+    }
+}
+```
+
+Declared as:
+
+```php
+return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
+    public function __construct()
+    {
+        $this->addRule(new ComposerScript(name: 'app-checks', commands: ['@app-sync-check', '@app-run-tests']));
+        $this->addRule(new ComposerScript(name: 'app-checks', commands: ['@app-run-tests', '@app-lint']));
+    }
+});
+```
+
+…which report as:
+
+- *Runs "@app-sync-check", "@app-run-tests" as the composer script "app-checks".*
+- *Runs "@app-run-tests", "@app-lint" as the composer script "app-checks".*
+
+## A second declaration of the script adds its commands after the first's, a shared one counting once
+
+Fixture: [`tests/Scenario/Composer/Script/fixtures/merges-a-second-declaration`](../../../tests/Scenario/Composer/Script/fixtures/merges-a-second-declaration)
+
+**Before** — `composer.json`:
+
+```json
+{
+    "name": "acme/project"
+}
+```
+
+**After:**
+
+```json
+{
+    "name": "acme/project",
+    "scripts": {
+        "app-checks": [
+            "@app-sync-check",
+            "@app-run-tests",
+            "@app-lint"
         ]
     }
 }

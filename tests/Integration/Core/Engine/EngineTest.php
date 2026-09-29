@@ -11,6 +11,7 @@ use OrthoCode\StandardsSync\Core\Engine\Engine;
 use OrthoCode\StandardsSync\Core\Plan\Change;
 use OrthoCode\StandardsSync\Core\Plan\ChangeKind;
 use OrthoCode\StandardsSync\Core\Rule\FileTarget;
+use OrthoCode\StandardsSync\Rules\Composer\Script\ComposerScript;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
 use OrthoCode\StandardsSync\Core\RuleSet\ComposableRuleSet;
 use OrthoCode\StandardsSync\Infrastructure\Filesystem\InMemoryFilesystem;
@@ -261,6 +262,28 @@ final class EngineTest extends TestCase
 
         self::assertCount(1, $drifting);
         self::assertSame($missing, $drifting[0]->rule());
+    }
+
+    public function testContributionsToOneListFromSeparateRuleSetsFoldAsOneRule(): void
+    {
+        $filesystem = new InMemoryFilesystem([
+            '/a/composer.json' => FileContent::fromString('{}'),
+        ]);
+        $config = SyncConfig::create()
+            ->withRoots(['/a'])
+            ->withRuleSet($this->ruleSetWith(new ComposerScript(name: 'app-checks', commands: ['@app-sync-check'])))
+            ->withRuleSet($this->ruleSetWith(
+                new ComposerScript(name: 'app-lint', commands: ['phpcs']),
+                new ComposerScript(name: 'app-checks', commands: ['@app-lint']),
+            ));
+
+        $manifest = new Engine($filesystem)->plan($config)->changes()[0];
+
+        self::assertCount(2, $manifest->applications());
+        self::assertSame(
+            'Runs "@app-sync-check", "@app-lint" as the composer script "app-checks".',
+            $manifest->applications()[0]->rule()->description(),
+        );
     }
 
     private function config(): SyncConfig

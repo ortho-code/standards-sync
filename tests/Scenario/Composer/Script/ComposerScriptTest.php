@@ -20,5 +20,6 @@ final class ComposerScriptTest extends ScenarioTestCase
         yield 'a script running something else is rewritten, its neighbours untouched' => ['rewrites-a-drifted-script', $config];
         yield 'a script already running the declared commands is never touched' => ['leaves-a-matching-script', $config];
         yield 'a script written as a single string becomes the list form' => ['replaces-a-string-script', $config];
+        yield 'a second declaration of the script adds its commands after the first\'s, a shared one counting once' => ['merges-a-second-declaration', null];
     }
 }

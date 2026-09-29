@@ -75,3 +75,30 @@ Everything else the rule does — the wrong-section move, the both-sections dupl
 **The third mode, designed and not built: a null constraint meaning presence.** Requiring a package while stating no version at all is coherent and would slot in beside the two — but nothing needs it, and it has one unsolved detail: an absent package must be written with *some* constraint, and if the standard declines to name one the engine has to invent it, realistically `*`, which allows any major and cannot resolve a branch-only package under stable minimum-stability anyway. Making the parameter nullable later is additive rather than breaking, so contract-first does not force the decision now. Trigger: a standard that must require a package without stating any version.
 
 **Fixtures added**, per the behaviour-catalog rule: a pinned branch adds the package it pins; a project on another branch is rewritten to it; a pinned requirement moves into the section that covers the need; and it drops the redundant duplicate the same way a floor requirement does. The unit cases that pinned the construction refusal are replaced by the pinned description, the byte-identical apply, and the rewrite explanation.
+
+## Changed 2026-09-29 — declarations of one composer script merge
+
+The 2026-08-11 entry's closing sentence, reserving union semantics for "a later named constructor on the same rule", is superseded.
+The ownership itself stands for now: the declared commands, merged, are exactly what the script runs.
+
+**Why.** A framework standard declared beside a tier needs one more step in the aggregate the tier declares.
+With one declaration owning the script, it could only restate the tier's whole list, which differs per tier, so the framework standard would have had to exist once per tier; and whichever rule set came later replaced the other's list with nothing reported.
+
+**What it does instead.** Declarations of one script merge before the fold, through the engine's `ContributesToList` seam (recorded in [rule-model.md](rule-model.md#decided-2026-09-28--contributions-to-one-list-merge-before-the-fold)): in declaration order, each adding its commands after the earlier ones', a command declared twice counting once.
+The merged list is still exactly what the script runs, so a command a project added is still removed; keeping those needs the engine to remember what the standards declared, which is a later step.
+**A same-name declaration therefore adds rather than replaces**, which retires the override the authoring guide documented for scripts.
+No known standard relied on it.
+
+**One form, no named constructor.** A `createExtension()` beside the owning constructor was in the design and dropped before the build, because the split decided only two merge details.
+The owner's commands going first is what declaration order already does — the engine's general rule, and for the import-tier rules also the tool's own precedence.
+A later owning declaration replacing an earlier one had no user; what it would serve, a child standard dropping a parent's step, is enforce-absence and is on the [roadmap](../roadmap.md) with its trigger.
+
+**Rejected alternatives, in the order they were weighed.**
+An order-dependent append rule beside the owning one — prototyped 2026-09-28 against the engine: declared after the tier it worked, declared before it the step vanished with `--check` green, and any unrelated drift in the manifest reported both rules as drifting although neither changed the outcome.
+A slot script the tier references and the framework owns — it rests on the composer leniency below, so every consumer without the framework standard would print the missing-script line on every run, and a mistyped reference would skip a check the same way.
+
+**Verified 2026-09-28 (composer 2.10.2):** a reference to a script that does not exist is not an error.
+`"app-checks": ["@app-a", "@app-nope"]` runs `app-a`, prints `You made a reference to a non-existent script @app-nope` and exits 0, and an empty list behaves as a missing script.
+So an aggregate calling a script nobody declares any more skips that check silently rather than failing.
+
+**Fixtures**: one script scenario (a second declaration adds its commands after the first's, a shared one counting once) and two engine-level scenarios under `tests/Scenario/Engine/ListContributions/` (the order of two rule sets decides where each standard's commands go); no existing fixture changed.
