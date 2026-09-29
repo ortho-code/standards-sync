@@ -66,3 +66,7 @@ Each of these is designed as far as its entry records and waits for its trigger;
   Nothing reads them there, since the engine reads a lock only at a consumer's own root, so this is a tidy-up.
   The standard this repository consumes records shipping a managed `.gitattributes` block for libraries; that block would cover every one of these, and the existing lines it duplicates could then go.
   Trigger: none; any release can carry it, by hand or through the standard's block.
+- **Test strings that spell file content with escapes.** The conventions build file-content fixtures with `FileContent::fromString()` and nowdocs rather than `\n` escape tokens; the JSON and JSON5 writer tests were brought in line on 2026-09-29.
+  Still spelling file content with `\n`: `TargetResolverTest`, `DriftReportTest`, `SyncCommandTest`, `DirectoryListingTest`, three cases in `RenovateExtendedPresetTest`, the `FileExample` contents in `MarkdownRendererTest`, and the six validator tests under `Testing/Validation`.
+  Strings whose escape is the point stay as they are: a newline that must be refused (`LabelTest`, the renovate and level-floor constructor checks), docblock or rendered-markdown text (`ClassDescriptionTest`, the renderer's assertions), and an indent value (`NeonIndentTest`).
+  Trigger: none needed — the next tidy-up.
