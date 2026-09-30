@@ -151,3 +151,21 @@ A value written `~`, `{}` or `[]` holds nothing and takes the declared value who
 Where a spelling cannot hold what is declared: a differing environment or container string is replaced by the declared mapping, since the string holds nothing the mapping lacks; triggers written as a list where a declared one is filtered are refused, since rewriting them as a mapping could lose the project's own; a single value where the standard declares more items is refused, since it cannot take a second one.
 A declared list, block or flow, or a single string at a place that reads it as a list, must have each item among the project's, a missing one appended.
 A job's `runs-on` has each declared label met by one of the project's of its kind at its version or later; the project's own labels beside it stay, and a list meeting none is replaced whole.
+
+## Built 2026-09-30 — the lock, and retracting what a standard stops declaring
+
+**What.** `GitHubWorkflow` contributes to the [lock](../design.md) under the list key `workflow`, recording a JSON Pointer (RFC 6901) for every node its template declares, spelled by `WorkflowPointer`: a mapping key by name, a step by its id, a scalar list item by its value — `/jobs/checks/steps/setup-php` is a step, `/on/push/branches/release~1**` the pattern `release/**`.
+A key's or a step's pointer carries no value, so a standard raising an action or changing a scalar retracts nothing, the new value applying as every declared one does; a list item's pointer is its value, so a raised runner label retires the old one, which the raise has already replaced unless the project holds both.
+A retired pointer the project's file still has is taken out with whatever the project added inside it, as a retired composer command goes with its arguments: a key or a job by `removeEntry`, a step found by its id by `removeItem`, and a list item by `removeScalarItem`, a new writer edit for block and one-line flow lists.
+The explanation names each: `The job "checks" still runs the step "lint", which the standard no longer declares.`
+
+**Order.** Retraction waits until the project holds everything declared, then goes outermost first, so a retired job takes its retired keys with it, and a retired node goes from a holder that already has the declared nodes beside it.
+A retired node is its holder's last only where the standard now declares the holder with nothing under it, and the holder then takes that declared value: an event whose declared filter was retired goes back to no filters.
+A value spelled without nodes that holds only retired ones takes the declared value too, since nothing of the project's is left in it: a filter written as a string naming a retired pattern becomes the declared list, and triggers written as a string or a list naming only retired events become the declared triggers; triggers naming one of the project's own beside them are still refused, as before.
+
+**An empty node GitHub rejects is refused in a template**: a `jobs` key with no jobs, a `steps` key with no steps, a filter with no patterns.
+A retraction leaving one of those would write a workflow GitHub rejects, and a template holding one is already one GitHub rejects, so a declared holder always keeps a node after its retired ones go.
+*Rejected*: leaving a node the retraction cannot edit away as the project's own, which keeps what the standard stopped declaring; refusing the sync over it, for a case only an invalid template produces.
+Where no declared value can stand in, sync refuses, naming the node.
+
+**Two declarations of one workflow file** are refused until they can be combined, which is the next cut.

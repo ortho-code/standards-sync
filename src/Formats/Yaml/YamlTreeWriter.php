@@ -8,6 +8,7 @@ use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlEntry;
 use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlItem;
 use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlLines;
 use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlMapping;
+use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlScalarDecoder;
 use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlSequence;
 use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlTree;
 use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlValueKind;
@@ -141,6 +142,48 @@ final readonly class YamlTreeWriter
     }
 
     /**
+     * The scalar item decoding to the given value removed from a block sequence or a flow sequence on one line, the separator beside it going too.
+     *
+     * @param list<string|int> $sequencePath
+     */
+    public static function removeScalarItem(string $content, array $sequencePath, mixed $value): string
+    {
+        $tree = YamlTree::fromString($content);
+        $held = $tree->valueAt($sequencePath) ?? throw new RuntimeException(sprintf('"%s" leads to no value; an item cannot be removed from it.', self::spelled($sequencePath)));
+        $node = $held->node();
+        if ($node instanceof YamlSequence) {
+            /** @var int|null $index a list's keys are its positions */
+            $index = array_find_key($node->items(), static fn(YamlItem $item): bool => $item->value()->node() === null && $item->value()->decoded() === $value);
+
+            return $index === null
+                ? throw new RuntimeException(sprintf('"%s" holds no such item; it cannot be removed.', self::spelled($sequencePath)))
+                : self::removeItem($content, $sequencePath, $index);
+        }
+        if ($held->kind() !== YamlValueKind::Flow || $held->isMultiline() || !str_starts_with($held->source(), '[')) {
+            throw new RuntimeException(sprintf('"%s" holds neither a block sequence nor a flow sequence on one line; an item cannot be removed from it.', self::spelled($sequencePath)));
+        }
+
+        $inner = substr($held->source(), 1, -1);
+        $pieces = self::flowItems($inner);
+        /** @var int|null $position a list's keys are its positions */
+        $position = array_find_key($pieces, static fn(array $piece): bool => YamlScalarDecoder::decode(substr($inner, $piece[0], $piece[1] - $piece[0])) === $value);
+        if ($position === null) {
+            throw new RuntimeException(sprintf('"%s" holds no such item; it cannot be removed.', self::spelled($sequencePath)));
+        }
+        if (count($pieces) === 1) {
+            throw new RuntimeException(sprintf('"%s" holds only this item; removing it would leave no sequence, so the entry holding it goes instead.', self::spelled($sequencePath)));
+        }
+        $next = $pieces[$position + 1] ?? null;
+        [$from, $to] = $next === null
+            ? [$pieces[$position - 1][1], $pieces[$position][1]]
+            : [$pieces[$position][0], $next[0]];
+        $line = $tree->lines()->line($held->line());
+        $written = '[' . substr($inner, 0, $from) . substr($inner, $to) . ']';
+
+        return $tree->lines()->withLine($held->line(), substr($line, 0, $held->startColumn()) . $written . substr($line, $held->endColumn()))->toString();
+    }
+
+    /**
      * The item at the index removed, with the comment lines directly above it.
      *
      * @param list<string|int> $sequencePath
@@ -195,6 +238,47 @@ final readonly class YamlTreeWriter
         $floor = $position === 0 ? 0 : $entries[$position - 1]->end();
 
         return $lines->withRemoved(self::commentsAbove($lines, $entry->line(), $floor), $entry->end())->toString();
+    }
+
+    /**
+     * Where each item of a flow sequence's inner text starts and ends, its surrounding spaces left out; commas inside quotes or nested brackets separate nothing.
+     *
+     * @return list<array{int, int}>
+     */
+    private static function flowItems(string $inner): array
+    {
+        $pieces = [];
+        $start = 0;
+        $depth = 0;
+        $quote = null;
+        $length = strlen($inner);
+        for ($position = 0; $position <= $length; $position++) {
+            $character = $inner[$position] ?? ',';
+            if ($quote !== null) {
+                if ($quote === '"' && $character === '\\') {
+                    $position++;
+                } elseif ($character === $quote) {
+                    $quote = null;
+                }
+                continue;
+            }
+            if ($character === '"' || $character === '\'') {
+                $quote = $character;
+            } elseif ($character === '[' || $character === '{') {
+                $depth++;
+            } elseif ($character === ']' || $character === '}') {
+                $depth--;
+            } elseif ($character === ',' && $depth === 0) {
+                $text = substr($inner, $start, $position - $start);
+                $leading = strlen($text) - strlen(ltrim($text));
+                if (trim($text) !== '') {
+                    $pieces[] = [$start + $leading, $start + strlen(rtrim($text))];
+                }
+                $start = $position + 1;
+            }
+        }
+
+        return $pieces;
     }
 
     /** @param list<string> $texts */

@@ -1,0 +1,38 @@
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        ".github/workflows/checks.yml": {
+            "workflow": [
+                "/name",
+                "/on",
+                "/on/pull_request",
+                "/on/push",
+                "/on/push/branches",
+                "/on/push/branches/main",
+                "/jobs",
+                "/jobs/checks",
+                "/jobs/checks/runs-on",
+                "/jobs/checks/runs-on/ubuntu-26.04",
+                "/jobs/checks/steps",
+                "/jobs/checks/steps/checkout",
+                "/jobs/checks/steps/checkout/id",
+                "/jobs/checks/steps/checkout/uses",
+                "/jobs/checks/steps/setup-php",
+                "/jobs/checks/steps/setup-php/id",
+                "/jobs/checks/steps/setup-php/uses",
+                "/jobs/checks/steps/setup-php/with",
+                "/jobs/checks/steps/setup-php/with/php-version",
+                "/jobs/checks/steps/setup-php/with/coverage",
+                "/jobs/checks/steps/install",
+                "/jobs/checks/steps/install/id",
+                "/jobs/checks/steps/install/uses",
+                "/jobs/checks/steps/checks",
+                "/jobs/checks/steps/checks/id",
+                "/jobs/checks/steps/checks/run"
+            ]
+        }
+    }
+}

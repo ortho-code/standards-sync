@@ -17,6 +17,7 @@ use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlValueKind;
  * A declared key must be present and its value contained; a key with nothing under it asks for the key alone.
  * A job's steps are found by id, in declared order, a step without one adopted when it holds the declared step; a list of scalars must hold the declared ones.
  * Action references and runner labels are minimums; every other value is exact, compared in the spelling GitHub reads all its spellings of it as.
+ * Only once the project holds everything declared does the walk look for what a standard stopped declaring, outermost first, so a retired node has its declared siblings beside it by the time it goes.
  * Places are spelled as paths of keys, a step by its id in brackets: `jobs.checks.steps[setup-php].with.php-version`.
  */
 final readonly class WorkflowContainment
@@ -27,15 +28,167 @@ final readonly class WorkflowContainment
     /** The words YAML reads as something other than a string when written plain. */
     private const array NOT_PLAIN_WORDS = ['true', 'false', 'null', '~', 'yes', 'no', 'on', 'off'];
 
-    /** @param bool $referencesByAction whether a reference holds a declared one when it names the same action, whatever its version */
+    /**
+     * @param bool $referencesByAction whether a reference holds a declared one when it names the same action, whatever its version
+     * @param list<string> $retired the retired pointers, as strings
+     */
     private function __construct(
         private YamlTree $declared,
         private bool $referencesByAction = false,
+        private array $retired = [],
     ) {}
 
-    public static function firstDifference(DeclaredWorkflow $declared, YamlTree $actual): ?WorkflowDifference
+    /** @param list<WorkflowPointer> $retired nodes an earlier sync recorded and nothing declares now */
+    public static function firstDifference(DeclaredWorkflow $declared, YamlTree $actual, array $retired = []): ?WorkflowDifference
     {
-        return new self($declared->tree())->mapping($declared->tree()->root(), $actual->root(), [], '');
+        $walk = new self($declared->tree(), false, array_map(static fn(WorkflowPointer $pointer): string => $pointer->toString(), $retired));
+        $difference = $walk->mapping($declared->tree()->root(), $actual->root(), [], '');
+        if ($difference instanceof WorkflowDifference) {
+            return $difference;
+        }
+
+        usort($retired, static fn(WorkflowPointer $a, WorkflowPointer $b): int => $a->depth() <=> $b->depth());
+        foreach ($retired as $pointer) {
+            $retraction = $walk->retraction($pointer, $actual);
+            if ($retraction instanceof WorkflowDifference) {
+                return $retraction;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The edit that takes a retired node out of the project's workflow, or null where the workflow no longer has it.
+     * A node that is the last one its holder has leaves the holder as the standard now declares it: an event back to no filters, a string back to the declared value.
+     */
+    private function retraction(WorkflowPointer $pointer, YamlTree $actual): ?WorkflowDifference
+    {
+        $segments = $pointer->segments();
+        $last = count($segments) - 1;
+        $holder = $actual->root();
+        $path = [];
+        $place = '';
+        foreach ($segments as $depth => $segment) {
+            if ($holder instanceof YamlMapping) {
+                $entry = $holder->entry($segment);
+                if (!$entry instanceof YamlEntry) {
+                    return null;
+                }
+                $entryPlace = $place === '' ? $segment : $place . '.' . $segment;
+                if ($depth === $last) {
+                    return count($holder->entries()) > 1
+                        ? WorkflowDifference::retiredEntry($path, $entryPlace, $segment)
+                        : $this->declaredInstead($pointer, $path, $place, '"' . $entryPlace . '"');
+                }
+                $value = $entry->value();
+                $path = [...$path, $segment];
+                $place = $entryPlace;
+                $holder = $value->node() ?? $value;
+                continue;
+            }
+            if ($holder instanceof YamlSequence && WorkflowSyntax::isStepsPath($path)) {
+                /** @var int|null $index a list's keys are its positions */
+                $index = array_find_key($holder->items(), static fn(YamlItem $item): bool => WorkflowSyntax::stepId($item->value()) === $segment);
+                if ($index === null) {
+                    return null;
+                }
+                if ($depth === $last) {
+                    return count($holder->items()) > 1
+                        ? WorkflowDifference::retiredStep($path, $segments[1], $segment, $index)
+                        : $this->declaredInstead($pointer, $path, $place, '"' . $place . '[' . $segment . ']"');
+                }
+                $holder = $holder->items()[$index]->value()->node();
+                $path = [...$path, $index];
+                $place .= '[' . $segment . ']';
+                continue;
+            }
+
+            return $depth === $last && ($holder instanceof YamlSequence || $holder instanceof YamlValue)
+                ? $this->retiredItem($holder, $pointer, $path, $place, $segment)
+                : null;
+        }
+
+        return null;
+    }
+
+    /**
+     * A retired scalar item of a list, block or spelled without nodes: removed where the list has more, and where it is the last, the list takes the declared value.
+     *
+     * @param list<string|int> $path
+     */
+    private function retiredItem(YamlSequence|YamlValue $list, WorkflowPointer $pointer, array $path, string $place, string $segment): ?WorkflowDifference
+    {
+        $items = $list instanceof YamlSequence
+            ? array_map(static fn(YamlItem $item): mixed => $item->value()->node() === null ? $item->value()->decoded() : null, $list->items())
+            : WorkflowSyntax::canonical($path, $list->decoded());
+        if (!is_array($items)) {
+            return null;
+        }
+        $values = array_is_list($items) ? $items : array_keys($items);
+        $matches = static fn(mixed $item): bool => is_scalar($item) && WorkflowPointer::segmentOf($item) === $segment;
+        if (!array_any($values, $matches)) {
+            return null;
+        }
+        $spelled = $list instanceof YamlValue ? $list->decoded() : $values;
+        if (count($values) === 1 || !is_array($spelled)) {
+            return $this->declaredInstead($pointer, $path, $place, self::itemsIn([$segment], $place));
+        }
+
+        return WorkflowDifference::retiredItem($path, $place, array_find($spelled, $matches), $segment);
+    }
+
+    /**
+     * The retired node is the last one its holder has: the holder takes the value the standard declares for it now, which the declared workflow keeps valid.
+     *
+     * @param list<string|int> $holderPath where the holder's own entry stands in the project's workflow
+     * @param string $named the retired node as the explanation names it
+     */
+    private function declaredInstead(WorkflowPointer $retired, array $holderPath, string $holderPlace, string $named): WorkflowDifference
+    {
+        $holder = $retired->parent();
+        $declared = $holder instanceof WorkflowPointer ? $this->declaredEntry($holder) : null;
+
+        return $declared instanceof YamlEntry && $holderPath !== []
+            ? WorkflowDifference::retiredLast($holderPath, $holderPlace, $named, $this->declared, $declared)
+            : WorkflowDifference::unretractable($named);
+    }
+
+    /**
+     * Items of a list, or keys of a mapping spelled without nodes, as an explanation names them: `master in "on.push.branches"`.
+     *
+     * @param non-empty-list<string> $items
+     */
+    private static function itemsIn(array $items, string $place): string
+    {
+        return implode(', ', $items) . ' in "' . $place . '"';
+    }
+
+    /** The declared entry a pointer leads to, found by the same keys and step ids a project's workflow is searched by. */
+    private function declaredEntry(WorkflowPointer $pointer): ?YamlEntry
+    {
+        $holder = $this->declared->root();
+        $path = [];
+        $entry = null;
+        foreach ($pointer->segments() as $segment) {
+            if ($holder instanceof YamlMapping) {
+                $entry = $holder->entry($segment);
+                $holder = $entry?->value()->node();
+                $path[] = $segment;
+                continue;
+            }
+            if ($holder instanceof YamlSequence && WorkflowSyntax::isStepsPath($path)) {
+                $step = array_find($holder->items(), static fn(YamlItem $item): bool => WorkflowSyntax::stepId($item->value()) === $segment);
+                $holder = $step?->value()->node();
+                $entry = null;
+                $path[] = 0;
+                continue;
+            }
+
+            return null;
+        }
+
+        return $entry;
     }
 
     /**
@@ -93,7 +246,7 @@ final readonly class WorkflowContainment
         }
         $items = self::listItems($wanted, $path);
         if ($items !== null) {
-            return $this->scalarList($items, $held, $path, $place);
+            return $this->scalarList($declared, $items, $held, $path, $place);
         }
 
         return $this->exact($declared, $held, $path, $place);
@@ -101,18 +254,24 @@ final readonly class WorkflowContainment
 
     /**
      * A declared mapping the project spells another way GitHub reads the same: triggers as a list, an environment as its name.
-     * Where the spelling holds what the mapping declares, it passes; where not, a string the declared mapping stands for is replaced by it, and triggers are refused, since rewriting them would lose the project's own.
+     * Where the spelling holds what the mapping declares, it passes; where not, a string the declared mapping stands for is replaced by it, and triggers are refused, since rewriting them would lose the project's own — unless every key the spelling holds is one the standard retired, which leaves nothing of the project's to keep, so the declared value takes its place.
      *
      * @param non-empty-list<string|int> $path
      */
     private function spelledMapping(YamlEntry $declared, YamlValue $held, array $path, string $place): ?WorkflowDifference
     {
-        if (self::contains($declared->value()->decoded(), WorkflowSyntax::canonical($path, $held->decoded()))) {
+        $spelled = WorkflowSyntax::canonical($path, $held->decoded());
+        if (self::contains($declared->value()->decoded(), $spelled)) {
             return null;
         }
+        if (WorkflowSyntax::takesStringAsMapping($path) && self::isSingleLineScalar($held)) {
+            return WorkflowDifference::changedValue($path, $place, $this->declared, $declared);
+        }
 
-        return WorkflowSyntax::takesStringAsMapping($path) && self::isSingleLineScalar($held)
-            ? WorkflowDifference::changedValue($path, $place, $this->declared, $declared)
+        $keys = is_array($spelled) ? array_map(strval(...), array_keys($spelled)) : [];
+
+        return $keys !== [] && !array_any($keys, fn(string $key): bool => !$this->isRetiredItem($path, $key))
+            ? WorkflowDifference::retiredLast($path, $place, self::itemsIn($keys, $place), $this->declared, $declared)
             : WorkflowDifference::unwritableShape($place, self::shape($held), 'a mapping');
     }
 
@@ -248,12 +407,12 @@ final readonly class WorkflowContainment
 
     /**
      * A declared list of scalars, or a single one GitHub reads as a list: each must be among the project's.
-     * A missing one is appended to the project's list; a project writing a single value where more are declared is refused, since the value cannot take a second.
+     * A missing one is appended to the project's list; a project writing a single value where more are declared is refused, since the value cannot take a second — unless that value is one the standard retired, which leaves nothing of the project's to keep, so the declared value takes its place.
      *
      * @param list<array{mixed, string}> $items each declared item, decoded, and as its source reads
      * @param non-empty-list<string|int> $path
      */
-    private function scalarList(array $items, YamlValue $held, array $path, string $place): ?WorkflowDifference
+    private function scalarList(YamlEntry $declared, array $items, YamlValue $held, array $path, string $place): ?WorkflowDifference
     {
         $present = WorkflowSyntax::canonical($path, $held->decoded());
         if (!is_array($present) || !array_is_list($present)) {
@@ -263,13 +422,28 @@ final readonly class WorkflowContainment
             if (in_array($item, $present, true)) {
                 continue;
             }
+            if (is_array($held->decoded())) {
+                return WorkflowDifference::missingListItem($path, $place, $source);
+            }
 
-            return is_array($held->decoded())
-                ? WorkflowDifference::missingListItem($path, $place, $source)
+            return $this->isRetiredItem($path, $held->decoded())
+                ? WorkflowDifference::retiredLast($path, $place, self::itemsIn([WorkflowPointer::segmentOf($held->decoded())], $place), $this->declared, $declared)
                 : WorkflowDifference::unwritableShape($place, 'a single value', 'a list');
         }
 
         return null;
+    }
+
+    /**
+     * Whether a list's item at a path, or a key of a mapping spelled without nodes, is one the standard retired; a path inside a step holds its position rather than its id, so nothing there reads as retired.
+     *
+     * @param non-empty-list<string|int> $path
+     */
+    private function isRetiredItem(array $path, mixed $item): bool
+    {
+        $segments = array_map(strval(...), $path);
+
+        return in_array(WorkflowPointer::fromSegments([...$segments, WorkflowPointer::segmentOf($item)])->toString(), $this->retired, true);
     }
 
     /** @param non-empty-list<string|int> $path */

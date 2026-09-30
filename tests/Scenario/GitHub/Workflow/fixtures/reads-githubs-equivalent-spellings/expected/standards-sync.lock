@@ -1,0 +1,28 @@
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        ".github/workflows/deploy.yml": {
+            "workflow": [
+                "/on",
+                "/on/pull_request",
+                "/on/push",
+                "/jobs",
+                "/jobs/deploy",
+                "/jobs/deploy/needs",
+                "/jobs/deploy/needs/build",
+                "/jobs/deploy/if",
+                "/jobs/deploy/runs-on",
+                "/jobs/deploy/runs-on/ubuntu-26.04",
+                "/jobs/deploy/environment",
+                "/jobs/deploy/environment/name",
+                "/jobs/deploy/steps",
+                "/jobs/deploy/steps/deploy",
+                "/jobs/deploy/steps/deploy/id",
+                "/jobs/deploy/steps/deploy/run"
+            ]
+        }
+    }
+}

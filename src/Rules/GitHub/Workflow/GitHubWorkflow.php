@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OrthoCode\StandardsSync\Rules\GitHub\Workflow;
 
 use LogicException;
+use OrthoCode\StandardsSync\Core\Rule\ContributesToList;
 use OrthoCode\StandardsSync\Core\Rule\ExplainsDrift;
 use OrthoCode\StandardsSync\Core\Rule\FileTarget;
 use OrthoCode\StandardsSync\Core\Rule\Rule;
@@ -18,11 +19,18 @@ use OrthoCode\StandardsSync\Rules\General\ManagedBlock\MarkerSyntax;
  * Keeps a declared GitHub Actions workflow in a project's workflow file: every key, job and step it declares is there, and whatever the project adds stays.
  * A missing key, job or step is added — a step after the one declared before it — and a declared value the project changed is written back; the file's own formatting and comments stay as they are.
  * Every declared step carries an id; a project's step without one that already holds a declared step is taken as that step and gains its id.
+ * A key, job, step or list item a standard declared at an earlier sync and declares no longer is taken out, with whatever the project added inside it.
  * An absent file is written as the workflow is declared, comments included.
  */
-final readonly class GitHubWorkflow implements Rule, ExplainsDrift
+final readonly class GitHubWorkflow implements Rule, ContributesToList, ExplainsDrift
 {
+    /** The one list a workflow contributes: its declared nodes, as pointers. */
+    private const string LIST_KEY = 'workflow';
+
     private DeclaredWorkflow $declared;
+
+    /** @var list<string> the pointers an earlier sync recorded and nothing declares now */
+    private array $retired;
 
     /**
      * @param string $workflow the workflow as a standard ships it
@@ -34,12 +42,42 @@ final readonly class GitHubWorkflow implements Rule, ExplainsDrift
         private ?Label $replacesBlock = null,
     ) {
         $this->declared = DeclaredWorkflow::fromString($workflow);
+        $this->retired = [];
     }
 
     #[\Override]
     public function target(): FileTarget
     {
         return $this->target;
+    }
+
+    #[\Override]
+    public function listKey(): string
+    {
+        return self::LIST_KEY;
+    }
+
+    #[\Override]
+    public function entries(): array
+    {
+        return $this->declared->pointers();
+    }
+
+    #[\Override]
+    public function withMerged(ContributesToList $later): static
+    {
+        throw new LogicException(sprintf('Two declarations of the workflow %s cannot be combined yet.', $this->target->toString()));
+    }
+
+    #[\Override]
+    public function withRetired(array $retired): static
+    {
+        /** @var static $retiring psalm types clone-with as a plain object */
+        $retiring = clone($this, [
+            'retired' => $retired,
+        ]);
+
+        return $retiring;
     }
 
     #[\Override]
@@ -74,9 +112,10 @@ final readonly class GitHubWorkflow implements Rule, ExplainsDrift
     private function synced(string $content): array
     {
         [$content, $reasons] = $this->withoutReplacedMarkers($content);
-        $passes = 2 * $this->declared->nodeCount() + 1;
+        $retired = array_values(array_filter(array_map(WorkflowPointer::fromString(...), $this->retired)));
+        $passes = 2 * $this->declared->nodeCount() + count($retired) + 1;
         for ($pass = 0; $pass < $passes; $pass++) {
-            $difference = WorkflowContainment::firstDifference($this->declared, YamlTree::fromString($content));
+            $difference = WorkflowContainment::firstDifference($this->declared, YamlTree::fromString($content), $retired);
             if (!$difference instanceof WorkflowDifference) {
                 return [$content, $reasons];
             }

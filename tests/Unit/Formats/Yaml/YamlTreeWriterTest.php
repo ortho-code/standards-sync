@@ -501,6 +501,51 @@ final class YamlTreeWriterTest extends TestCase
         self::assertSame("b\n", YamlTree::fromString($written)->valueAt(['steps', 1, 'run'])?->decoded());
     }
 
+    public function testRemovesAScalarFromABlockSequenceByItsValue(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    branches:
+                      - main
+                      - 'release/**'
+                    YAML,
+            ),
+            YamlTreeWriter::removeScalarItem(FileContent::fromString(
+                <<<'YAML'
+                    branches:
+                      - main
+                      - master
+                      - 'release/**'
+                    YAML,
+            ), ['branches'], 'master'),
+        );
+    }
+
+    public function testRemovesAScalarFromAFlowSequenceWithItsSeparator(): void
+    {
+        self::assertSame(FileContent::fromString('branches: [main, develop] # both'), YamlTreeWriter::removeScalarItem(FileContent::fromString('branches: [main, master, develop] # both'), ['branches'], 'master'));
+        self::assertSame(FileContent::fromString('branches: [ main ]'), YamlTreeWriter::removeScalarItem(FileContent::fromString('branches: [ main, "release/**" ]'), ['branches'], 'release/**'));
+        self::assertSame(FileContent::fromString('branches: [master]'), YamlTreeWriter::removeScalarItem(FileContent::fromString('branches: [main, master]'), ['branches'], 'main'));
+        self::assertSame(FileContent::fromString('needs: [build, "a, b"]'), YamlTreeWriter::removeScalarItem(FileContent::fromString('needs: [lint, build, "a, b"]'), ['needs'], 'lint'));
+    }
+
+    public function testRefusesToRemoveTheOnlyItemOfAFlowSequence(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIs('"branches" holds only this item; removing it would leave no sequence, so the entry holding it goes instead.');
+
+        YamlTreeWriter::removeScalarItem(FileContent::fromString('branches: [main]'), ['branches'], 'main');
+    }
+
+    public function testRefusesToRemoveAnItemTheSequenceDoesNotHold(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIs('"branches" holds no such item; it cannot be removed.');
+
+        YamlTreeWriter::removeScalarItem(FileContent::fromString('branches: [main, develop]'), ['branches'], 'master');
+    }
+
     public function testRefusesToRemoveTheOnlyItem(): void
     {
         $this->expectException(RuntimeException::class);

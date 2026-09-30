@@ -132,6 +132,59 @@ final readonly class WorkflowDifference
         return self::refusal(sprintf('It has "%s" as %s where the standard declares %s; write it as %s and sync again.', $place, $actual, $declared, $declared));
     }
 
+    /** @param list<string|int> $mappingPath */
+    public static function retiredEntry(array $mappingPath, string $place, string $key): self
+    {
+        return new self(
+            sprintf('It still has "%s", which the standard no longer declares.', $place),
+            static fn(string $content): string => YamlTreeWriter::removeEntry($content, $mappingPath, $key),
+        );
+    }
+
+    /** @param list<string|int> $stepsPath */
+    public static function retiredStep(array $stepsPath, string $job, string $id, int $index): self
+    {
+        return new self(
+            sprintf('The job "%s" still runs the step "%s", which the standard no longer declares.', $job, $id),
+            static fn(string $content): string => YamlTreeWriter::removeItem($content, $stepsPath, $index),
+        );
+    }
+
+    /**
+     * @param list<string|int> $listPath
+     * @param mixed $item the item as the project's list decodes it
+     */
+    public static function retiredItem(array $listPath, string $place, mixed $item, string $spelled): self
+    {
+        return new self(
+            sprintf('Its "%s" still lists %s, which the standard no longer declares.', $place, $spelled),
+            static fn(string $content): string => YamlTreeWriter::removeScalarItem($content, $listPath, $item),
+        );
+    }
+
+    /**
+     * A retired node that is the last its holder has: the holder takes the value the standard declares for it now.
+     *
+     * @param non-empty-list<string|int> $holderPath
+     * @param string $retired what is retired, as the explanation names it: a place in quotes, or items and the place holding them
+     * @param YamlEntry $entry the holder as the standard declares it now
+     */
+    public static function retiredLast(array $holderPath, string $holderPlace, string $retired, YamlTree $declared, YamlEntry $entry): self
+    {
+        $fragment = YamlFragment::fromValue($declared, $entry);
+
+        return new self(
+            sprintf('It still has %s, which the standard no longer declares, so "%s" takes the value it declares now.', $retired, $holderPlace),
+            static fn(string $content): string => YamlTreeWriter::replaceValue($content, $holderPath, $fragment),
+        );
+    }
+
+    /** @param string $retired what is retired, as the explanation names it: a place in quotes, or items and the place holding them */
+    public static function unretractable(string $retired): self
+    {
+        return self::refusal(sprintf('It still has %s, which the standard no longer declares, and taking it out would leave its holder with nothing the standard declares; remove it by hand and sync again.', $retired));
+    }
+
     public function explanation(): string
     {
         return $this->explanation;

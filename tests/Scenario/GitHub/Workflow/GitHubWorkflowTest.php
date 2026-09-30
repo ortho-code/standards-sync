@@ -32,5 +32,9 @@ final class GitHubWorkflowTest extends ScenarioTestCase
         yield 'a branch ref names no version, so the declared ref replaces it' => ['replaces-a-branch-ref', $config];
         yield 'a moving runner label names no version, so the declared label replaces it' => ['replaces-a-moving-runner-label', $config];
         yield 'GitHub\'s other spellings of the declared triggers, needs, runner, environment and condition hold them, with the project\'s own additions beside them' => ['reads-githubs-equivalent-spellings', 'standards-sync-deploy.php'];
+        yield 'a step the lock records and the standard no longer declares is taken out, with what the project added to it' => ['retracts-a-step-no-longer-declared', $config];
+        yield 'a job the lock records and the standard no longer declares is taken out, the project\'s own jobs staying' => ['retracts-a-job-no-longer-declared', $config];
+        yield 'a list item the lock records and the standard no longer declares is taken out, the project\'s own items staying' => ['retracts-a-list-item-no-longer-declared', $config];
+        yield 'an event whose declared filter is retired goes back to the event the standard declares now' => ['returns-an-event-to-no-filters', $config];
     }
 }
