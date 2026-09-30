@@ -31,8 +31,8 @@ Both are one mismatch: a block is a copy, and the engine's positioning is floors
 **Decisions.**
 
 1. **A declared step is identified by its `id`**, which a standard's template must give every step. A project's step without that `id` is adopted when it contains the declared step, the first in order when two do, and sync adds the `id` to it — so a workflow written before ids, whether a synced block or a project's own, gains ids rather than duplicates. *Rejected*: matching a `uses` step by its action, which binds a declared checkout to a project's second checkout of another repository; matching a `run` step by its text, which turns a project's edit of a declared script into a missing step plus one of the project's own, and duplicates it on sync.
-2. **Additions are the project's, except those that can make a declared job or step not run, or not fail, without failing loudly**: `if` and `continue-on-error` on a declared job or step, `needs` added to a declared job, and labels added to a declared `runs-on` are drift, and sync removes them. *Rejected*: every addition allowed, which lets `continue-on-error: true` make the checks unable to fail; a closed list of allowed additions, which fails closed on every key GitHub adds and ties consumers to engine releases again.
-3. **A declared trigger's filter lists may gain entries while neither side holds a `!` pattern, and are exact once either does; a filter key added to a declared event is drift.** Pattern order matters only once `!` is used, and an added filter key narrows the trigger or silences it.
+2. **Additions are the project's, except those that can make a declared job or step not run, or not fail, without failing loudly**: `if` and `continue-on-error` on a declared job or step, `needs` added to a declared job, and labels added to a declared `runs-on` are drift, and sync removes them. *Rejected*: every addition allowed, which lets `continue-on-error: true` make the checks unable to fail; a closed list of allowed additions, which fails closed on every key GitHub adds and ties consumers to engine releases again. *(Reversed the same date before it was built: the project's additions are never guarded — see the reversal below.)*
+3. **A declared trigger's filter lists may gain entries while neither side holds a `!` pattern, and are exact once either does; a filter key added to a declared event is drift.** Pattern order matters only once `!` is used, and an added filter key narrows the trigger or silences it. *(Reversed with decision 2.)*
 4. **Declared scalars are exact, expressions included**: `php-version: ${{ matrix.php }}` in place of a declared literal is drift, and a matrix belongs in a job of the project's own. *Rejected*: letting an expression satisfy any declared scalar, which lets `${{ '7.4' }}` through.
 5. **GitHub's equivalent forms are normalised; a shape sync cannot edit into the declared form is refused**, naming the node and what to write. *Rejected*: restructuring the node, which rewrites the project's formatting for a case two of the sampled files show.
 6. **Minimum versions.** A tag compares on the components both sides spell, so `v7` satisfies `v7.2.0` as a moving major tag does; a digest pin compares by the version in its comment and is kept verbatim; the action, path included, must match exactly; local, same-repository and `docker://` references are exact. A ref naming no orderable version — a branch, a bare SHA — is drift, and sync writes the declared one. Runner labels compare within one name and suffix; `-latest` and unversioned labels are exact.
@@ -127,3 +127,27 @@ The order is now: among the steps after the declared step before it, the first t
 The version is set aside for adopting alone: the next walk finds the step by its new id and raises its action to the minimum.
 Worked example: a job with a lint step on `setup-php@v1` and its checks' step on `@v2` adopts the `@v2` step, and the `@v1` step stays the project's own; with both on `@v1`, the first in place is adopted and raised, the second stays the project's.
 *Rejected*: adopting by the action alone, the wrong-binding case decision 1 already rejected, where a second checkout of another repository is taken for the declared one.
+
+## Reversed 2026-09-30 — the project's additions are never guarded (decisions 2 and 3)
+
+**Why.** Decisions 2 and 3 would have removed the additions that can switch a declared job or step off — `if`, `continue-on-error`, an added `needs`, extra runner labels — and filter keys added to a declared trigger.
+Reviewed before they were built, they fought legitimate additions: a condition skipping a job on forks, a `needs` ordering it after the project's own build, an extra runner label, and a standard shipping a workflow for projects to complete with filters of their own, which would have needed an opt-out of its own.
+They were also a list of GitHub's keys, growing with GitHub's releases.
+And the engine guards no other file against a project working around it on purpose: a composer script keeps any command the project adds, and a PHPStan floor does not police the project's `ignoreErrors`.
+A standard gets its declared workflow held; a project may add at will.
+
+**What is given up.** Switching the declared checks off by an addition stays in sync — `continue-on-error: true` on the checks' step, `if: false` on the job — and GitHub reports a skipped job as "Success" even as a required check.
+So does the accidental case: `tags` added to a `push` that only filtered `branches`, which stops branch pushes from triggering it.
+
+**What still holds.** Every declared key, job and step, the declared values and the minimum versions; a declared filter list still holds its declared patterns, though a `!` pattern no longer makes its order checked.
+
+*Trigger to reconsider*: the first project found with a standard's declared checks switched off by an addition.
+
+## Built 2026-09-30 — GitHub's equivalent spellings (decision 5)
+
+**What.** `WorkflowSyntax::canonical()` spells a value the way GitHub reads all its spellings of it: triggers written as a string or a list become a mapping of events; a job's `needs` and `runs-on` and an event's filters read a single string as a list holding it; a job's `environment` reads a string as its name and its `container` as its image; a condition reads the same without its `${{ }}`.
+The walk compares in that spelling, so every equivalent form passes as it is written.
+A value written `~`, `{}` or `[]` holds nothing and takes the declared value whole.
+Where a spelling cannot hold what is declared: a differing environment or container string is replaced by the declared mapping, since the string holds nothing the mapping lacks; triggers written as a list where a declared one is filtered are refused, since rewriting them as a mapping could lose the project's own; a single value where the standard declares more items is refused, since it cannot take a second one.
+A declared list, block or flow, or a single string at a place that reads it as a list, must have each item among the project's, a missing one appended.
+A job's `runs-on` has each declared label met by one of the project's of its kind at its version or later; the project's own labels beside it stay, and a list meeting none is replaced whole.

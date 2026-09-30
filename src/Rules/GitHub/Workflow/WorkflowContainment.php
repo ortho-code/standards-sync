@@ -16,11 +16,17 @@ use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlValueKind;
  * Walks the declared workflow against a project's, in declared order, and finds the first place the project falls short of it.
  * A declared key must be present and its value contained; a key with nothing under it asks for the key alone.
  * A job's steps are found by id, in declared order, a step without one adopted when it holds the declared step; a list of scalars must hold the declared ones.
- * Action references and runner labels are minimums; every other value is exact.
+ * Action references and runner labels are minimums; every other value is exact, compared in the spelling GitHub reads all its spellings of it as.
  * Places are spelled as paths of keys, a step by its id in brackets: `jobs.checks.steps[setup-php].with.php-version`.
  */
 final readonly class WorkflowContainment
 {
+    /** A string that reads back as itself unquoted: no indicator first, nothing that ends a plain scalar inside. */
+    private const string PLAIN_ITEM = '/^[A-Za-z0-9_.\/][A-Za-z0-9_.\/*@+-]*$/';
+
+    /** The words YAML reads as something other than a string when written plain. */
+    private const array NOT_PLAIN_WORDS = ['true', 'false', 'null', '~', 'yes', 'no', 'on', 'off'];
+
     /** @param bool $referencesByAction whether a reference holds a declared one when it names the same action, whatever its version */
     private function __construct(
         private YamlTree $declared,
@@ -62,15 +68,15 @@ final readonly class WorkflowContainment
         if ($wanted->kind() === YamlValueKind::Empty) {
             return null;
         }
-        if ($held->kind() === YamlValueKind::Empty) {
+        if (self::holdsNothing($held)) {
             return WorkflowDifference::changedValue($path, $place, $this->declared, $declared);
         }
 
         if (WorkflowSyntax::isUsesPath($path) && self::isSingleLineScalar($wanted) && self::isSingleLineScalar($held)) {
             return $this->reference($wanted, $held, $path, $place);
         }
-        if (WorkflowSyntax::isRunsOnPath($path) && self::isSingleLineScalar($wanted) && self::isSingleLineScalar($held)) {
-            return $this->runner($wanted, $held, $path, $place);
+        if (WorkflowSyntax::isRunsOnPath($path)) {
+            return $this->runner($declared, $held, $path, $place);
         }
 
         $wantedNode = $wanted->node();
@@ -78,18 +84,36 @@ final readonly class WorkflowContainment
         if ($wantedNode instanceof YamlMapping) {
             return $heldNode instanceof YamlMapping
                 ? $this->mapping($wantedNode, $heldNode, $path, $place)
-                : WorkflowDifference::unwritableShape($place, self::shape($held), 'a mapping');
+                : $this->spelledMapping($declared, $held, $path, $place);
         }
         if ($wantedNode instanceof YamlSequence && WorkflowSyntax::isStepsPath($path)) {
             return $heldNode instanceof YamlSequence
                 ? $this->steps($wantedNode, $heldNode, $path, $place)
                 : WorkflowDifference::unwritableShape($place, self::shape($held), 'a list of steps');
         }
-        if ($wantedNode instanceof YamlSequence && self::holdsScalars($wantedNode)) {
-            return $this->scalarList($wantedNode, $held, $path, $place);
+        $items = self::listItems($wanted, $path);
+        if ($items !== null) {
+            return $this->scalarList($items, $held, $path, $place);
         }
 
         return $this->exact($declared, $held, $path, $place);
+    }
+
+    /**
+     * A declared mapping the project spells another way GitHub reads the same: triggers as a list, an environment as its name.
+     * Where the spelling holds what the mapping declares, it passes; where not, a string the declared mapping stands for is replaced by it, and triggers are refused, since rewriting them would lose the project's own.
+     *
+     * @param non-empty-list<string|int> $path
+     */
+    private function spelledMapping(YamlEntry $declared, YamlValue $held, array $path, string $place): ?WorkflowDifference
+    {
+        if (self::contains($declared->value()->decoded(), WorkflowSyntax::canonical($path, $held->decoded()))) {
+            return null;
+        }
+
+        return WorkflowSyntax::takesStringAsMapping($path) && self::isSingleLineScalar($held)
+            ? WorkflowDifference::changedValue($path, $place, $this->declared, $declared)
+            : WorkflowDifference::unwritableShape($place, self::shape($held), 'a mapping');
     }
 
     /**
@@ -190,38 +214,59 @@ final readonly class WorkflowContainment
     }
 
     /**
-     * A runner label: the declared label's name and suffix at its version or later.
+     * A job's runner labels: each declared label met by one of the project's of its name and suffix at its version or later, whether either side writes one label or a list; the project's own labels beside it stay.
      *
      * @param non-empty-list<string|int> $path
      */
-    private function runner(YamlValue $wanted, YamlValue $held, array $path, string $place): ?WorkflowDifference
+    private function runner(YamlEntry $declared, YamlValue $held, array $path, string $place): ?WorkflowDifference
     {
-        if ($wanted->decoded() === $held->decoded()) {
+        $wanted = $declared->value();
+        $minimums = self::strings(WorkflowSyntax::canonical($path, $wanted->decoded()));
+        $labels = self::strings(WorkflowSyntax::canonical($path, $held->decoded()));
+        if ($minimums === null || $labels === null) {
+            return $this->exact($declared, $held, $path, $place);
+        }
+        $met = !array_any($minimums, static fn(string $minimum): bool => !array_any(
+            $labels,
+            static fn(string $label): bool => $label === $minimum || RunnerLabel::fromString($label)->isAtLeast(RunnerLabel::fromString($minimum)) === true,
+        ));
+        if ($met) {
             return null;
         }
-        $minimum = RunnerLabel::fromString((string) $wanted->decoded());
-        $actual = RunnerLabel::fromString((string) $held->decoded());
+        if (!self::isSingleLineScalar($wanted) || !self::isSingleLineScalar($held)) {
+            return WorkflowDifference::changedValue($path, $place, $this->declared, $declared);
+        }
+
+        $minimum = RunnerLabel::fromString($minimums[0]);
+        $actual = RunnerLabel::fromString($labels[0]);
         $atLeast = $actual->isAtLeast($minimum);
-        if ($atLeast === true) {
-            return null;
-        }
 
         return $atLeast === null || $actual->isSameKind($minimum)
             ? WorkflowDifference::belowMinimum($path, $place, $held->source(), $wanted->source(), $atLeast === false, true)
             : WorkflowDifference::changedScalar($path, $place, $held->source(), $wanted->source());
     }
 
-    /** @param non-empty-list<string|int> $path */
-    private function scalarList(YamlSequence $declared, YamlValue $held, array $path, string $place): ?WorkflowDifference
+    /**
+     * A declared list of scalars, or a single one GitHub reads as a list: each must be among the project's.
+     * A missing one is appended to the project's list; a project writing a single value where more are declared is refused, since the value cannot take a second.
+     *
+     * @param list<array{mixed, string}> $items each declared item, decoded, and as its source reads
+     * @param non-empty-list<string|int> $path
+     */
+    private function scalarList(array $items, YamlValue $held, array $path, string $place): ?WorkflowDifference
     {
-        $present = $held->decoded();
+        $present = WorkflowSyntax::canonical($path, $held->decoded());
         if (!is_array($present) || !array_is_list($present)) {
             return WorkflowDifference::unwritableShape($place, self::shape($held), 'a list');
         }
-        foreach ($declared->items() as $item) {
-            if (!in_array($item->value()->decoded(), $present, true)) {
-                return WorkflowDifference::missingListItem($path, $place, $item->value()->source());
+        foreach ($items as [$item, $source]) {
+            if (in_array($item, $present, true)) {
+                continue;
             }
+
+            return is_array($held->decoded())
+                ? WorkflowDifference::missingListItem($path, $place, $source)
+                : WorkflowDifference::unwritableShape($place, 'a single value', 'a list');
         }
 
         return null;
@@ -231,7 +276,9 @@ final readonly class WorkflowContainment
     private function exact(YamlEntry $declared, YamlValue $held, array $path, string $place): ?WorkflowDifference
     {
         $wanted = $declared->value();
-        if ($wanted->decoded() === $held->decoded()) {
+        $canonicalWanted = WorkflowSyntax::canonical($path, $wanted->decoded());
+        $canonicalHeld = WorkflowSyntax::canonical($path, $held->decoded());
+        if (WorkflowSyntax::takesStringAsMapping($path) ? self::contains($canonicalWanted, $canonicalHeld) : $canonicalWanted === $canonicalHeld) {
             return null;
         }
 
@@ -240,9 +287,87 @@ final readonly class WorkflowContainment
             : WorkflowDifference::changedValue($path, $place, $this->declared, $declared);
     }
 
-    private static function holdsScalars(YamlSequence $sequence): bool
+    /**
+     * The items of a declared value held as a list: a block list of scalars, or a single scalar where GitHub reads one as a list; null for any other value.
+     *
+     * @param non-empty-list<string|int> $path
+     * @return list<array{mixed, string}>|null each item decoded, and as its source reads
+     */
+    private static function listItems(YamlValue $wanted, array $path): ?array
     {
-        return !array_any($sequence->items(), static fn(YamlItem $item): bool => $item->value()->node() !== null || is_array($item->value()->decoded()));
+        $node = $wanted->node();
+        if ($node instanceof YamlSequence) {
+            $items = array_map(static fn(YamlItem $item): array => [$item->value()->decoded(), $item->value()->source()], $node->items());
+
+            return array_any($items, static fn(array $item): bool => is_array($item[0])) ? null : $items;
+        }
+        $decoded = $wanted->decoded();
+        if ($wanted->kind() === YamlValueKind::Flow && is_array($decoded) && array_is_list($decoded) && $decoded !== []) {
+            $items = [];
+            foreach ($decoded as $item) {
+                $written = self::written($item);
+                if ($written === null) {
+                    return null;
+                }
+                $items[] = [$item, $written];
+            }
+
+            return $items;
+        }
+
+        return WorkflowSyntax::takesStringAsList($path) && self::isSingleLineScalar($wanted) ? [[$decoded, $wanted->source()]] : null;
+    }
+
+    /** A flow list's item as a block list item writes it: plain where it reads back as itself, single-quoted where not; null for anything but a string or an integer. */
+    private static function written(mixed $item): ?string
+    {
+        if (is_int($item)) {
+            return (string) $item;
+        }
+        if (!is_string($item)) {
+            return null;
+        }
+
+        return preg_match(self::PLAIN_ITEM, $item) === 1 && !is_numeric($item) && !in_array(strtolower($item), self::NOT_PLAIN_WORDS, true)
+            ? $item
+            : '\'' . str_replace('\'', '\'\'', $item) . '\'';
+    }
+
+    /** Whether a decoded value holds a declared one: every declared key present, a declared key with nothing under it asking for the key alone, every declared list item among the held ones, every scalar equal. */
+    private static function contains(mixed $declared, mixed $held): bool
+    {
+        if (!is_array($declared)) {
+            return $declared === $held;
+        }
+        if (!is_array($held)) {
+            return false;
+        }
+        if (array_is_list($declared)) {
+            return !array_any($declared, static fn(mixed $item): bool => !in_array($item, $held, true));
+        }
+
+        return !array_any(
+            array_keys($declared),
+            static fn(int|string $key): bool => !array_key_exists($key, $held) || ($declared[$key] !== null && !self::contains($declared[$key], $held[$key])),
+        );
+    }
+
+    /** Whether the project's value holds nothing: no value at all, `~`, or an empty `{}` or `[]`. */
+    private static function holdsNothing(YamlValue $value): bool
+    {
+        if ($value->kind() === YamlValueKind::Empty) {
+            return true;
+        }
+
+        return $value->node() === null && in_array($value->decoded(), [null, []], true);
+    }
+
+    /**
+     * @return list<string>|null
+     */
+    private static function strings(mixed $value): ?array
+    {
+        return is_array($value) && array_is_list($value) && !array_any($value, static fn(mixed $item): bool => !is_string($item)) ? $value : null;
     }
 
     private static function isSingleLineScalar(YamlValue $value): bool

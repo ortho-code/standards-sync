@@ -31,5 +31,6 @@ final class GitHubWorkflowTest extends ScenarioTestCase
         yield 'a digest pin below the declared version is replaced, its comment with it' => ['replaces-a-digest-pin-below-the-minimum', $config];
         yield 'a branch ref names no version, so the declared ref replaces it' => ['replaces-a-branch-ref', $config];
         yield 'a moving runner label names no version, so the declared label replaces it' => ['replaces-a-moving-runner-label', $config];
+        yield 'GitHub\'s other spellings of the declared triggers, needs, runner, environment and condition hold them, with the project\'s own additions beside them' => ['reads-githubs-equivalent-spellings', 'standards-sync-deploy.php'];
     }
 }

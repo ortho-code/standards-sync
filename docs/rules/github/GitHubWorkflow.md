@@ -920,3 +920,65 @@ jobs:
       - id: checks
         run: composer app-checks
 ```
+
+Declared as:
+
+```php
+return SyncConfig::create()->withRuleSet(new class extends ComposableRuleSet {
+    public function __construct()
+    {
+        $this->addRule(new GitHubWorkflow(
+            target: FileTarget::fromString('.github/workflows/deploy.yml'),
+            workflow: FileContent::fromString(
+                <<<'YAML'
+                    on:
+                      pull_request:
+                      push:
+
+                    jobs:
+                      deploy:
+                        needs: build
+                        if: github.event_name == 'push'
+                        runs-on: ubuntu-26.04
+                        environment: production
+                        steps:
+                          - id: deploy
+                            run: make deploy
+                    YAML,
+            ),
+        ));
+    }
+});
+```
+
+…which reports as: *Keeps the declared workflow in .github/workflows/deploy.yml, beside any keys, jobs and steps the project adds.*
+
+## GitHub's other spellings of the declared triggers, needs, runner, environment and condition hold them, with the project's own additions beside them
+
+Fixture: [`tests/Scenario/GitHub/Workflow/fixtures/reads-githubs-equivalent-spellings`](../../../tests/Scenario/GitHub/Workflow/fixtures/reads-githubs-equivalent-spellings)
+
+`.github/workflows/deploy.yml` **stays byte-identical**:
+
+```yaml
+on: [pull_request, push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-26.04
+    steps:
+      - run: make
+  deploy:
+    needs: [build, lint]
+    if: ${{ github.event_name == 'push' }}
+    runs-on: [ubuntu-28.04]
+    environment:
+      name: production
+      url: https://acme.example
+    steps:
+      - id: deploy
+        run: make deploy
+  lint:
+    runs-on: ubuntu-26.04
+    steps:
+      - run: make lint
+```
