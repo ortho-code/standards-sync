@@ -9,11 +9,11 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The release notes ARE the changelog entry, not a generated commit list: the changelog is written for the people consuming the package, and a commit list is not.
       # Extracts the section for this tag — everything from its own heading up to the next one.
       - run: |
