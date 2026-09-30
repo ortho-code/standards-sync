@@ -50,6 +50,6 @@ The design phase, run the same day over the verified surface above. Two rules, b
 
 ### Lifted 2026-09-30 — the dev pin back to `^13`
 
-Psalm 6.17.0 (2026-09-10) widened its `sebastian/diff` requirement to `^9.0`, which is what phpunit 13 needs, so the conflict behind the engine's `^12` dev pin is gone and the pin lifts as the entry above said it would.
+Psalm 6.17.0 (2026-09-10) widened its `sebastian/diff` requirement to `^9.0`, which is what phpunit 13.2 and later need, so the conflict behind the engine's `^12` dev pin is gone and the pin lifts as the entry above said it would.
 Verified by installing phpunit 13.3.6 beside psalm 6.19.1 and `sebastian/diff` 9: the full check aggregate, deptrac and `composer validate --strict` pass, and `phpunit --validate-configuration` accepts the engine's config.
 The same fact frees an org's requirement floor: a tool set carrying `vimeo/psalm: ^6` and `phpunit/phpunit: ^13` now installs on PHP 8.5.
