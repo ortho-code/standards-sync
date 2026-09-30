@@ -14,6 +14,8 @@ Every example is generated from the scenario suite (`tests/Scenario`): the fixtu
   - [EcsBaseSet](ecs/EcsBaseSet.md)
 - **General**
   - [ManagedBlock](general/ManagedBlock.md)
+- **GitHub**
+  - [GitHubWorkflow](github/GitHubWorkflow.md)
 - [PhpStan](phpstan/README.md)
   - [PhpStanIncludedRuleset](phpstan/PhpStanIncludedRuleset.md)
   - [PhpStanMinLevel](phpstan/PhpStanMinLevel.md)

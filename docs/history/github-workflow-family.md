@@ -100,3 +100,17 @@ Nesting steps in by the target's unit rather than the source's, while the furthe
 Found by the corpus run below: keeping a document without a final line break that way, as the first cut did, inserted a template's `run: |` script without its final line break when it became the document's last value, a value sync could never make match the template's.
 
 **Checked** over the same corpus with the production classes: 16,798 edits across nine kinds — adding a key to a job, removing each job key, inserting a step with a nested `with` and a block scalar and a plain `run` step at the start, middle and end of every job, removing each step, raising every action ref, adding an input to every `with` and a `with` block to every step without one, and adding a pattern to every trigger filter — each parsing to exactly the expected data and touching no line outside the edit, with four refusals, all designed: three mappings holding only the entry to remove, one filter written as a string.
+
+## Built 2026-09-30 — the rule's core: keys, jobs, steps and exact values
+
+**What.** `Rules/GitHub/Workflow/GitHubWorkflow` over four supporting classes: `DeclaredWorkflow` holds the template and refuses at construction a step without an id, a step id its job declares twice, or a workflow the reader refuses; `WorkflowContainment` walks the declared workflow against the project's and finds the first place the project falls short; `WorkflowDifference` carries that shortfall's explanation beside the edit that resolves it; `WorkflowSyntax` holds the parts of GitHub's syntax the walk reads — where jobs and their steps are, and what names a step.
+`apply()` resolves the first difference and walks again until none is left, so a second sync finds nothing and returns its input; the passes are bounded by the declared workflow's size, and running out of them is an engine bug by construction.
+An absent file is written as the template reads, comments included.
+
+**How the walk compares.** A declared key must be present, and a key declared with nothing under it asks for the key alone; a value the project left empty takes the declared one whole.
+A job's steps are found by id in declared order: a missing step goes in after the declared step before it, or first; a step without an id that holds the declared step, its id aside, is adopted and gains the id as its last key, since a step's key order means nothing; a declared step found before its predecessor is refused (decision 9).
+A list of scalars must hold the declared items, a missing one appended; every other value is exact for now, action refs included, and a single-line scalar is corrected in place with the template's text while anything else has its value replaced.
+A shape sync cannot edit into the declared form — a list where a mapping is declared — is refused through the writers' existing `RuntimeException`, so no new refusal mechanism was needed.
+
+**What this cut leaves to the next ones**: minimum versions (decision 6), weakening additions and trigger filters (decisions 2 and 3, where an added filter key is still the project's here), GitHub's equivalent forms (decision 5), and the lock, which is what lets a step the standard stops declaring be retracted.
+A standard may also want to ship a workflow as a template the project completes with filters of its own; the filter decision leaves room for the standard to mark a trigger as the project's to filter, designed when a standard needs it.

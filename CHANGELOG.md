@@ -4,6 +4,12 @@ What changed in each release, for the projects consuming the standard through an
 
 ## Unreleased
 
+**New: `GitHubWorkflow`, which keeps a declared GitHub Actions workflow in a project's workflow file.** Every key, job and step the standard declares must be there, and whatever the project adds stays: its own steps, inputs, triggers and jobs.
+A missing key, job or step is added — a step after the one declared before it — and a declared value the project changed is written back, while the file's own formatting and comments stay as they are.
+Every declared step needs an `id`; a project's step without one that already holds a declared step is taken as that step and gains its id.
+`replacesBlock:` takes over a workflow a standard used to ship as a managed block: the first sync removes the block's two marker lines and keeps the rest.
+A project that moves a declared step before the one declared before it, or writes a declared part in another shape, gets a refusal saying what to write instead.
+
 **Tool imports are recorded in `standards-sync.lock`, as composer scripts are since 0.3.0.** This covers the PHPStan `includes` entry, the Rector and ECS `withSets()` entries, the deptrac `imports` entry and the renovate `extends` entry.
 When a standard moves a template or renames a preset, the next sync replaces the old entry in place, keeping its line's indentation and trailing comment, and an entry no standard declares any more is removed; an entry the lock never recorded, such as one the project added, stays.
 Standards importing into the same list now combine in declaration order, an entry declared twice counting once.

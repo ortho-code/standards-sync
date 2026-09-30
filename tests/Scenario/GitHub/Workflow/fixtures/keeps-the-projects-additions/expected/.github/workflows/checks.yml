@@ -1,0 +1,35 @@
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    steps:
+      - id: checkout
+        name: Check out the code
+        uses: actions/checkout@v7
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+          extensions: intl
+      - id: install
+        uses: ramsey/composer-install@v4
+      - name: Warm the cache
+        run: bin/console cache:warmup
+      - id: checks
+        run: composer app-checks
+  e2e:
+    runs-on: ubuntu-26.04
+    steps:
+      - run: make e2e

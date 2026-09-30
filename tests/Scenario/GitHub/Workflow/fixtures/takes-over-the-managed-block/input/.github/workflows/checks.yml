@@ -1,0 +1,22 @@
+# >>> acme - managed >>>
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+      # setup-php before the install
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - uses: ramsey/composer-install@v4
+      - run: composer app-checks
+# <<< acme <<<

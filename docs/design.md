@@ -15,7 +15,7 @@ A value-aware rule *enforces* a minimum: a project below the floor is raised on 
 ## Three tiers of sharing
 
 - **Tier A — native import / extends.** The format can reference shared config (PHPStan `includes`, Rector `require`, renovate `extends`). Sharing is the real config in the package plus a one-line import in the repo; the content rides `composer update`.
-- **Tier B — structured merge.** Parseable files with no import (`composer.json`, XML configs): rules own specific keys and leave the rest. Value-aware rules (floors, ceilings, pins) live here.
+- **Tier B — structured merge.** Parseable files with no import (`composer.json`, XML configs, GitHub workflows): rules own specific keys and leave the rest. Value-aware rules (floors, ceilings, pins) live here, and so does containment: a GitHub workflow is held to a declared one, every declared key, job and step present and the project's own kept beside them ([github-workflow-family.md](history/github-workflow-family.md)).
 - **Tier C — opaque text.** No import, no structure to key on (`.editorconfig`, `.gitignore`): managed marker blocks.
 
 Priority is A → B → C by value. There is deliberately **no universal parse-and-merge framework**; each rule does narrow, targeted parsing of its one concern (see [prior approaches](history/prior-approaches.md) for the attempt that sank on that weight).
