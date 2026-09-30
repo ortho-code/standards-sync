@@ -1,0 +1,20 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@v6
+      - id: checks
+        run: composer app-checks
+      # Builds the front end the checks read.
+      - id: assets
+        run: npm ci
+  docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: make docs

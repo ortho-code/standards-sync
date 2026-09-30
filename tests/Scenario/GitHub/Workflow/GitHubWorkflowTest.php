@@ -36,5 +36,6 @@ final class GitHubWorkflowTest extends ScenarioTestCase
         yield 'a job the lock records and the standard no longer declares is taken out, the project\'s own jobs staying' => ['retracts-a-job-no-longer-declared', $config];
         yield 'a list item the lock records and the standard no longer declares is taken out, the project\'s own items staying' => ['retracts-a-list-item-no-longer-declared', $config];
         yield 'an event whose declared filter is retired goes back to the event the standard declares now' => ['returns-an-event-to-no-filters', $config];
+        yield 'a second declaration of the workflow adds its trigger and step to the first, and its newer action raises the first one\'s' => ['merges-two-declarations-of-one-workflow', 'standards-sync-merged.php'];
     }
 }

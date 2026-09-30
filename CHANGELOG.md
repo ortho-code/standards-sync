@@ -12,6 +12,8 @@ Every declared step needs an `id`; a project's step without one that already hol
 `replacesBlock:` takes over a workflow a standard used to ship as a managed block: the first sync removes the block's two marker lines and keeps the rest.
 A project that moves a declared step before the one declared before it, or writes a declared part in another shape, gets a refusal saying what to write instead.
 `standards-sync.lock` records what the workflow declares, so a key, job, step or list item a standard stops declaring is taken out on the next sync, with whatever the project added inside it, while the project's own stay; a trigger or a filter left holding only what was retired takes what the standard declares now.
+A retired part written in brackets or braces is refused with what to write instead, except an item of a list on one line, which is taken out.
+Two standards declaring the same workflow combine, as composer scripts do: the later one's workflow is made to hold the earlier one's, the earlier one's value standing where both declare one and an action or runner at the higher minimum; two that cannot combine, such as steps in the other order, are refused when the plan is built.
 For rule authors: a template with a `jobs` key but no jobs, a `steps` key but no steps, or a filter with no patterns is refused when the config is built.
 
 **Tool imports are recorded in `standards-sync.lock`, as composer scripts are since 0.3.0.** This covers the PHPStan `includes` entry, the Rector and ECS `withSets()` entries, the deptrac `imports` entry and the renovate `extends` entry.

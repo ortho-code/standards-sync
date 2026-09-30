@@ -179,6 +179,21 @@ final readonly class WorkflowDifference
         );
     }
 
+    /**
+     * A retired node inside a value the writer cannot take it out of.
+     *
+     * @param string $retired what is retired, as the explanation names it: a place in quotes, or items and the place holding them
+     */
+    public static function retiredInline(string $retired, string $holderPlace): self
+    {
+        return self::refusal(sprintf(
+            'It still has %s, which the standard no longer declares, inside "%s", which is written in brackets or braces and cannot be edited by sync; write "%s" as an indented block and sync again.',
+            $retired,
+            $holderPlace,
+            $holderPlace,
+        ));
+    }
+
     /** @param string $retired what is retired, as the explanation names it: a place in quotes, or items and the place holding them */
     public static function unretractable(string $retired): self
     {

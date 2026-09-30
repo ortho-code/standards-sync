@@ -61,6 +61,7 @@ final readonly class WorkflowContainment
     /**
      * The edit that takes a retired node out of the project's workflow, or null where the workflow no longer has it.
      * A node that is the last one its holder has leaves the holder as the standard now declares it: an event back to no filters, a string back to the declared value.
+     * A node inside a value written in brackets or braces is refused, except an item of a flow list on one line, which the writer can take out.
      */
     private function retraction(WorkflowPointer $pointer, YamlTree $actual): ?WorkflowDifference
     {
@@ -103,6 +104,11 @@ final readonly class WorkflowContainment
                 $place .= '[' . $segment . ']';
                 continue;
             }
+            if ($holder instanceof YamlValue && $depth < $last) {
+                $named = self::namedInside(WorkflowSyntax::canonical($path, $holder->decoded()), $segment, array_slice($segments, $depth + 1), $place);
+
+                return $named === null ? null : WorkflowDifference::retiredInline($named, $place);
+            }
 
             return $depth === $last && ($holder instanceof YamlSequence || $holder instanceof YamlValue)
                 ? $this->retiredItem($holder, $pointer, $path, $place, $segment)
@@ -113,7 +119,7 @@ final readonly class WorkflowContainment
     }
 
     /**
-     * A retired scalar item of a list, block or spelled without nodes: removed where the list has more, and where it is the last, the list takes the declared value.
+     * A retired scalar item of a list, block or spelled without nodes: where it is the last, the list takes the declared value; where the list has more, the item is removed from a block list or a flow list on one line, and refused in any other spelling, which the writer cannot edit.
      *
      * @param list<string|int> $path
      */
@@ -134,8 +140,32 @@ final readonly class WorkflowContainment
         if (count($values) === 1 || !is_array($spelled)) {
             return $this->declaredInstead($pointer, $path, $place, self::itemsIn([$segment], $place));
         }
+        if ($list instanceof YamlValue && !$list->isOneLineFlowSequence()) {
+            return WorkflowDifference::retiredInline(array_is_list($items) ? self::itemsIn([$segment], $place) : '"' . $place . '.' . $segment . '"', $place);
+        }
 
         return WorkflowDifference::retiredItem($path, $place, array_find($spelled, $matches), $segment);
+    }
+
+    /**
+     * How an explanation names the node a pointer's remaining segments lead to inside a value spelled without nodes, or null where the value does not hold it.
+     *
+     * @param list<string> $deeper the segments after this one
+     */
+    private static function namedInside(mixed $decoded, string $segment, array $deeper, string $place): ?string
+    {
+        $held = is_array($decoded) ? $decoded : [$decoded];
+        if (!array_is_list($held)) {
+            if (!array_key_exists($segment, $held)) {
+                return null;
+            }
+            $at = $place . '.' . $segment;
+
+            return $deeper === [] ? '"' . $at . '"' : self::namedInside($held[$segment], $deeper[0], array_slice($deeper, 1), $at);
+        }
+        $holds = array_any($held, static fn(mixed $item): bool => is_scalar($item) && WorkflowPointer::segmentOf($item) === $segment);
+
+        return $deeper === [] && $holds ? self::itemsIn([$segment], $place) : null;
     }
 
     /**

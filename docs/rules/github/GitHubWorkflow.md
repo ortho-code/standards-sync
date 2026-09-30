@@ -2329,3 +2329,181 @@ jobs:
     }
 }
 ```
+
+Declared as:
+
+```php
+// A framework standard declared beside the tier adds a trigger and a step to the tier's workflow, and asks for a newer checkout.
+return SyncConfig::create()
+    ->withRuleSet(new class extends ComposableRuleSet {
+        public function __construct()
+        {
+            $this->addRule(new GitHubWorkflow(
+                target: FileTarget::fromString('.github/workflows/checks.yml'),
+                workflow: FileContent::fromString(
+                    <<<'YAML'
+                        on:
+                          push:
+                            branches: [main]
+
+                        jobs:
+                          checks:
+                            runs-on: ubuntu-24.04
+                            steps:
+                              - id: checkout
+                                uses: actions/checkout@v5
+                              - id: checks
+                                run: composer app-checks
+                        YAML,
+                ),
+            ));
+        }
+    })
+    ->withRuleSet(new class extends ComposableRuleSet {
+        public function __construct()
+        {
+            $this->addRule(new GitHubWorkflow(
+                target: FileTarget::fromString('.github/workflows/checks.yml'),
+                workflow: FileContent::fromString(
+                    <<<'YAML'
+                        on:
+                          pull_request:
+
+                        jobs:
+                          checks:
+                            runs-on: ubuntu-24.04
+                            steps:
+                              - id: checkout
+                                uses: actions/checkout@v6
+                              # Builds the front end the checks read.
+                              - id: assets
+                                run: npm ci
+                        YAML,
+                ),
+            ));
+        }
+    });
+```
+
+…which report as:
+
+- *Keeps the declared workflow in .github/workflows/checks.yml, beside any keys, jobs and steps the project adds.*
+- *Keeps the declared workflow in .github/workflows/checks.yml, beside any keys, jobs and steps the project adds.*
+
+## A second declaration of the workflow adds its trigger and step to the first, and its newer action raises the first one's
+
+Fixture: [`tests/Scenario/GitHub/Workflow/fixtures/merges-two-declarations-of-one-workflow`](../../../tests/Scenario/GitHub/Workflow/fixtures/merges-two-declarations-of-one-workflow)
+
+**Before** — `.github/workflows/checks.yml`:
+
+```yaml
+on:
+  push:
+    branches: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@v5
+      - id: checks
+        run: composer app-checks
+  docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: make docs
+```
+
+**After:**
+
+```yaml
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@v6
+      - id: checks
+        run: composer app-checks
+      # Builds the front end the checks read.
+      - id: assets
+        run: npm ci
+  docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: make docs
+```
+
+**Before** — `standards-sync.lock`:
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        ".github/workflows/checks.yml": {
+            "workflow": [
+                "/on",
+                "/on/push",
+                "/on/push/branches",
+                "/on/push/branches/main",
+                "/jobs",
+                "/jobs/checks",
+                "/jobs/checks/runs-on",
+                "/jobs/checks/runs-on/ubuntu-24.04",
+                "/jobs/checks/steps",
+                "/jobs/checks/steps/checkout",
+                "/jobs/checks/steps/checkout/id",
+                "/jobs/checks/steps/checkout/uses",
+                "/jobs/checks/steps/checks",
+                "/jobs/checks/steps/checks/id",
+                "/jobs/checks/steps/checks/run"
+            ]
+        }
+    }
+}
+```
+
+**After:**
+
+```
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        ".github/workflows/checks.yml": {
+            "workflow": [
+                "/on",
+                "/on/pull_request",
+                "/on/push",
+                "/on/push/branches",
+                "/on/push/branches/main",
+                "/jobs",
+                "/jobs/checks",
+                "/jobs/checks/runs-on",
+                "/jobs/checks/runs-on/ubuntu-24.04",
+                "/jobs/checks/steps",
+                "/jobs/checks/steps/checkout",
+                "/jobs/checks/steps/checkout/id",
+                "/jobs/checks/steps/checkout/uses",
+                "/jobs/checks/steps/checks",
+                "/jobs/checks/steps/checks/id",
+                "/jobs/checks/steps/checks/run",
+                "/jobs/checks/steps/assets",
+                "/jobs/checks/steps/assets/id",
+                "/jobs/checks/steps/assets/run"
+            ]
+        }
+    }
+}
+```

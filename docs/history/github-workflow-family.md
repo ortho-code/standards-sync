@@ -169,3 +169,19 @@ A retraction leaving one of those would write a workflow GitHub rejects, and a t
 Where no declared value can stand in, sync refuses, naming the node.
 
 **Two declarations of one workflow file** are refused until they can be combined, which is the next cut.
+
+## Built 2026-09-30 — two declarations of one workflow, and retired nodes in brackets or braces
+
+**What.** `withMerged()` makes the later declaration's workflow hold the earlier one's through the walk a project's workflow goes through, so the earlier one reads as the standard and the later one as the project: where both declare a value the earlier one's stands, an action or a runner stands at the higher of the two minimums, and a step only the later one declares keeps its place after the step it followed.
+The merged workflow is what an absent file is written as, in the later declaration's formatting and comments with the earlier one's parts inserted in its style, their comments with them; the lock records both declarations' nodes as one list.
+Worked example: a tier declaring `push`, `checkout@v5` and a `checks` step, and a framework standard declared after it with `pull_request`, `checkout@v6` and an `assets` step, combine into both triggers, `checkout@v6`, then `checks`, then `assets`.
+*Rejected*: a merged model the walk reads structurally, which reworks the walk for a case no standard has yet.
+
+**Two declarations the walk cannot combine are refused when the plan is built**, quoting the walk's refusal: steps the two order the other way, or a value one spells in a shape the other cannot be edited into.
+The quoted refusal is phrased for a project and ends in "sync again", which a template's author reads as the change to make in the later template. *Rejected*: splitting every refusal into a reason and a remedy for this one reader.
+
+**Each declaration's managed block is taken over**: the merged rule removes the markers of every label its declarations name. *Rejected*: keeping the earlier label and refusing two different ones, which refuses a case with nothing to resolve.
+
+**A retired node inside brackets or braces is refused**, naming it and the value to write as an indented block: in a flow mapping, `on: {push: {}, pull_request: {}}`; in a flow list over several lines; or nested in one, `on: {push: {branches: [main, master]}}`, which the first cut left in place without a word.
+Only an item of a flow list on one line is taken out in place, and a mapping in braces naming only retired keys takes the declared value, as a string naming only retired ones does.
+*Rejected*: teaching the writer to take an entry out of a flow mapping, for a spelling the walk already refuses additions into; leaving a nested one in place, which keeps what the standard retired unannounced.

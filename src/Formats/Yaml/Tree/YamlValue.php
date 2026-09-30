@@ -72,6 +72,12 @@ final readonly class YamlValue
         return $this->end - $this->line > 1;
     }
 
+    /** Whether the value is a flow sequence written on one line, whose items can be edited within that line. */
+    public function isOneLineFlowSequence(): bool
+    {
+        return $this->kind === YamlValueKind::Flow && !$this->isMultiline() && str_starts_with($this->source, '[');
+    }
+
     /** What the value means, decoded from its own text alone. */
     public function decoded(): mixed
     {

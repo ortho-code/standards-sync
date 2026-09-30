@@ -152,6 +152,49 @@ final class RetractionTest extends TestCase
         self::rule(self::pushOnMain())->withRetired(['/on/pull_request'])->apply(FileContent::fromString('on: [pull_request, workflow_dispatch]'));
     }
 
+    public function testRefusesARetiredTriggerInsideBraces(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIs('It still has "on.pull_request", which the standard no longer declares, inside "on", which is written in brackets or braces and cannot be edited by sync; write "on" as an indented block and sync again.');
+
+        self::rule(self::pushOnMain())->withRetired(['/on/pull_request'])->apply(FileContent::fromString('on: {push: {branches: [main]}, pull_request: {}}'));
+    }
+
+    public function testRefusesARetiredPatternNestedInsideBraces(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIs('It still has master in "on.push.branches", which the standard no longer declares, inside "on", which is written in brackets or braces and cannot be edited by sync; write "on" as an indented block and sync again.');
+
+        self::rule(self::pushOnMain())->withRetired(['/on/push/branches/master'])->apply(FileContent::fromString('on: {push: {branches: [main, master]}}'));
+    }
+
+    public function testRefusesARetiredPatternInBracketsOverSeveralLines(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIs('It still has master in "on.push.branches", which the standard no longer declares, inside "on.push.branches", which is written in brackets or braces and cannot be edited by sync; write "on.push.branches" as an indented block and sync again.');
+
+        self::rule(self::pushOnMain())->withRetired(['/on/push/branches/master'])->apply(FileContent::fromString(
+            <<<'YAML'
+                on:
+                  push:
+                    branches: [main,
+                      master]
+                YAML,
+        ));
+    }
+
+    public function testGivesTriggersInBracesNamingOnlyRetiredOnesTheDeclaredTriggers(): void
+    {
+        self::assertSame(self::pushOnMain(), self::rule(self::pushOnMain())->withRetired(['/on/pull_request'])->apply(FileContent::fromString('on: {pull_request: {}}')));
+    }
+
+    public function testLeavesBracesWithoutTheRetiredNodeAlone(): void
+    {
+        $content = FileContent::fromString('on: {push: {branches: [main]}}');
+
+        self::assertSame($content, self::rule(self::pushOnMain())->withRetired(['/on/push/branches/master', '/on/push/tags'])->apply($content));
+    }
+
     public function testLeavesARetiredNodeTheProjectNoLongerHasAlone(): void
     {
         $content = FileContent::fromString(

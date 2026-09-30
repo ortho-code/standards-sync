@@ -125,7 +125,7 @@ final readonly class YamlTreeWriter
         if ($node instanceof YamlSequence) {
             return self::insertItem($content, $sequencePath, count($node->items()), YamlFragment::fromScalarItem($source));
         }
-        if ($value->kind() === YamlValueKind::Flow && !$value->isMultiline() && str_starts_with($value->source(), '[')) {
+        if ($value->isOneLineFlowSequence()) {
             $inner = substr($value->source(), 1, -1);
             $body = rtrim($inner);
             $appended = match (true) {
@@ -159,7 +159,7 @@ final readonly class YamlTreeWriter
                 ? throw new RuntimeException(sprintf('"%s" holds no such item; it cannot be removed.', self::spelled($sequencePath)))
                 : self::removeItem($content, $sequencePath, $index);
         }
-        if ($held->kind() !== YamlValueKind::Flow || $held->isMultiline() || !str_starts_with($held->source(), '[')) {
+        if (!$held->isOneLineFlowSequence()) {
             throw new RuntimeException(sprintf('"%s" holds neither a block sequence nor a flow sequence on one line; an item cannot be removed from it.', self::spelled($sequencePath)));
         }
 

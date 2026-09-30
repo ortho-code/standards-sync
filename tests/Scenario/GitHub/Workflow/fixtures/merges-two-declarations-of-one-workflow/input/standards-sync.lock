@@ -1,0 +1,27 @@
+{
+    "_readme": [
+        "Written by standards-sync: the entries the standards declared at the last sync, so the next sync can retract any they stop declaring.",
+        "Commit this file; do not edit it."
+    ],
+    "files": {
+        ".github/workflows/checks.yml": {
+            "workflow": [
+                "/on",
+                "/on/push",
+                "/on/push/branches",
+                "/on/push/branches/main",
+                "/jobs",
+                "/jobs/checks",
+                "/jobs/checks/runs-on",
+                "/jobs/checks/runs-on/ubuntu-24.04",
+                "/jobs/checks/steps",
+                "/jobs/checks/steps/checkout",
+                "/jobs/checks/steps/checkout/id",
+                "/jobs/checks/steps/checkout/uses",
+                "/jobs/checks/steps/checks",
+                "/jobs/checks/steps/checks/id",
+                "/jobs/checks/steps/checks/run"
+            ]
+        }
+    }
+}
