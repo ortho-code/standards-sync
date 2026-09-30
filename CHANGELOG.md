@@ -4,6 +4,18 @@ What changed in each release, for the projects consuming the standard through an
 
 ## Unreleased
 
+**Tool imports are recorded in `standards-sync.lock`, as composer scripts are since 0.3.0.** This covers the PHPStan `includes` entry, the Rector and ECS `withSets()` entries, the deptrac `imports` entry and the renovate `extends` entry.
+When a standard moves a template or renames a preset, the next sync replaces the old entry in place, keeping its line's indentation and trailing comment, and an entry no standard declares any more is removed; an entry the lock never recorded, such as one the project added, stays.
+Standards importing into the same list now combine in declaration order, an entry declared twice counting once.
+The lock gains these entries on the first sync, so the first `sync --check` after upgrading fails until you run `sync` once and commit the lock.
+The lock retracts only what it recorded, so a template a standard moves before a project's first sync on this version leaves the old entry beside the new one.
+
+**Fixed:** in a Rector or ECS config, an apostrophe in a comment inside the scanned call no longer makes the sync refuse the file, a bracket in a comment no longer counts as code, and a commented-out `->withSets([` above the real call no longer receives the new entry between its comment lines.
+In neon, a `#` starts a comment only after whitespace, as neon reads it, so `level: 6#x` is no longer taken for level 6, and the level rule refuses it.
+A neon list whose entries sit at the section's own indentation no longer loses the project's entry out of the list when the sync inserts one, and a line under a list header that is not an entry, such as `-a.neon`, is refused instead of being written into a file neon cannot parse.
+
+**For rule authors:** two rule classes contributing to one list in one file are refused when the plan is built, naming both.
+
 The installed package no longer carries this repository's own tool configs, `standards-sync.php` or `standards-sync.lock`: an install is now `bin/`, `src/`, the manifest, the licence, the readme and this changelog.
 
 ## 0.3.0 — 2026-09-29
