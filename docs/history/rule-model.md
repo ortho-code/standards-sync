@@ -455,6 +455,12 @@ An escape stays only where the escaped character is the point — an input refus
 A comment per statement turns the renderer test's one comment above a group of assertions into one per line, and accepting a comment above a run of lines makes the check fuzzy; it would also be the repository's first test about its own tests.
 The convention stays prose, checked in review.
 
+## Changed 2026-10-01 — the YAML validator no longer guards its parser
+
+symfony/yaml moved to `require` with the YAML reader ([github-workflow-family.md](github-workflow-family.md)), so it installs wherever the engine does, and `YamlValidator`'s missing-parser branch could no longer be reached in any install; its message still told the reader to add symfony/yaml to `require-dev`.
+The branch and its `parserInstalled:` argument are gone, and the validator parses every synced `.yaml` and `.yml` file unconditionally.
+The [fail-loud contract of 2026-08-12](#revised-2026-08-12--validation-fails-loud-on-a-missing-parser) is unchanged for the validators whose parser is a development dependency of the package running the fixtures: neon, JSON5 and the psalm schema check.
+
 ## Open choices — settled at R0 (2026-07-15)
 
 1. **Split "what" from "how", or self-contained per-format rules?** The cleaner answer: instead of one generic `ManagedBlockRule` plus a separate apply-strategy, have **per-format rule classes** — `EditorConfigRule`, `GitignoreRule`, … — each self-contained, baking its format knowledge in (sharing a common `AbstractBlockRule` for the marker mechanics). The format-specific class *is* the "how", so no separate strategy layer or `applicable()` pairing is needed, and it grows well — a contributor adds a `FooRule` for a new format. Caveat: for format-*generic* families (an `ImportRule` that varies only by a small syntax detail across `phpstan.neon` / `rector.php`), N per-format classes are overkill — there a single rule with a tiny format-applier is lighter. **Decided:** per rule *family* — per-format classes for the block family (resolves the split cleanly); a single rule + small applier only where a family is genuinely format-generic. Note `.editorconfig` and `.gitignore` currently do identical block-placement, so they can start on one shared base and split when real format-specifics appear (editorconfig key-merge, gitignore line-union).

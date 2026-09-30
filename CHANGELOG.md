@@ -2,6 +2,10 @@
 
 What changed in each release, for the projects consuming the standard through an org package.
 
+## Unreleased
+
+**For rule authors:** `YamlValidator` no longer takes a `parserInstalled:` argument, and never reports symfony/yaml as missing: it installs with the engine since 0.4.0, so the validator always has its parser.
+
 ## 0.4.0 — 2026-09-30
 
 **New: `GitHubWorkflow`, which keeps a declared GitHub Actions workflow in a project's workflow file.** Every key, job and step the standard declares must be there, and whatever the project adds stays: its own steps, inputs, triggers, filters, conditions and jobs.

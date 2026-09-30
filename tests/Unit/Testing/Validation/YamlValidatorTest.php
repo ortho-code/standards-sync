@@ -49,19 +49,4 @@ final class YamlValidatorTest extends TestCase
 
         new YamlValidator()->assertValid('./notes.txt', FileContent::fromString('imports: [broken'));
     }
-
-    public function testFailsLoudWhenTheParserIsMissing(): void
-    {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('install symfony/yaml');
-
-        new YamlValidator(parserInstalled: false)->assertValid('./deptrac.yaml', FileContent::fromString('imports: []'));
-    }
-
-    public function testIgnoresAFileItDoesNotCoverEvenWithoutTheParser(): void
-    {
-        $this->expectNotToPerformAssertions();
-
-        new YamlValidator(parserInstalled: false)->assertValid('./notes.txt', 'anything');
-    }
 }

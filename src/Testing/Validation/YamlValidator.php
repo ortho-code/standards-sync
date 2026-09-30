@@ -8,28 +8,16 @@ use RuntimeException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-/** Parses every synced .yaml and .yml file; a yaml file synced without symfony/yaml installed fails loud, so the format is never silently unvalidated. */
+/** Parses every synced .yaml and .yml file; its parser, symfony/yaml, installs with the engine, so the format is always validated. */
 final readonly class YamlValidator implements SyncedFileValidator
 {
     private const array EXTENSIONS = ['.yaml', '.yml'];
-
-    private bool $parserInstalled;
-
-    /** @param bool|null $parserInstalled overrides the symfony/yaml availability detection; null detects */
-    public function __construct(?bool $parserInstalled = null)
-    {
-        $this->parserInstalled = $parserInstalled ?? class_exists(Yaml::class);
-    }
 
     #[\Override]
     public function assertValid(string $path, string $content): void
     {
         if (!array_any(self::EXTENSIONS, static fn(string $extension): bool => str_ends_with($path, $extension))) {
             return;
-        }
-
-        if (!$this->parserInstalled) {
-            throw new RuntimeException(sprintf('The synced %s cannot be validated: install symfony/yaml (require-dev) to parse synced yaml, or leave the YamlValidator out of the validator list.', $path));
         }
 
         try {

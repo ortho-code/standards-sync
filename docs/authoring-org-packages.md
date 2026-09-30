@@ -144,7 +144,7 @@ The engine ships framework-neutral helpers under `Testing/`; they return plain d
 
 A standard declaring a composer script makes every sync write `standards-sync.lock`, so a fixture's expected tree carries the lock beside the manifest, and `SyncTester`'s result map holds it too.
 
-Fixture runs additionally parse-validate every synced file (`Testing/Validation/`), so a writer cannot produce syntactically broken output unnoticed. A synced file whose parser is not installed **fails loud** rather than skipping: the parsers for the formats a package ships must be present — nette/neon for neon, symfony/yaml for yaml, vimeo/psalm for the psalm schema check, phpunit/phpunit for the phpunit schema check (which any suite running these fixtures has by construction) — or the validator is left out through `SyncFixtureTester`'s `validators:` parameter.
+Fixture runs additionally parse-validate every synced file (`Testing/Validation/`), so a writer cannot produce syntactically broken output unnoticed. A synced file whose parser is not installed **fails loud** rather than skipping: the parsers for the formats a package ships must be present — nette/neon for neon, colinodell/json5 for JSON5, vimeo/psalm for the psalm schema check, phpunit/phpunit for the phpunit schema check (which any suite running these fixtures has by construction) — or the validator is left out through `SyncFixtureTester`'s `validators:` parameter. YAML needs nothing extra: its parser, symfony/yaml, installs with the engine.
 
 In the package's own repository the org package is composer's *root* package, so references render bare (`templates/…`) rather than as a consumer would see them. A test asserting reference paths injects a fixed package:
 
