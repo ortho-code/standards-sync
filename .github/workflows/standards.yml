@@ -19,4 +19,16 @@ jobs:
           coverage: none
       - uses: ramsey/composer-install@v4
       - run: composer app-checks
+  lowest:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - uses: ramsey/composer-install@v4
+        with:
+          dependency-versions: lowest
+      - run: composer app-run-tests
 # <<< ortho-code <<<
