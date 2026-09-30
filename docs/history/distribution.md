@@ -13,3 +13,15 @@ The dated trail of the naming and release decisions, append-only; the current po
 ## Release status (decided 2026-08-25)
 
 The first tag is **v0.x, without a compatibility promise** — SemVer's v0 semantics apply. The BC-surface audit (API vs. internal, per class) runs before the first v1 tag. The engine's channel is a public Packagist tag; publishing followed once the building blocks — docs, CI, composer metadata — were verified (v0.1.0, 2026-08-27).
+
+## The package archive (decided 2026-09-30)
+
+- **The archive leaves out what only this repository's own development reads.**
+  The installed copy carried `ecs.php`, `phpstan.neon`, `psalm.xml`, `rector.php`, `renovate.json5`, `standards-sync.php` and `standards-sync.lock` beside the code, because `.gitattributes` export-ignored only `tests/`, `docs/` and a few others.
+  Nothing read them in `vendor/` — the engine reads a lock only at a consumer's own root — so the fix waited for the standard this repository consumes to ship a managed `.gitattributes` block covering every one of them.
+  It did, in its 0.3.1: synced here, the block took over the seven lines it duplicated, and the three it does not cover — `/docs`, `/deptrac.yaml`, `/docker-compose.yml` — moved below it, where the standard tells a consumer to put its own.
+  The archive is now `bin/`, `src/`, the manifest, the licence, the readme and the changelog.
+- **A template named after a file git reads by name is live in an org package's own repository.**
+  Found while that block was built: `templates/` is in the package's working tree, so a `.gitattributes` there applies to the templates beside it, and an export-ignore list under that name strips the very templates it lists from the package's archive.
+  Verified with `git archive`, and verified for `.gitignore` as well, whose lines keep a matching new template out of `git add -A`.
+  The guidance — save such a template without the dot, and the target keeps the real name — went to the [authoring guide](../authoring-org-packages.md).

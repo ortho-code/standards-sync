@@ -27,6 +27,20 @@ final class Acme extends Standard
 
 **Everything the package distributes lives in its `templates/` directory** — both copied fragments (often partial files) and the complete rulesets consumers' tools load from `vendor/<name>/templates/…`. `read()` and `path()` resolve inside it, so a rule can never point at the package's own config: what the package lints *itself* with stays at its root, outside the distributed directory by construction. Both accept a relative path, so a package distributing several variants of a file separates them by subdirectory.
 
+**A template named after a file git reads by name is live in the package's own repository.**
+`templates/` sits in the package's working tree, so a `.gitattributes` saved there applies to the templates beside it, and an export-ignore list under that name strips from the package's archive the very templates it names.
+Save it as `gitattributes`, without the dot; the rule's target still names the real file:
+
+```php
+$this->addRule(new ManagedBlock(
+    target: FileTarget::fromString('.gitattributes'),
+    label: Label::fromString('acme-coding-standards'),
+    content: $package->read('gitattributes'),
+));
+```
+
+A `.gitignore` template is live the same way — a new template matching one of its lines stays out of `git add` — which is harmless for as long as none does.
+
 A hierarchy composes inside `enforce()`: a second-tier standard starts with `$this->include(new AcmeBase());` and adds or overrides after it. The tiers live in separate packages or side by side in one — see [Several standards in one package](#several-standards-in-one-package).
 
 A consumer whose layout composer does not know (an in-repo psr-4 package) injects the location in its own `standards-sync.php`:

@@ -2,6 +2,10 @@
 
 What changed in each release, for the projects consuming the standard through an org package.
 
+## Unreleased
+
+The installed package no longer carries this repository's own tool configs, `standards-sync.php` or `standards-sync.lock`: an install is now `bin/`, `src/`, the manifest, the licence, the readme and this changelog.
+
 ## 0.3.0 — 2026-09-29
 
 **Breaking:** a composer script's declared commands no longer make up the whole script.

@@ -38,3 +38,8 @@ The standard evolves (line length 120→140, a new rule, a stricter floor). Cons
 - **SemVer of the standard package** — a breaking tightening is a major bump; consumers pin a constraint and upgrade deliberately.
 - **Per-rule disable** — a consumer turns off a specific rule they can't adopt yet, without abandoning the whole standard (the enable/disable mechanism from the rule model).
 - **Import (Tier A) rides `composer update`** — for imported config the version constraint *is* the pace control.
+
+## What a consumer installs
+
+Composer installs the archive `git archive` builds, so `.gitattributes` decides what reaches a consumer's `vendor/`: `bin/`, `src/`, the manifest, the licence, the readme and the changelog.
+The export-ignore lines for everything this repository lints, tests and syncs itself with come from the managed block of the standard it consumes; `/docs`, `/deptrac.yaml` and `/docker-compose.yml` are its own lines, below the block.
