@@ -114,3 +114,16 @@ A shape sync cannot edit into the declared form — a list where a mapping is de
 
 **What this cut leaves to the next ones**: minimum versions (decision 6), weakening additions and trigger filters (decisions 2 and 3, where an added filter key is still the project's here), GitHub's equivalent forms (decision 5), and the lock, which is what lets a step the standard stops declaring be retracted.
 A standard may also want to ship a workflow as a template the project completes with filters of its own; the filter decision leaves room for the standard to mark a trigger as the project's to filter, designed when a standard needs it.
+
+## Built 2026-09-30 — minimum versions, and the order steps are adopted in
+
+**What.** Decision 6, over three value types: `SpelledVersion` compares dotted numbers on the components both sides spell; `ActionReference` reads `owner/repo[/path]@ref`, taking a commit SHA's version from its pin comment in the spellings Renovate writes (`v7.0.1`, `pin @v7.0.1`, `tag=v7.0.1`); `RunnerLabel` reads a GitHub-hosted label as a name, a version and a suffix.
+A step's `uses`, a job's reusable-workflow `uses` and a job's `runs-on` hold the declared value when they name the same action or the same kind of runner at its version or later.
+A lower version, or a value naming none — a branch, a bare SHA, `ubuntu-latest` — is replaced by the declared text in place; another action, or a runner of another name or suffix, is a changed value like any other.
+A pin comment belongs to its reference: the project's goes with the SHA it named, a declared pin is written with its own comment, and any other comment the project wrote after the value stays.
+
+**Adoption, refined (decision 1).** Phase 3 adopted the first step without an id anywhere in the job that held the declared step, which left a project's own step on an older action unadopted, and the declared step inserted beside it.
+The order is now: among the steps after the declared step before it, the first that holds the declared step as it is, versions as minimums; then the first that holds it with its action at any version; only then an earlier step, whose adoption leads to the reordered-step refusal rather than to a duplicate.
+The version is set aside for adopting alone: the next walk finds the step by its new id and raises its action to the minimum.
+Worked example: a job with a lint step on `setup-php@v1` and its checks' step on `@v2` adopts the `@v2` step, and the `@v1` step stays the project's own; with both on `@v1`, the first in place is adopted and raised, the second stays the project's.
+*Rejected*: adopting by the action alone, the wrong-binding case decision 1 already rejected, where a second checkout of another repository is taken for the declared one.

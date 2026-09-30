@@ -210,6 +210,185 @@ final class GitHubWorkflowTest extends TestCase
         self::assertSame($once, self::rule()->apply($once));
     }
 
+    public function testAdoptsTheStepHoldingTheDeclaredOneAsItIsBeforeOneHoldingItOnAnOlderAction(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    on:
+                      pull_request:
+                    jobs:
+                      checks:
+                        steps:
+                          - id: checkout
+                            uses: actions/checkout@v7
+                          - uses: shivammathur/setup-php@v1
+                            with:
+                              tools: phpcs
+                          - uses: shivammathur/setup-php@v2
+                            id: setup
+                    YAML,
+            ),
+            self::rule()->apply(FileContent::fromString(
+                <<<'YAML'
+                    on:
+                      pull_request:
+                    jobs:
+                      checks:
+                        steps:
+                          - id: checkout
+                            uses: actions/checkout@v7
+                          - uses: shivammathur/setup-php@v1
+                            with:
+                              tools: phpcs
+                          - uses: shivammathur/setup-php@v2
+                    YAML,
+            )),
+        );
+    }
+
+    public function testAdoptsAStepOnAnOlderActionAndRaisesIt(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    on:
+                      pull_request:
+                    jobs:
+                      checks:
+                        steps:
+                          - id: checkout
+                            uses: actions/checkout@v7
+                          - uses: shivammathur/setup-php@v2
+                            with:
+                              extensions: intl
+                            id: setup
+                          - uses: shivammathur/setup-php@v1
+                    YAML,
+            ),
+            self::rule()->apply(FileContent::fromString(
+                <<<'YAML'
+                    on:
+                      pull_request:
+                    jobs:
+                      checks:
+                        steps:
+                          - id: checkout
+                            uses: actions/checkout@v7
+                          - uses: shivammathur/setup-php@v1
+                            with:
+                              extensions: intl
+                          - uses: shivammathur/setup-php@v1
+                    YAML,
+            )),
+        );
+    }
+
+    public function testRefusesWhenTheOnlyStepToAdoptRunsBeforeTheOneDeclaredBeforeIt(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The job "checks" runs the step "setup" before "checkout", which the standard declares first');
+
+        self::rule()->apply(FileContent::fromString(
+            <<<'YAML'
+                on:
+                  pull_request:
+                jobs:
+                  checks:
+                    steps:
+                      - uses: shivammathur/setup-php@v1
+                      - id: checkout
+                        uses: actions/checkout@v7
+                YAML,
+        ));
+    }
+
+    public function testReplacesABranchRefAndDropsADigestPinsCommentWithIt(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    on:
+                      pull_request:
+                    jobs:
+                      checks:
+                        steps:
+                          - id: checkout
+                            uses: actions/checkout@v7 # the project's own note
+                          - id: setup
+                            uses: shivammathur/setup-php@v2
+                    YAML,
+            ),
+            self::rule()->apply(FileContent::fromString(
+                <<<'YAML'
+                    on:
+                      pull_request:
+                    jobs:
+                      checks:
+                        steps:
+                          - id: checkout
+                            uses: actions/checkout@main # the project's own note
+                          - id: setup
+                            uses: shivammathur/setup-php@0123456789abcdef0123456789abcdef01234567 # v1.9.0
+                    YAML,
+            )),
+        );
+    }
+
+    public function testWritesADeclaredDigestPinWithItsComment(): void
+    {
+        $rule = new GitHubWorkflow(FileTarget::fromString('checks.yml'), FileContent::fromString(
+            <<<'YAML'
+                jobs:
+                  checks:
+                    steps:
+                      - id: checkout
+                        uses: actions/checkout@0123456789abcdef0123456789abcdef01234567 # v7.0.1
+                YAML,
+        ));
+
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    jobs:
+                      checks:
+                        steps:
+                          - id: checkout
+                            uses: actions/checkout@0123456789abcdef0123456789abcdef01234567 # v7.0.1
+                    YAML,
+            ),
+            $rule->apply(FileContent::fromString(
+                <<<'YAML'
+                    jobs:
+                      checks:
+                        steps:
+                          - id: checkout
+                            uses: actions/checkout@v6
+                    YAML,
+            )),
+        );
+    }
+
+    public function testExplainsAVersionBelowTheMinimumAndOneThatNamesNone(): void
+    {
+        self::assertSame(
+            'It has "jobs.checks.steps[checkout].uses" as actions/checkout@v6, below the declared actions/checkout@v7. It has "jobs.checks.steps[setup].uses" as shivammathur/setup-php@main, which names no version to compare with the declared shivammathur/setup-php@v2.',
+            self::rule()->explain(FileContent::fromString(
+                <<<'YAML'
+                    on:
+                      pull_request:
+                    jobs:
+                      checks:
+                        steps:
+                          - id: checkout
+                            uses: actions/checkout@v6
+                          - id: setup
+                            uses: shivammathur/setup-php@main
+                    YAML,
+            )),
+        );
+    }
+
     private static function rule(): GitHubWorkflow
     {
         return new GitHubWorkflow(FileTarget::fromString('.github/workflows/checks.yml'), self::declared(), Label::fromString('acme'));

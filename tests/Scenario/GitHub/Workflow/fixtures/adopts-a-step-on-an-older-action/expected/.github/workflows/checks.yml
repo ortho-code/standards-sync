@@ -1,0 +1,24 @@
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+        id: checkout
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+          extensions: intl
+        id: setup-php
+      - uses: ramsey/composer-install@v4
+        id: install
+      - run: composer app-checks
+        id: checks

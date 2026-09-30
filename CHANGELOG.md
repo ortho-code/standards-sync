@@ -6,7 +6,8 @@ What changed in each release, for the projects consuming the standard through an
 
 **New: `GitHubWorkflow`, which keeps a declared GitHub Actions workflow in a project's workflow file.** Every key, job and step the standard declares must be there, and whatever the project adds stays: its own steps, inputs, triggers and jobs.
 A missing key, job or step is added — a step after the one declared before it — and a declared value the project changed is written back, while the file's own formatting and comments stay as they are.
-Every declared step needs an `id`; a project's step without one that already holds a declared step is taken as that step and gains its id.
+Action references and runner labels are minimums: a project on a newer action or runner keeps it, and one below the declared version, or naming none (a branch, `ubuntu-latest`), is raised to the declared one; a digest pin counts as the version its comment names.
+Every declared step needs an `id`; a project's step without one that already holds a declared step is taken as that step and gains its id, and a step that holds it apart from an older version of its action is taken too, its action then raised.
 `replacesBlock:` takes over a workflow a standard used to ship as a managed block: the first sync removes the block's two marker lines and keeps the rest.
 A project that moves a declared step before the one declared before it, or writes a declared part in another shape, gets a refusal saying what to write instead.
 

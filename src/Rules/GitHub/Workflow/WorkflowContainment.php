@@ -15,13 +15,16 @@ use OrthoCode\StandardsSync\Formats\Yaml\Tree\YamlValueKind;
 /**
  * Walks the declared workflow against a project's, in declared order, and finds the first place the project falls short of it.
  * A declared key must be present and its value contained; a key with nothing under it asks for the key alone.
- * A job's steps are found by id, in declared order, a step without one adopted when it holds the declared step; a list of scalars must hold the declared ones; every other value is exact.
+ * A job's steps are found by id, in declared order, a step without one adopted when it holds the declared step; a list of scalars must hold the declared ones.
+ * Action references and runner labels are minimums; every other value is exact.
  * Places are spelled as paths of keys, a step by its id in brackets: `jobs.checks.steps[setup-php].with.php-version`.
  */
 final readonly class WorkflowContainment
 {
+    /** @param bool $referencesByAction whether a reference holds a declared one when it names the same action, whatever its version */
     private function __construct(
         private YamlTree $declared,
+        private bool $referencesByAction = false,
     ) {}
 
     public static function firstDifference(DeclaredWorkflow $declared, YamlTree $actual): ?WorkflowDifference
@@ -63,6 +66,13 @@ final readonly class WorkflowContainment
             return WorkflowDifference::changedValue($path, $place, $this->declared, $declared);
         }
 
+        if (WorkflowSyntax::isUsesPath($path) && self::isSingleLineScalar($wanted) && self::isSingleLineScalar($held)) {
+            return $this->reference($wanted, $held, $path, $place);
+        }
+        if (WorkflowSyntax::isRunsOnPath($path) && self::isSingleLineScalar($wanted) && self::isSingleLineScalar($held)) {
+            return $this->runner($wanted, $held, $path, $place);
+        }
+
         $wantedNode = $wanted->node();
         $heldNode = $held->node();
         if ($wantedNode instanceof YamlMapping) {
@@ -96,7 +106,7 @@ final readonly class WorkflowContainment
             /** @var int|null $index a list's keys are its positions */
             $index = array_find_key($items, static fn(YamlItem $item): bool => WorkflowSyntax::stepId($item->value()) === $id);
             if ($index === null) {
-                $adoptable = $this->adoptable($step, $items, $path);
+                $adoptable = $this->adoptable($step, $items, $path, $cursor);
 
                 return $adoptable === null
                     ? WorkflowDifference::missingStep($path, $cursor, $job, $this->declared, $step, $id, $previous)
@@ -126,26 +136,79 @@ final readonly class WorkflowContainment
     }
 
     /**
-     * The first step without an id that holds the declared step, its id aside.
+     * The step without an id to take as the declared step, its id aside: among the steps after the declared one before it, the first that holds it as it is, then the first that holds it with its action at any version; only then an earlier step, which leaves it out of order.
+     * The version is set aside only to adopt: the next walk finds the step by its id and holds its action to the minimum.
      *
      * @param list<YamlItem> $items
      * @param list<string|int> $path
      */
-    private function adoptable(YamlItem $step, array $items, array $path): ?int
+    private function adoptable(YamlItem $step, array $items, array $path, int $cursor): ?int
     {
         $declared = $step->value()->node();
         if (!$declared instanceof YamlMapping) {
             return null;
         }
-        foreach ($items as $index => $item) {
-            $candidate = $item->value()->node();
-            if (WorkflowSyntax::stepId($item->value()) === null && $candidate instanceof YamlMapping
-                && !$this->mapping($declared, $candidate, [...$path, $index], '', [WorkflowSyntax::KEY_ID]) instanceof WorkflowDifference) {
-                return $index;
+        foreach ([true, false] as $inPlace) {
+            foreach ([false, true] as $referencesByAction) {
+                $walk = new self($this->declared, $referencesByAction);
+                foreach ($items as $index => $item) {
+                    $candidate = $item->value()->node();
+                    if (($index >= $cursor) === $inPlace && WorkflowSyntax::stepId($item->value()) === null && $candidate instanceof YamlMapping
+                        && !$walk->mapping($declared, $candidate, [...$path, $index], '', [WorkflowSyntax::KEY_ID]) instanceof WorkflowDifference) {
+                        return $index;
+                    }
+                }
             }
         }
 
         return null;
+    }
+
+    /**
+     * An action reference: the declared one's action at its version or later.
+     *
+     * @param non-empty-list<string|int> $path
+     */
+    private function reference(YamlValue $wanted, YamlValue $held, array $path, string $place): ?WorkflowDifference
+    {
+        if ($wanted->decoded() === $held->decoded()) {
+            return null;
+        }
+        $minimum = ActionReference::fromUses((string) $wanted->decoded(), $wanted->comment());
+        $actual = ActionReference::fromUses((string) $held->decoded(), $held->comment());
+        if ($this->referencesByAction ? $actual->isSameAction($minimum) : $actual->isAtLeast($minimum) === true) {
+            return null;
+        }
+
+        // A pin comment belongs to its reference: the project's goes with the value it named, and the declared one comes along with the declared value.
+        $declared = $minimum->namesVersionInComment() ? $wanted->source() . ' #' . $wanted->comment() : $wanted->source();
+        $keepComment = !$actual->namesVersionInComment() && !$minimum->namesVersionInComment();
+
+        return $actual->isSameAction($minimum)
+            ? WorkflowDifference::belowMinimum($path, $place, $held->source(), $declared, $actual->isAtLeast($minimum) === false, $keepComment)
+            : WorkflowDifference::changedScalar($path, $place, $held->source(), $declared, $keepComment);
+    }
+
+    /**
+     * A runner label: the declared label's name and suffix at its version or later.
+     *
+     * @param non-empty-list<string|int> $path
+     */
+    private function runner(YamlValue $wanted, YamlValue $held, array $path, string $place): ?WorkflowDifference
+    {
+        if ($wanted->decoded() === $held->decoded()) {
+            return null;
+        }
+        $minimum = RunnerLabel::fromString((string) $wanted->decoded());
+        $actual = RunnerLabel::fromString((string) $held->decoded());
+        $atLeast = $actual->isAtLeast($minimum);
+        if ($atLeast === true) {
+            return null;
+        }
+
+        return $atLeast === null || $actual->isSameKind($minimum)
+            ? WorkflowDifference::belowMinimum($path, $place, $held->source(), $wanted->source(), $atLeast === false, true)
+            : WorkflowDifference::changedScalar($path, $place, $held->source(), $wanted->source());
     }
 
     /** @param non-empty-list<string|int> $path */

@@ -548,3 +548,375 @@ jobs:
       - run: composer app-checks
         id: checks
 ```
+
+## A step without an id on an older version of the declared action is taken as that step, and its action raised
+
+Fixture: [`tests/Scenario/GitHub/Workflow/fixtures/adopts-a-step-on-an-older-action`](../../../tests/Scenario/GitHub/Workflow/fixtures/adopts-a-step-on-an-older-action)
+
+**Before** — `.github/workflows/checks.yml`:
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v1
+        with:
+          php-version: '8.5'
+          coverage: none
+          extensions: intl
+      - uses: ramsey/composer-install@v4
+      - run: composer app-checks
+```
+
+**After:**
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+        id: checkout
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+          extensions: intl
+        id: setup-php
+      - uses: ramsey/composer-install@v4
+        id: install
+      - run: composer app-checks
+        id: checks
+```
+
+## A newer action and a newer runner stay, since versions are minimums
+
+Fixture: [`tests/Scenario/GitHub/Workflow/fixtures/keeps-a-newer-action-and-runner`](../../../tests/Scenario/GitHub/Workflow/fixtures/keeps-a-newer-action-and-runner)
+
+`.github/workflows/checks.yml` **stays byte-identical**:
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-28.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@v8
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2.36.0
+        with:
+          php-version: '8.5'
+          coverage: none
+      - id: install
+        uses: ramsey/composer-install@v4
+      - id: checks
+        run: composer app-checks
+```
+
+## An action below its declared version is raised, the project's comment kept
+
+Fixture: [`tests/Scenario/GitHub/Workflow/fixtures/raises-an-older-action`](../../../tests/Scenario/GitHub/Workflow/fixtures/raises-an-older-action)
+
+**Before** — `.github/workflows/checks.yml`:
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@v6 # the one we tested
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - id: install
+        uses: ramsey/composer-install@v4
+      - id: checks
+        run: composer app-checks
+```
+
+**After:**
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@v7 # the one we tested
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - id: install
+        uses: ramsey/composer-install@v4
+      - id: checks
+        run: composer app-checks
+```
+
+## A digest pin whose comment names the declared version or later stays as written
+
+Fixture: [`tests/Scenario/GitHub/Workflow/fixtures/keeps-a-digest-pin-at-the-minimum`](../../../tests/Scenario/GitHub/Workflow/fixtures/keeps-a-digest-pin-at-the-minimum)
+
+`.github/workflows/checks.yml` **stays byte-identical**:
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@0123456789abcdef0123456789abcdef01234567 # v7.0.1
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - id: install
+        uses: ramsey/composer-install@v4
+      - id: checks
+        run: composer app-checks
+```
+
+## A digest pin below the declared version is replaced, its comment with it
+
+Fixture: [`tests/Scenario/GitHub/Workflow/fixtures/replaces-a-digest-pin-below-the-minimum`](../../../tests/Scenario/GitHub/Workflow/fixtures/replaces-a-digest-pin-below-the-minimum)
+
+**Before** — `.github/workflows/checks.yml`:
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@0123456789abcdef0123456789abcdef01234567 # v6.0.2
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - id: install
+        uses: ramsey/composer-install@v4
+      - id: checks
+        run: composer app-checks
+```
+
+**After:**
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@v7
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - id: install
+        uses: ramsey/composer-install@v4
+      - id: checks
+        run: composer app-checks
+```
+
+## A branch ref names no version, so the declared ref replaces it
+
+Fixture: [`tests/Scenario/GitHub/Workflow/fixtures/replaces-a-branch-ref`](../../../tests/Scenario/GitHub/Workflow/fixtures/replaces-a-branch-ref)
+
+**Before** — `.github/workflows/checks.yml`:
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@v7
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - id: install
+        uses: ramsey/composer-install@main
+      - id: checks
+        run: composer app-checks
+```
+
+**After:**
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@v7
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - id: install
+        uses: ramsey/composer-install@v4
+      - id: checks
+        run: composer app-checks
+```
+
+## A moving runner label names no version, so the declared label replaces it
+
+Fixture: [`tests/Scenario/GitHub/Workflow/fixtures/replaces-a-moving-runner-label`](../../../tests/Scenario/GitHub/Workflow/fixtures/replaces-a-moving-runner-label)
+
+**Before** — `.github/workflows/checks.yml`:
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        uses: actions/checkout@v7
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - id: install
+        uses: ramsey/composer-install@v4
+      - id: checks
+        run: composer app-checks
+```
+
+**After:**
+
+```yaml
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-26.04
+    steps:
+      - id: checkout
+        uses: actions/checkout@v7
+      # setup-php before the install
+      - id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+      - id: install
+        uses: ramsey/composer-install@v4
+      - id: checks
+        run: composer app-checks
+```

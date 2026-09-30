@@ -35,12 +35,32 @@ final readonly class WorkflowDifference
         );
     }
 
-    /** @param list<string|int> $path */
-    public static function changedScalar(array $path, string $place, string $actual, string $declared): self
+    /**
+     * @param list<string|int> $path
+     * @param bool $keepComment whether the comment after the project's value stays, which it does unless it belonged to that value
+     */
+    public static function changedScalar(array $path, string $place, string $actual, string $declared, bool $keepComment = true): self
     {
         return new self(
             sprintf('It has "%s" as %s where the standard declares %s.', $place, $actual, $declared),
-            static fn(string $content): string => YamlTreeWriter::replaceScalar($content, $path, $declared),
+            static fn(string $content): string => YamlTreeWriter::replaceScalar($content, $path, $declared, $keepComment),
+        );
+    }
+
+    /**
+     * A version the project holds below the declared minimum, or one that names no version to compare with it.
+     *
+     * @param list<string|int> $path
+     * @param bool $orderable whether the project's value names a version at all
+     * @param bool $keepComment whether the comment after the project's value stays, which it does unless it belonged to that value
+     */
+    public static function belowMinimum(array $path, string $place, string $actual, string $declared, bool $orderable, bool $keepComment): self
+    {
+        return new self(
+            $orderable
+                ? sprintf('It has "%s" as %s, below the declared %s.', $place, $actual, $declared)
+                : sprintf('It has "%s" as %s, which names no version to compare with the declared %s.', $place, $actual, $declared),
+            static fn(string $content): string => YamlTreeWriter::replaceScalar($content, $path, $declared, $keepComment),
         );
     }
 
