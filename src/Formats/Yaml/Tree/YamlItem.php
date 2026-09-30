@@ -35,6 +35,12 @@ final readonly class YamlItem
         return $this->value;
     }
 
+    /** The columns the content starts after the dash, or null when nothing but a comment follows the dash on its line. */
+    public function contentOffset(): ?int
+    {
+        return $this->value->kind() !== YamlValueKind::Empty && $this->value->line() === $this->line ? $this->contentColumn - $this->dashColumn : null;
+    }
+
     /** The first line after the item's value. */
     public function end(): int
     {

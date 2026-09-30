@@ -86,3 +86,17 @@ For a consumer the engine is always a development dependency, so what it require
 
 **Built 2026-09-30**: `YamlTree` over `YamlLines`, which keeps each line's own ending and a byte-order mark, so joining the lines gives the document back byte for byte; the node types `YamlMapping`, `YamlEntry`, `YamlSequence`, `YamlItem` and `YamlValue`, each value with its kind, its source text, its closing comment, its extent and its decoded meaning; `YamlTreeParser`; and `YamlScalarDecoder` with its `YamlDecoding` layer.
 Checked against the same corpus after the port: the reader decodes all 385 valid files it accepts exactly as symfony/yaml does.
+
+## Built 2026-09-30 — the writer: narrow edits, new content in the target's own style
+
+**What.** `Formats/Yaml/YamlTreeWriter` makes seven edits over a located tree, string in and string out like `JsonObjectWriter`: replace a single-line scalar, keeping or dropping the comment after it; replace an entry's value; add an entry to a mapping, or to a key holding nothing; insert an item before another or after the last; append a scalar to a block sequence or a one-line flow sequence; and remove an item or an entry with the comment lines directly above it, the dash moving to an item's next key when the removed key opened it.
+An edit the document's shape does not allow is refused, naming the path; removing a mapping's only entry or a sequence's only item is refused too, since what holds it is what should go.
+
+**New content comes from a `YamlFragment`**: an entry, an item or a value taken from a source document, or a scalar entry or item built from its text.
+It is written in the target document's `YamlStyle`, read from the document itself as the unit a nested mapping steps in by, where a sequence's dashes stand against their key, and where an item's content starts after its dash, each the one the document uses most; an inserted item takes its own sequence's dash style where the sequence shows one.
+Nesting steps in by the target's unit rather than the source's, while the further lines of a scalar are shifted with their owner and never rescaled, so a script's own indentation reaches the target unchanged; the comment lines directly above an entry or an item travel with it, and blank lines inside it stay.
+
+**The writer never takes a line break away.** Inserted lines end in the document's line ending, and a last line without one gains it when anything is inserted after it; a removal leaves the remaining lines' endings as they were.
+Found by the corpus run below: keeping a document without a final line break that way, as the first cut did, inserted a template's `run: |` script without its final line break when it became the document's last value, a value sync could never make match the template's.
+
+**Checked** over the same corpus with the production classes: 16,798 edits across nine kinds — adding a key to a job, removing each job key, inserting a step with a nested `with` and a block scalar and a plain `run` step at the start, middle and end of every job, removing each step, raising every action ref, adding an input to every `with` and a `with` block to every step without one, and adding a pattern to every trigger filter — each parsing to exactly the expected data and touching no line outside the edit, with four refusals, all designed: three mappings holding only the entry to remove, one filter written as a string.

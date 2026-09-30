@@ -76,4 +76,54 @@ final readonly class YamlLines
     {
         return $this->endings[$index] !== '';
     }
+
+    /**
+     * The lines with new ones inserted before the given line, each ending in the document's line ending.
+     * Inserted after a last line without a line break, they give it one: a block scalar ending the document would otherwise lose its final line break, and with it part of its value.
+     *
+     * @param list<string> $texts
+     */
+    public function withInserted(int $at, array $texts): self
+    {
+        if ($texts === []) {
+            return $this;
+        }
+
+        $ending = $this->ending();
+        $endings = $this->endings;
+        if ($at === count($this->texts) && $at > 0 && $endings[$at - 1] === '') {
+            $endings[$at - 1] = $ending;
+        }
+        $lines = $this->texts;
+        array_splice($lines, $at, 0, $texts);
+        array_splice($endings, $at, 0, array_fill(0, count($texts), $ending));
+
+        return new self($this->byteOrderMark, $lines, $endings);
+    }
+
+    /** The lines without those from the first given line up to the second; the lines left keep their endings. */
+    public function withRemoved(int $from, int $to): self
+    {
+        $lines = $this->texts;
+        $endings = $this->endings;
+        array_splice($lines, $from, $to - $from);
+        array_splice($endings, $from, $to - $from);
+
+        return new self($this->byteOrderMark, $lines, $endings);
+    }
+
+    /** The lines with one line's text replaced, its ending kept. */
+    public function withLine(int $index, string $text): self
+    {
+        $lines = $this->texts;
+        array_splice($lines, $index, 1, [$text]);
+
+        return new self($this->byteOrderMark, $lines, $this->endings);
+    }
+
+    /** The ending a new line takes: the document's first, or a line feed where no line has one. */
+    private function ending(): string
+    {
+        return array_find($this->endings, static fn(string $ending): bool => $ending !== '') ?? self::LINE_FEED;
+    }
 }

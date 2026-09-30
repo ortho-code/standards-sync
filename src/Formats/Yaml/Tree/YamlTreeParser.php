@@ -120,7 +120,7 @@ final readonly class YamlTreeParser
             throw new RuntimeException(sprintf('Line %d holds a merge key; the YAML reader does not handle merge keys.', $line + 1));
         }
 
-        return new YamlEntry($key[0], $line, $column, $this->value($line, $key[1], $column, true), $opensItem);
+        return new YamlEntry($key[0], $line, $column, $key[1], $this->value($line, $key[1], $column, true), $opensItem);
     }
 
     /** @return array{string, int}|null the key and the column after its colon */

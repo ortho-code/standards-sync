@@ -51,4 +51,54 @@ final class YamlLinesTest extends TestCase
     {
         self::assertSame('a: 1', YamlLines::fromString("\u{FEFF}" . FileContent::fromString('a: 1'))->line(0));
     }
+
+    public function testInsertsLinesWithTheDocumentsFirstEnding(): void
+    {
+        // The carriage returns are the point: inserted lines take the ending the document already uses.
+        self::assertSame("a: 1\r\nb: 2\r\nc: 3\r\n", YamlLines::fromString("a: 1\r\nc: 3\r\n")->withInserted(1, ['b: 2'])->toString());
+    }
+
+    public function testInsertingAfterALastLineWithoutABreakGivesItOne(): void
+    {
+        self::assertSame(
+            FileContent::fromString(
+                <<<'YAML'
+                    a: 1
+                    b: 2
+                    YAML,
+            ),
+            YamlLines::fromString('a: 1')->withInserted(1, ['b: 2'])->toString(),
+        );
+    }
+
+    public function testRemovingALastLineWithoutABreakKeepsTheNewLastLinesBreak(): void
+    {
+        $lines = YamlLines::fromString(
+            <<<'YAML'
+                a: 1
+                b: 2
+                YAML,
+        );
+
+        self::assertSame(FileContent::fromString('a: 1'), $lines->withRemoved(1, 2)->toString());
+    }
+
+    public function testRemovesLinesInTheMiddle(): void
+    {
+        $lines = YamlLines::fromString(FileContent::fromString(
+            <<<'YAML'
+                a: 1
+                b: 2
+                c: 3
+                YAML,
+        ));
+
+        self::assertSame(FileContent::fromString('a: 1'), $lines->withRemoved(1, 3)->toString());
+    }
+
+    public function testReplacesALineKeepingItsEnding(): void
+    {
+        // The carriage return is the point: the replaced line keeps its own ending.
+        self::assertSame("a: 2\r\nb: 2\n", YamlLines::fromString("a: 1\r\nb: 2\n")->withLine(0, 'a: 2')->toString());
+    }
 }
