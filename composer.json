@@ -14,7 +14,8 @@
     "composer-runtime-api": "^2.1",
     "composer/semver": "^3.4",
     "symfony/console": "^8.1",
-    "symfony/filesystem": "^8.1"
+    "symfony/filesystem": "^8.1",
+    "symfony/yaml": "^8.1"
   },
   "require-dev": {
     "ortho-code/coding-standards": "^0.3",
@@ -23,7 +24,6 @@
     "nette/neon": "^3.4",
     "phpunit/phpunit": "^13",
     "rector/rector": "^2.5",
-    "symfony/yaml": "^8.1",
     "symplify/easy-coding-standard": "^13.3.2",
     "vimeo/psalm": "^6.14",
     "phpstan/phpstan": "^2.2",

@@ -22,7 +22,7 @@ The project documentation and its design record, in two genres: the pages in thi
 ## History
 
 - [history/rule-model.md](history/rule-model.md) — the rule-based model's trail: the original direction, the contract decisions (R0–R2), the cross-family decisions, and the build sequence.
-- The tool families' decision records: [phpstan](history/phpstan-family.md), [rector](history/rector-family.md), [ecs](history/ecs-family.md), [psalm](history/psalm-family.md), [composer](history/composer-family.md), [deptrac](history/deptrac-family.md), [renovate](history/renovate-family.md), [phpunit](history/phpunit-family.md).
+- The tool families' decision records: [phpstan](history/phpstan-family.md), [rector](history/rector-family.md), [ecs](history/ecs-family.md), [psalm](history/psalm-family.md), [composer](history/composer-family.md), [deptrac](history/deptrac-family.md), [renovate](history/renovate-family.md), [phpunit](history/phpunit-family.md), [github workflow](history/github-workflow-family.md).
 - [history/distribution.md](history/distribution.md) — the naming and release decisions.
 - [history/prior-approaches.md](history/prior-approaches.md) — the three earlier takes on this tool and what not to repeat.
 - [history/prior-art.md](history/prior-art.md) — how other ecosystems solved this (copier/cruft, projen, mrm, renovate) and the alternatives they suggest.

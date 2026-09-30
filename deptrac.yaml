@@ -15,10 +15,19 @@ deptrac:
     # Format-editing machinery shared across rule families (neon today); the engine stays format-blind.
     - name: Formats
       collectors:
-        - type: directory
-          value: src/Formats/.*
+        - type: bool
+          must:
+            - type: classNameRegex
+              value: '#^OrthoCode\\StandardsSync\\Formats\\#'
+          must_not:
+            - type: classNameRegex
+              value: '#^OrthoCode\\StandardsSync\\Formats\\Yaml\\Tree\\YamlScalarDecoder$#'
+    # The one Formats class allowed vendor code: symfony/yaml decodes a single value from its own text, never a whole document, whose reading of a value can depend on what surrounds it.
+    # Scoped to that class so every other Formats class stays provably vendor-free.
+    - name: YamlDecoding
+      collectors:
         - type: classNameRegex
-          value: '#^OrthoCode\\StandardsSync\\Formats\\#'
+          value: '#^OrthoCode\\StandardsSync\\Formats\\Yaml\\Tree\\YamlScalarDecoder$#'
     # The shipped rule library: concrete rules per mechanism (Block) or per tool (PhpStan), built on the Core contract.
     # Core must never reference a concrete rule; the reverse edge is the open/closed promise, checked.
     - name: Rules
@@ -84,6 +93,9 @@ deptrac:
       - Vendor
     Formats:
       - Core
+      - YamlDecoding
+    YamlDecoding:
+      - Vendor
     Rules:
       - Core
       - Formats

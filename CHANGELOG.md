@@ -16,6 +16,8 @@ A neon list whose entries sit at the section's own indentation no longer loses t
 
 **For rule authors:** two rule classes contributing to one list in one file are refused when the plan is built, naming both.
 
+**A new dependency:** installing the engine now also installs `symfony/yaml` (`^8.1`), with which the engine's YAML reader decodes single values.
+
 The installed package no longer carries this repository's own tool configs, `standards-sync.php` or `standards-sync.lock`: an install is now `bin/`, `src/`, the manifest, the licence, the readme and this changelog.
 
 ## 0.3.0 — 2026-09-29
