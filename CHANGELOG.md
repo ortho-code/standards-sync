@@ -2,7 +2,7 @@
 
 What changed in each release, for the projects consuming the standard through an org package.
 
-## Unreleased
+## 0.4.0 — 2026-09-30
 
 **New: `GitHubWorkflow`, which keeps a declared GitHub Actions workflow in a project's workflow file.** Every key, job and step the standard declares must be there, and whatever the project adds stays: its own steps, inputs, triggers, filters, conditions and jobs.
 GitHub's other spellings of a declared value count as it: `on: [push]` for a declared `push` trigger, a single string for a one-item list, an environment's name for its mapping, a condition with or without `${{ }}`.
