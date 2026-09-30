@@ -47,3 +47,9 @@ The design phase, run the same day over the verified surface above. Two rules, b
 **Built 2026-08-14**, as designed — all suites and deptrac green on the first run, `XmlElementWriter` reused without any change (the cross-family reuse the promotion predicted, the ECS-for-`FluentChainWriter` result repeated on XML). Build notes: `PhpUnitPinnedAttributes::apply()` has no compliant branch — the writer's byte-identity early-return serves rewriting, normalizing, inserting and leaving alike (the psalm floor's shape); the unit catalog additionally pins that a spelling phpunit happens to read correctly (`TRUE`) normalizes too, and that the trap clause stays off a deviation between recognized spellings (`false` where `true` is required). The Family converge fixture carries a consumer comment above the root tag, riding the writer's comment-skip.
 
 **Wired 2026-08-14** — verified live in the test consumers. Verified tool fact found at wiring: a consumer *without* a `tests/` directory fails the check loudly (exit 2, "Test directory … not found"), but an existing-but-empty `tests/` directory passes with "No tests executed!" and exit 0 — `failOnEmptyTestSuite` is the flag that closes that hole (verified live: an empty suite then exits 1).
+
+### Lifted 2026-09-30 — the dev pin back to `^13`
+
+Psalm 6.17.0 (2026-09-10) widened its `sebastian/diff` requirement to `^9.0`, which is what phpunit 13 needs, so the conflict behind the engine's `^12` dev pin is gone and the pin lifts as the entry above said it would.
+Verified by installing phpunit 13.3.6 beside psalm 6.19.1 and `sebastian/diff` 9: the full check aggregate, deptrac and `composer validate --strict` pass, and `phpunit --validate-configuration` accepts the engine's config.
+The same fact frees an org's requirement floor: a tool set carrying `vimeo/psalm: ^6` and `phpunit/phpunit: ^13` now installs on PHP 8.5.

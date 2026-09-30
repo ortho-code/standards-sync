@@ -21,7 +21,7 @@
     "colinodell/json5": "^3.0",
     "deptrac/deptrac": "^4",
     "nette/neon": "^3.4",
-    "phpunit/phpunit": "^12",
+    "phpunit/phpunit": "^13",
     "rector/rector": "^2.5",
     "symfony/yaml": "^8.1",
     "symplify/easy-coding-standard": "^13.3",
