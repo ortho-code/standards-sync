@@ -1,4 +1,3 @@
-# >>> ortho-code - managed >>>
 name: Coding standards
 
 on:
@@ -13,22 +12,29 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
+        id: checkout
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
           coverage: none
+        id: setup-php
       - uses: ramsey/composer-install@v4
+        id: install
       - run: composer app-checks
+        id: checks
   lowest:
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
+        id: checkout
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
           coverage: none
+        id: setup-php
       - uses: ramsey/composer-install@v4
         with:
           dependency-versions: lowest
+        id: install
       - run: composer app-run-tests
-# <<< ortho-code <<<
+        id: tests

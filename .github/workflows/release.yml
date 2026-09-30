@@ -1,4 +1,3 @@
-# >>> ortho-code - managed >>>
 name: Release
 
 # Tag-driven, because a release should be a deliberate act rather than a side effect of pushing.
@@ -14,6 +13,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7
+        id: checkout
       # The release notes ARE the changelog entry, not a generated commit list: the changelog is written for the people consuming the package, and a commit list is not.
       # Extracts the section for this tag — everything from its own heading up to the next one.
       - run: |
@@ -32,4 +32,4 @@ jobs:
           gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md
         env:
           GH_TOKEN: ${{ github.token }}
-# <<< ortho-code <<<
+        id: release
