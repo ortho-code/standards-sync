@@ -19,7 +19,7 @@ final class SyncFixtureTesterTest extends TestCase
     public function testFailsLoudWhenASyncedXmlFileIsNotWellFormed(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The synced ./broken.xml is not well-formed XML');
+        $this->expectExceptionMessageIsOrContains('The synced ./broken.xml is not well-formed XML');
 
         (new SyncFixtureTester())->diff(__DIR__ . '/fixtures/broken-xml');
     }

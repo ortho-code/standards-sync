@@ -34,7 +34,7 @@ final class XmlValidatorTest extends TestCase
     public function testFailsLoudOnMalformedXml(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The synced ./broken.xml is not well-formed XML');
+        $this->expectExceptionMessageIsOrContains('The synced ./broken.xml is not well-formed XML');
 
         new XmlValidator()->assertValid('./broken.xml', FileContent::fromString('<foo><bar></foo>'));
     }

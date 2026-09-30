@@ -438,7 +438,7 @@ final class FluentChainWriterTest extends TestCase
     public function testRefusesABlockCommentThatNeverCloses(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A block comment in the config never closes');
+        $this->expectExceptionMessageIsOrContains('A block comment in the config never closes');
 
         FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets([ /* open', 'withSets', '\'a.php\'');
     }
@@ -500,7 +500,7 @@ final class FluentChainWriterTest extends TestCase
     public function testRefusesToAppendWithoutATerminatedStatement(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('terminated statement');
+        $this->expectExceptionMessageIsOrContains('terminated statement');
 
         FluentChainWriter::ensureArrayEntry(FileContent::fromString('return RectorConfig::configure()'), 'withSets', '\'a.php\'');
     }
@@ -508,7 +508,7 @@ final class FluentChainWriterTest extends TestCase
     public function testRefusesASingleLineArray(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('one entry per line');
+        $this->expectExceptionMessageIsOrContains('one entry per line');
 
         FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets([\'a.php\']);', 'withSets', '\'b.php\'');
     }
@@ -516,7 +516,7 @@ final class FluentChainWriterTest extends TestCase
     public function testRefusesANonArrayArgument(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('not an array');
+        $this->expectExceptionMessageIsOrContains('not an array');
 
         FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets($sets);', 'withSets', '\'a.php\'');
     }
@@ -524,7 +524,7 @@ final class FluentChainWriterTest extends TestCase
     public function testRefusesACallThatNeverCloses(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('never closes');
+        $this->expectExceptionMessageIsOrContains('never closes');
 
         FluentChainWriter::ensureArrayEntry('return RectorConfig::configure()->withSets([;', 'withSets', '\'a.php\'');
     }

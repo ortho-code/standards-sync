@@ -28,7 +28,7 @@ final class GitHubWorkflowTest extends TestCase
     public function testRefusesADeclaredStepMovedBeforeTheOneDeclaredBeforeIt(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The job "checks" runs the step "setup" before "checkout", which the standard declares first; move "setup" after "checkout" and sync again.');
+        $this->expectExceptionMessageIs('The job "checks" runs the step "setup" before "checkout", which the standard declares first; move "setup" after "checkout" and sync again.');
 
         self::rule()->apply(FileContent::fromString(
             <<<'YAML'
@@ -46,7 +46,7 @@ final class GitHubWorkflowTest extends TestCase
     public function testRefusesAShapeSyncCannotEditIntoTheDeclaredOne(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('It has "jobs" as a list where the standard declares a mapping; write it as a mapping and sync again.');
+        $this->expectExceptionMessageIs('It has "jobs" as a list where the standard declares a mapping; write it as a mapping and sync again.');
 
         self::rule()->apply(FileContent::fromString('jobs: [checks]'));
     }
@@ -54,7 +54,7 @@ final class GitHubWorkflowTest extends TestCase
     public function testRejectsADeclaredStepWithoutAnId(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The declared step 2 of the job "checks" has no id');
+        $this->expectExceptionMessageIsOrContains('The declared step 2 of the job "checks" has no id');
 
         DeclaredWorkflow::fromString(FileContent::fromString(
             <<<'YAML'
@@ -71,7 +71,7 @@ final class GitHubWorkflowTest extends TestCase
     public function testRejectsAStepIdItsJobDeclaresTwice(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The job "checks" declares the step id "checks" twice.');
+        $this->expectExceptionMessageIs('The job "checks" declares the step id "checks" twice.');
 
         DeclaredWorkflow::fromString(FileContent::fromString(
             <<<'YAML'
@@ -89,7 +89,7 @@ final class GitHubWorkflowTest extends TestCase
     public function testRejectsAWorkflowTheReaderRefuses(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The declared workflow cannot be read: Line 1 holds an anchor');
+        $this->expectExceptionMessageIsOrContains('The declared workflow cannot be read: Line 1 holds an anchor');
 
         DeclaredWorkflow::fromString(FileContent::fromString('name: &name Checks'));
     }
@@ -287,7 +287,7 @@ final class GitHubWorkflowTest extends TestCase
     public function testRefusesWhenTheOnlyStepToAdoptRunsBeforeTheOneDeclaredBeforeIt(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The job "checks" runs the step "setup" before "checkout", which the standard declares first');
+        $this->expectExceptionMessageIsOrContains('The job "checks" runs the step "setup" before "checkout", which the standard declares first');
 
         self::rule()->apply(FileContent::fromString(
             <<<'YAML'

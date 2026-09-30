@@ -17,7 +17,7 @@ final class ComposerScriptTest extends TestCase
     public function testRefusesAScriptWithoutAName(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('needs a name');
+        $this->expectExceptionMessageIsOrContains('needs a name');
 
         new ComposerScript(name: ' ', commands: ['vendor/bin/standards-sync sync --check']);
     }
@@ -25,7 +25,7 @@ final class ComposerScriptTest extends TestCase
     public function testRefusesAScriptWithoutCommands(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('needs at least one command');
+        $this->expectExceptionMessageIsOrContains('needs at least one command');
 
         new ComposerScript(name: 'app-check-standards', commands: []);
     }
@@ -123,7 +123,7 @@ final class ComposerScriptTest extends TestCase
     public function testRefusesToMergeADeclarationOfAnotherScript(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Only declarations of the composer script "app-checks" merge into it.');
+        $this->expectExceptionMessageIs('Only declarations of the composer script "app-checks" merge into it.');
 
         new ComposerScript(name: 'app-checks', commands: ['@app-sync-check'])
             ->withMerged(new ComposerScript(name: 'app-lint', commands: ['@app-sync-check']));

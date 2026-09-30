@@ -30,7 +30,7 @@ final class NeonValidatorTest extends TestCase
     public function testFailsLoudOnBrokenNeon(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The synced ./phpstan.neon is not valid neon');
+        $this->expectExceptionMessageIsOrContains('The synced ./phpstan.neon is not valid neon');
 
         $content = FileContent::fromString(
             <<<'NEON'
@@ -59,7 +59,7 @@ final class NeonValidatorTest extends TestCase
     public function testFailsLoudWhenTheParserIsMissing(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('install nette/neon');
+        $this->expectExceptionMessageIsOrContains('install nette/neon');
 
         $content = FileContent::fromString(
             <<<'NEON'

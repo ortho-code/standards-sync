@@ -42,7 +42,7 @@ final class PinnedAttributeTest extends TestCase
     public function testRejectsANameThatIsNoXmlAttributeName(string $name): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('is not an XML attribute name');
+        $this->expectExceptionMessageIsOrContains('is not an XML attribute name');
 
         PinnedAttribute::fromNameAndValue($name, true);
     }
@@ -59,7 +59,7 @@ final class PinnedAttributeTest extends TestCase
     public function testRejectsAnEmptyValue(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('cannot be empty');
+        $this->expectExceptionMessageIsOrContains('cannot be empty');
 
         PinnedAttribute::fromNameAndValue('failOnWarning', '');
     }

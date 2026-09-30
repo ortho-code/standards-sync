@@ -379,7 +379,7 @@ final class YamlTreeTest extends TestCase
     public function testRefusesWhatItDoesNotHandle(string $content, string $message): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage($message);
+        $this->expectExceptionMessageIsOrContains($message);
 
         YamlTree::fromString($content);
     }

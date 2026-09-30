@@ -81,7 +81,7 @@ final class ComposerRequirementTest extends TestCase
     public function testRefusesAConstraintTheManifestWritesThatComposerCannotParse(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('requires phpstan/phpstan at "not a constraint" in require-dev, which is not a version constraint composer can parse');
+        $this->expectExceptionMessageIsOrContains('requires phpstan/phpstan at "not a constraint" in require-dev, which is not a version constraint composer can parse');
 
         self::rule()->apply(self::manifest('{"require-dev": {"phpstan/phpstan": "not a constraint"}}'));
     }

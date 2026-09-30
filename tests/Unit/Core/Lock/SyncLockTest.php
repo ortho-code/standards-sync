@@ -113,7 +113,7 @@ final class SyncLockTest extends TestCase
     public function testRefusesALockItDidNotWrite(string $json): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"./standards-sync.lock" is not a lock standards-sync wrote; delete it and sync again to rewrite it.');
+        $this->expectExceptionMessageIs('"./standards-sync.lock" is not a lock standards-sync wrote; delete it and sync again to rewrite it.');
 
         SyncLock::fromJson($json, Path::fromString('./standards-sync.lock'));
     }
@@ -121,7 +121,7 @@ final class SyncLockTest extends TestCase
     public function testRefusesInvalidJson(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"./standards-sync.lock" is not valid JSON');
+        $this->expectExceptionMessageIsOrContains('"./standards-sync.lock" is not valid JSON');
 
         SyncLock::fromJson('{', Path::fromString('./standards-sync.lock'));
     }

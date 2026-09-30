@@ -245,7 +245,7 @@ final class BlockListWriterTest extends TestCase
         );
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The "includes:" section is not a block list');
+        $this->expectExceptionMessageIsOrContains('The "includes:" section is not a block list');
 
         self::writer()->ensureEntry($content, 'includes', 'vendor/other/phpstan.neon');
     }
@@ -260,7 +260,7 @@ final class BlockListWriterTest extends TestCase
         );
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The "includes:" section holds a value rather than a block list');
+        $this->expectExceptionMessageIsOrContains('The "includes:" section holds a value rather than a block list');
 
         self::writer()->ensureEntry($content, 'includes', 'vendor/acme/standards/strict.neon');
     }

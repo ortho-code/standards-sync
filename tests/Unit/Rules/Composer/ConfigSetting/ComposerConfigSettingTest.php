@@ -27,7 +27,7 @@ final class ComposerConfigSettingTest extends TestCase
     public function testRefusesASettingWithAnEmptySegment(string $setting): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('every segment of a dotted name needs a key');
+        $this->expectExceptionMessageIsOrContains('every segment of a dotted name needs a key');
 
         new ComposerConfigSetting(setting: $setting, value: true);
     }

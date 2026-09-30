@@ -62,7 +62,7 @@ final class PathTest extends TestCase
     public function testFromRelativeStringRejectsAnAbsolutePath(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A path must be relative; got "/etc/phpstan.neon".');
+        $this->expectExceptionMessageIs('A path must be relative; got "/etc/phpstan.neon".');
 
         Path::fromRelativeString('/etc/phpstan.neon');
     }

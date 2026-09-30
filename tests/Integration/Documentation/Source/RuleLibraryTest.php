@@ -24,7 +24,7 @@ final class RuleLibraryTest extends IntegrationTestCase
             PHP));
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not resolve to a loadable type');
+        $this->expectExceptionMessageIsOrContains('does not resolve to a loadable type');
 
         RuleLibrary::fromDirectory(
             $this->workspace() . '/library',

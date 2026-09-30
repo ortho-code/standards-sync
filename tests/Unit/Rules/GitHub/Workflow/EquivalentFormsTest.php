@@ -91,7 +91,7 @@ final class EquivalentFormsTest extends TestCase
     public function testRefusesASingleValueWhereMoreAreDeclared(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('It has "jobs.checks.needs" as a single value where the standard declares a list; write it as a list and sync again.');
+        $this->expectExceptionMessageIs('It has "jobs.checks.needs" as a single value where the standard declares a list; write it as a list and sync again.');
 
         self::rule(self::job('needs: [build, lint]'))->apply(self::job('needs: build'));
     }
@@ -99,7 +99,7 @@ final class EquivalentFormsTest extends TestCase
     public function testRefusesTriggersAsAListWhereADeclaredOneIsFiltered(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('It has "on" as a list where the standard declares a mapping; write it as a mapping and sync again.');
+        $this->expectExceptionMessageIs('It has "on" as a list where the standard declares a mapping; write it as a mapping and sync again.');
 
         self::rule(FileContent::fromString(
             <<<'YAML'

@@ -69,7 +69,7 @@ final class YamlTreeWriterTest extends TestCase
     public function testRefusesToReplaceABlockScalarInPlace(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"run" does not hold a single-line scalar');
+        $this->expectExceptionMessageIsOrContains('"run" does not hold a single-line scalar');
 
         YamlTreeWriter::replaceScalar(FileContent::fromString(
             <<<'YAML'
@@ -82,7 +82,7 @@ final class YamlTreeWriterTest extends TestCase
     public function testRefusesAPathThatLeadsNowhere(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"steps.0.uses" leads to no value');
+        $this->expectExceptionMessageIsOrContains('"steps.0.uses" leads to no value');
 
         YamlTreeWriter::replaceScalar(FileContent::fromString('steps: []'), ['steps', 0, 'uses'], 'a');
     }
@@ -274,7 +274,7 @@ final class YamlTreeWriterTest extends TestCase
     public function testRefusesToAddAnEntryToAScalar(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"a" holds neither a block mapping nor nothing');
+        $this->expectExceptionMessageIsOrContains('"a" holds neither a block mapping nor nothing');
 
         YamlTreeWriter::addEntry(FileContent::fromString('a: 1'), ['a'], YamlFragment::fromScalarEntry('b', '2'));
     }
@@ -418,7 +418,7 @@ final class YamlTreeWriterTest extends TestCase
     public function testRefusesToAppendToAString(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"branches" holds neither a block sequence nor a flow sequence on one line');
+        $this->expectExceptionMessageIsOrContains('"branches" holds neither a block sequence nor a flow sequence on one line');
 
         YamlTreeWriter::appendScalarItem(FileContent::fromString('branches: main'), ['branches'], 'master');
     }
@@ -504,7 +504,7 @@ final class YamlTreeWriterTest extends TestCase
     public function testRefusesToRemoveTheOnlyItem(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"steps" holds only this item');
+        $this->expectExceptionMessageIsOrContains('"steps" holds only this item');
 
         YamlTreeWriter::removeItem(FileContent::fromString(
             <<<'YAML'
@@ -558,7 +558,7 @@ final class YamlTreeWriterTest extends TestCase
     public function testRefusesToRemoveTheOnlyEntry(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"job" holds only the entry "steps"');
+        $this->expectExceptionMessageIsOrContains('"job" holds only the entry "steps"');
 
         YamlTreeWriter::removeEntry(FileContent::fromString(
             <<<'YAML'

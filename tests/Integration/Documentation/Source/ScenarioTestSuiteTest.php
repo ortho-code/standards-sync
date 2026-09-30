@@ -30,7 +30,7 @@ final class ScenarioTestSuiteTest extends IntegrationTestCase
         require $file;
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not resolve to a OrthoCode\StandardsSync\Testing\ScenarioTestCase subclass');
+        $this->expectExceptionMessageIsOrContains('does not resolve to a OrthoCode\StandardsSync\Testing\ScenarioTestCase subclass');
 
         ScenarioTestSuite::fromDirectory(
             $this->workspace() . '/suite',

@@ -173,7 +173,7 @@ final class XmlElementWriterTest extends TestCase
     public function testReadingFailsLoudOnAnUnmanageableFile(string $body, string $message): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage($message);
+        $this->expectExceptionMessageIs($message);
 
         XmlElementWriter::readAttribute(FileContent::fromString($body), 'psalm', 'errorLevel');
     }
@@ -181,7 +181,7 @@ final class XmlElementWriterTest extends TestCase
     public function testWritingFailsLoudWithoutAnOpenTag(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('No <psalm> open tag found; the file cannot be managed.');
+        $this->expectExceptionMessageIs('No <psalm> open tag found; the file cannot be managed.');
 
         XmlElementWriter::writeAttribute(FileContent::fromString('<other />'), 'psalm', 'errorLevel', '2');
     }
@@ -420,7 +420,7 @@ final class XmlElementWriterTest extends TestCase
         );
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('"%s" would need entity encoding', $needsEncoding));
+        $this->expectExceptionMessageIsOrContains(sprintf('"%s" would need entity encoding', $needsEncoding));
 
         XmlElementWriter::writeAttribute($content, 'psalm', 'autoloader', $value);
     }
@@ -435,7 +435,7 @@ final class XmlElementWriterTest extends TestCase
         );
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('"\'" would need entity encoding');
+        $this->expectExceptionMessageIsOrContains('"\'" would need entity encoding');
 
         XmlElementWriter::writeAttribute($content, 'psalm', 'autoloader', 'it\'s.php');
     }

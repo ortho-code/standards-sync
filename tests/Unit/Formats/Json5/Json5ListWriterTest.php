@@ -420,7 +420,7 @@ final class Json5ListWriterTest extends TestCase
     public function testRefusesContentThatIsNotAnObject(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not hold a JSON5 object');
+        $this->expectExceptionMessageIsOrContains('does not hold a JSON5 object');
 
         Json5ListWriter::ensureEntry(FileContent::fromString('[]'), 'extends', self::ENTRY);
     }
@@ -428,7 +428,7 @@ final class Json5ListWriterTest extends TestCase
     public function testRefusesADuplicateKey(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('sets "extends" more than once');
+        $this->expectExceptionMessageIsOrContains('sets "extends" more than once');
 
         Json5ListWriter::ensureEntry(FileContent::fromString('{ extends: [], "extends": [] }'), 'extends', self::ENTRY);
     }
@@ -436,7 +436,7 @@ final class Json5ListWriterTest extends TestCase
     public function testRefusesAKeyThatHoldsNoList(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"extends" does not hold a list');
+        $this->expectExceptionMessageIsOrContains('"extends" does not hold a list');
 
         Json5ListWriter::ensureEntry(FileContent::fromString('{ extends: true }'), 'extends', self::ENTRY);
     }
@@ -444,7 +444,7 @@ final class Json5ListWriterTest extends TestCase
     public function testRefusesAStringThatNeverCloses(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A JSON5 string never closes');
+        $this->expectExceptionMessageIsOrContains('A JSON5 string never closes');
 
         Json5ListWriter::ensureEntry(
             FileContent::fromString(
@@ -460,7 +460,7 @@ final class Json5ListWriterTest extends TestCase
     public function testRefusesACommentThatNeverCloses(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A JSON5 comment never closes');
+        $this->expectExceptionMessageIsOrContains('A JSON5 comment never closes');
 
         Json5ListWriter::ensureEntry(
             FileContent::fromString(

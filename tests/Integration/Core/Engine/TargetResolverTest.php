@@ -53,7 +53,7 @@ final class TargetResolverTest extends TestCase
     {
         // If the directory name counted, this would resolve with a preference instead of refusing two same-side files.
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Both "/a/dist/a.conf" and "/a/etc/a.conf" exist for one target; remove all but one.');
+        $this->expectExceptionMessageIs('Both "/a/dist/a.conf" and "/a/etc/a.conf" exist for one target; remove all but one.');
 
         $this->resolver([
             '/a/dist/a.conf' => FileContent::fromString('one'),
@@ -64,7 +64,7 @@ final class TargetResolverTest extends TestCase
     public function testDistInsideASegmentIsNotADistVariant(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Both "/a/distribution.neon" and "/a/phpstan.neon" exist for one target; remove all but one.');
+        $this->expectExceptionMessageIs('Both "/a/distribution.neon" and "/a/phpstan.neon" exist for one target; remove all but one.');
 
         $this->resolver([
             '/a/distribution.neon' => FileContent::fromString('one'),
@@ -76,7 +76,7 @@ final class TargetResolverTest extends TestCase
     public function testTwoRenovateGrammarsRefuse(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Both "/a/renovate.json" and "/a/renovate.json5" exist for one target; remove all but one.');
+        $this->expectExceptionMessageIs('Both "/a/renovate.json" and "/a/renovate.json5" exist for one target; remove all but one.');
 
         $this->resolver([
             '/a/renovate.json' => FileContent::fromString('{}'),

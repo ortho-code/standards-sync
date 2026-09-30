@@ -146,7 +146,7 @@ final class PhpUnitPinnedAttributesTest extends TestCase
     public function testRefusesAnEmptySet(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('At least one attribute');
+        $this->expectExceptionMessageIsOrContains('At least one attribute');
 
         new PhpUnitPinnedAttributes(attributes: []);
     }

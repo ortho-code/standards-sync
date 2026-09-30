@@ -23,7 +23,7 @@ final class RenovateExtendedPresetTest extends TestCase
     public function testRefusesAnEmptyPresetReference(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A preset reference is one non-empty line.');
+        $this->expectExceptionMessageIs('A preset reference is one non-empty line.');
 
         new RenovateExtendedPreset(preset: ' ');
     }
@@ -31,7 +31,7 @@ final class RenovateExtendedPresetTest extends TestCase
     public function testRefusesAMultiLinePresetReference(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A preset reference is one non-empty line.');
+        $this->expectExceptionMessageIs('A preset reference is one non-empty line.');
 
         // The line break is the input being refused rather than file content, so it stays an escape.
         new RenovateExtendedPreset(preset: "a\nb");
@@ -40,7 +40,7 @@ final class RenovateExtendedPresetTest extends TestCase
     public function testRefusesAnEmptyComment(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A rule comment is one non-empty line.');
+        $this->expectExceptionMessageIs('A rule comment is one non-empty line.');
 
         new RenovateExtendedPreset(preset: self::PRESET, comment: ' ');
     }
@@ -135,7 +135,7 @@ final class RenovateExtendedPresetTest extends TestCase
     public function testRefusesAJsoncCandidate(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"renovate.jsonc" is a JSONC config, which this standard does not manage');
+        $this->expectExceptionMessageIsOrContains('"renovate.jsonc" is a JSONC config, which this standard does not manage');
 
         new RenovateExtendedPreset(preset: self::PRESET)->applyAt(Path::fromString('renovate.jsonc'), FileContent::fromString('{}'));
     }
@@ -152,7 +152,7 @@ final class RenovateExtendedPresetTest extends TestCase
         );
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"renovate.json" is not strict JSON');
+        $this->expectExceptionMessageIsOrContains('"renovate.json" is not strict JSON');
 
         new RenovateExtendedPreset(preset: self::PRESET)->applyAt(Path::fromString('renovate.json'), $content);
     }
@@ -167,7 +167,7 @@ final class RenovateExtendedPresetTest extends TestCase
         );
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('".renovaterc" is not strict JSON');
+        $this->expectExceptionMessageIsOrContains('".renovaterc" is not strict JSON');
 
         new RenovateExtendedPreset(preset: self::PRESET)->applyAt(Path::fromString('.renovaterc'), $content);
     }

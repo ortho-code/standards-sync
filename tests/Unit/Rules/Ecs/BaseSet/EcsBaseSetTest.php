@@ -198,7 +198,7 @@ final class EcsBaseSetTest extends TestCase
     public function testRefusesACallableStyleConfig(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('fluent form');
+        $this->expectExceptionMessageIsOrContains('fluent form');
 
         $this->rule()->apply(FileContent::fromString(
             <<<'PHP'
@@ -219,7 +219,7 @@ final class EcsBaseSetTest extends TestCase
     public function testRefusesAnIncludeChainConfig(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('fluent form');
+        $this->expectExceptionMessageIsOrContains('fluent form');
 
         $this->rule()->apply(FileContent::fromString(
             <<<'PHP'
@@ -238,7 +238,7 @@ final class EcsBaseSetTest extends TestCase
     public function testRefusesASingleLineSetsArray(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('one entry per line');
+        $this->expectExceptionMessageIsOrContains('one entry per line');
 
         $this->rule()->apply(FileContent::fromString('return ECSConfig::configure()->withSets([SetList::PSR_12]);'));
     }
@@ -254,7 +254,7 @@ final class EcsBaseSetTest extends TestCase
     public function testRejectsAnExpressionAsTheSetPath(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('relative path');
+        $this->expectExceptionMessageIsOrContains('relative path');
 
         new EcsBaseSet(set: '__DIR__ . \'/vendor/acme/standards/config/ecs.php\'');
     }
@@ -262,7 +262,7 @@ final class EcsBaseSetTest extends TestCase
     public function testRejectsAnAbsoluteSetPath(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('relative');
+        $this->expectExceptionMessageIsOrContains('relative');
 
         new EcsBaseSet(set: '/vendor/acme/standards/config/ecs.php');
     }

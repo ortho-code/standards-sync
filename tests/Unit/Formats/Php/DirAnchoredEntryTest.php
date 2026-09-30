@@ -26,7 +26,7 @@ final class DirAnchoredEntryTest extends TestCase
     public function testRefusesExpressionTextInThePath(string $path): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('plain relative path');
+        $this->expectExceptionMessageIsOrContains('plain relative path');
 
         DirAnchoredEntry::fromRelativeString($path);
     }
@@ -42,7 +42,7 @@ final class DirAnchoredEntryTest extends TestCase
     public function testRefusesAnAbsolutePath(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('relative');
+        $this->expectExceptionMessageIsOrContains('relative');
 
         DirAnchoredEntry::fromRelativeString('/vendor/acme/rector.php');
     }

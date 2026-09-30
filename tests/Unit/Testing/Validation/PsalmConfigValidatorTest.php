@@ -41,7 +41,7 @@ final class PsalmConfigValidatorTest extends TestCase
     public function testFailsLoudOnASchemaViolation(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('violates the psalm config schema');
+        $this->expectExceptionMessageIsOrContains('violates the psalm config schema');
 
         new PsalmConfigValidator()->assertValid('./psalm.xml', FileContent::fromString('<psalm errorLevel="4"><bogus /></psalm>'));
     }
@@ -49,7 +49,7 @@ final class PsalmConfigValidatorTest extends TestCase
     public function testFailsLoudWhenPsalmIsMissing(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('install vimeo/psalm');
+        $this->expectExceptionMessageIsOrContains('install vimeo/psalm');
 
         new PsalmConfigValidator(psalmInstalled: false)->assertValid('./psalm.xml', FileContent::fromString('<psalm errorLevel="4" />'));
     }

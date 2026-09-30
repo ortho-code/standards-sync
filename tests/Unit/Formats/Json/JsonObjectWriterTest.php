@@ -48,7 +48,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testRefusesToReadANonStringAsAString(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"config.sort-packages" does not hold a string');
+        $this->expectExceptionMessageIsOrContains('"config.sort-packages" does not hold a string');
 
         JsonObjectWriter::read(self::manifest(), ['config', 'sort-packages']);
     }
@@ -94,7 +94,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testRefusesToReadANonListAsAList(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"config.sort-packages" does not hold a string or a list of strings');
+        $this->expectExceptionMessageIsOrContains('"config.sort-packages" does not hold a string or a list of strings');
 
         JsonObjectWriter::readList(self::manifest(), ['config', 'sort-packages']);
     }
@@ -534,7 +534,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testRefusesMalformedJson(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('is not valid JSON');
+        $this->expectExceptionMessageIsOrContains('is not valid JSON');
 
         JsonObjectWriter::read('{"name": }', ['name']);
     }
@@ -542,7 +542,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testRefusesARootThatIsNotAnObject(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not hold a JSON object');
+        $this->expectExceptionMessageIsOrContains('does not hold a JSON object');
 
         JsonObjectWriter::read('["a"]', ['name']);
     }
@@ -550,7 +550,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testRefusesToWriteBeneathANonObject(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"name" does not hold an object');
+        $this->expectExceptionMessageIsOrContains('"name" does not hold an object');
 
         JsonObjectWriter::write(self::manifest(), ['name', 'nested'], 'x');
     }
@@ -569,7 +569,7 @@ final class JsonObjectWriterTest extends TestCase
         );
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('sets "phpstan/phpstan" more than once');
+        $this->expectExceptionMessageIsOrContains('sets "phpstan/phpstan" more than once');
 
         JsonObjectWriter::read($content, ['require-dev', 'phpstan/phpstan']);
     }
@@ -660,7 +660,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testEnsureListEntryRefusesANonListMember(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"extends" does not hold a list');
+        $this->expectExceptionMessageIsOrContains('"extends" does not hold a list');
 
         JsonObjectWriter::ensureListEntry(FileContent::fromString('{ "extends": true }'), ['extends'], 'a');
     }
@@ -765,7 +765,7 @@ final class JsonObjectWriterTest extends TestCase
     public function testRemoveListEntriesRefusesANonListMember(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"extends" does not hold a list');
+        $this->expectExceptionMessageIsOrContains('"extends" does not hold a list');
 
         JsonObjectWriter::removeListEntries(FileContent::fromString('{ "extends": true }'), ['extends'], ['a']);
     }
